@@ -1,4 +1,5 @@
-# 深拷贝
+# js手写实现系列
+## 深拷贝
 JSON.parse(JSON.stringify())的方式无法复制函数等数据类型，因此不是完备的深拷贝
 Object.assign为浅层拷贝，对象深层嵌套时拷贝的是引用
 ```js
@@ -70,7 +71,7 @@ class Demo {
   }
 }
 ```
-# compose函数
+## compose函数
 ```js
 // 传入函数数组，从右向左结合的合并函数
 class Demo {
@@ -88,7 +89,7 @@ class Demo {
   }
 }
 ```
-# LRU缓存机制
+## LRU缓存机制
 LRU (最近最少使用) 缓存机制，命中频次越小越有可能被清理的机制  
 利用原生Map是有序的特性
 ```js
@@ -128,7 +129,7 @@ class LRUCache {
 }
 LRUCache.test();
 ```
-# 可连续调用的sum函数
+## 可连续调用的sum函数
 ```js
 class Demo {
   static sum(...args) {
@@ -146,7 +147,7 @@ class Demo {
 }
 Demo.test();
 ```
-# 简单的querySting编解码
+## 简单的querySting编解码
 解码面临：
   1. 如何使用正则解析 qs
   2. 如何正确转义汉字
@@ -163,7 +164,7 @@ Demo.test();
 ```js
 class Solution {
  static parse(url) {
-   // 一、夹杂在 ? 与 # 之前的字符就是 qs，使用 /\?([^/?#:]+)#?/ 正则来抽取
+   // 一、夹杂在 ? 与 ## 之前的字符就是 qs，使用 /\?([^/?#:]+)#?/ 正则来抽取
    // 使用正则从 URL 中解析出 querystring
    // 二、通过 Optional Chain 来避免空值错误
    const queryString = url.match(/\?([^/?#:]+)#?/)?.[1];
@@ -235,7 +236,7 @@ class Solution {
 }
 Solution.test();
 ```
-# 数组系列操作
+## 数组系列操作
 ```js
 class Solution {
   /**
@@ -262,7 +263,7 @@ class Solution {
 }
 Solution.test()
 ```
-# 0ms的setTimeout
+## 0ms的setTimeout
 现象：
 ```js
 let a = performance.now();

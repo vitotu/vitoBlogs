@@ -254,7 +254,7 @@ registry.register(theObject, "some value"); // thisObject要观察的对象
 ### Proxy  
 Proxy在目标对象之前架设"拦截",修改某些操作的默认行为,属于元编程(对编程语言进行编程)`var proxy = new Proxy(target, handler);`target是要拦截的对象,handler对象定义拦截行为,对返回proxy实例的操作会被相应的拦截.proxy实例作为其他对象的原型时,对该对象操作也会相应的拦截  
   
-Proxy支持get,set,has,deleteProperty,ownKeys,getOwnPropertyDescriptor,defineProperty,preventExtensions,getPrototypeOf,isExtensible,setPrototypeOf,apply,construct一共13中行为  
+Proxy支持get, set, has, deleteProperty, ownKeys, getOwnPropertyDescriptor, defineProperty, preventExtensions, getPrototypeOf, isExtensible, setPrototypeOf, apply, construct 一共13中行为  
   
 `get(target, propKey, receiver)`拦截读取操作,传入目标对象,属性名,Proxy实例操作对象(可选)  
 `set(target, propKey, value, receiver)`拦截某个属性的赋值操作  
