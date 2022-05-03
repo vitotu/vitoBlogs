@@ -49,10 +49,17 @@ Observer对象利用Object.defineProperty()方法对数据进行监听，并借�
 而当视图发生更新时，仅需在compile增加input事件监听，完成数据修改即可
 
 流程图如下：  
-![reactive.png](../../resource/reactive.png)
+![reactive.png](../../resource/reactive.png)  
 
-[参考文档1](https://blog.nowcoder.net/n/8517450fe4fd4220b4078f9c61e42ec1)
-[参考文档2](https://segmentfault.com/a/1190000023824423)
+::: tip
+简单手写实现演示如下：
+<iframe id="reactive-demo" height=80 width=100% frameborder=0 src="/demo/reactive.html"></iframe>
+
+[手写简单实现代码](./reactive.md)  
+:::
+
+[参考文档1](https://blog.nowcoder.net/n/8517450fe4fd4220b4078f9c61e42ec1)  
+[参考文档2](https://segmentfault.com/a/1190000023824423)  
 
 ## computed原理
 computed属性在响应式的基础上增加了缓存，当computed捕获到依赖变化时会将缓存控制位dirty置为true，重新读取computed时会执行get进行重新计算，并将计算值进行缓存，计算完成后翻转dirty状态，方便再次读取时使用缓存  

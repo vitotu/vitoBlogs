@@ -1,6 +1,6 @@
 ---
 home: true
-# heroImage: /proxima.png
+heroImage: /img/proxima.png
 heroText: Vito 的博客
 tagline: 学而知不足，记录学习，分享交流
 # actionText: 快速上手 →
