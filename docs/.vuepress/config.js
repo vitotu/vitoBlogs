@@ -1,17 +1,25 @@
 module.exports = {
   title: 'Vito\'s blog',
   description: 'vito的个人网站',
-  head: [ // 注入到当前页面的 HTML <head> 中的标签
-    ['link', { rel: 'icon', href: '/public/proxima.png' }], // 增加一个自定义的 favicon(网页标签的图标)
-  ],
+  open:true,
+  // head: [ // 注入到当前页面的 HTML <head> 中的标签
+  //   ['link', { rel: 'icon', href: '/proxima.png' }], // 增加一个自定义的 favicon(网页标签的图标)
+  // ],
   base: '/', // 这是部署到github相关的配置
   markdown: {
-    lineNumbers: true // 代码块显示行号
+    lineNumbers: false, // 代码块显示行号
+    toc: {
+      includeLevel: [2, 3]
+    }
   },
   themeConfig: {
     nav:[ // 导航栏配置
-      {text: 'js', link: '/js/' },  
-      {text: 'vue', link: '/vue/'},
+      {text: 'JavaScript', link: '/js/', },  
+      {text: 'Vue', items:[
+        { text:'vue2基础', link:'/vue/vue2base/'},
+        { text:'vue2进阶', link:'/vue/vue2plus/'},
+        { text:'vue3基础', link:'/vue/vue3base/'},
+      ]},
       {text: 'html', link: '/html/'},
       {text: 'css', link: '/css/'},
       {text: '浏览器', link: '/browser/'},
@@ -26,13 +34,5 @@ module.exports = {
     lastUpdated: 'Last Updated',
     // nextLinks: true,
     // prevLinks: true
-  },
-  chainWebpack: (config) => {
-    config.module
-        .rule('url-loader')
-        .test(/\.(webp)(\?.*)?$/)
-        .use('url-loader')
-        .loader('url-loader')
-        .end()
   }
 };

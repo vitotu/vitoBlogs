@@ -289,7 +289,7 @@ js执行是会将对象放在堆(heap)中，将基础变量以及对象的引用
 js还维护了一个执行栈与数据栈意义不同  
 ## 浏览器  
 js重要的运行环境之一浏览器，可能时多进程或单进程的；但浏览器都是多线程的。js是单线程的；  
-不同的浏览器有不同的内核：`chrome,Safari:webkit,firefox:Gecko,IE:Trident等`，这些内核提供了html，css文档解析，dom/css模块在内存中的管理，布局和渲染以及js解释器等模块，chrome和nodejs中的js解释器为v8  
+不同的浏览器有不同的内核：`chrome, Safari:webkit, firefox:Gecko, IE:Trident等`，这些内核提供了html，css文档解析，dom/css模块在内存中的管理，布局和渲染以及js解释器等模块，chrome和nodejs中的js解释器为v8  
 ## 事件循环模型  
 ![avatar](../resource/eventLoop.png)  
 简单理解：  
@@ -484,7 +484,7 @@ console.log(person1)  // Person {name: "Tom", age: 20}
 文档加载相关指标
 ![avatar](https://www.w3.org/TR/navigation-timing-2/timestamp-diagram.svg)  
 * Time to First Byte（TTFB）:浏览器从请求页面开始到接收第一字节的时间，这个时间段内包括 DNS 查找、TCP 连接和 SSL 连接。
-* DomContentLoaded（DCL）:DOMContentLoaded事件触发的时间,html文档完全加载解析后(无需等待样式表、图像、iframe等)
+* DomContentLoaded(DCL): DOMContentLoaded 事件触发的时间, html 文档完全加载解析后(无需等待样式表、图像、iframe等)
 * Load（L）：onLoad 事件触发的时间。页面所有资源都加载完毕后（比如图片，CSS），onLoad 事件才被触发。
 
 内容呈现相关

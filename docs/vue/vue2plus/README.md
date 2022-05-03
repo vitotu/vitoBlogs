@@ -5,7 +5,7 @@ vue2进阶，深入理解vue2的原理
 
 vue2通过数据劫持，利用`Object.defineProperty(target, key, descriptor)`方法，设置get，set拦截读取和设置操作，通过发布订阅模式通知更新实现响应式  
 Vue中双向数据大致可以划分三个模块：Observer、Compile、Watcher，如图：  
-![vueReactive.png](../resource/vueReactive.png)  
+![vueReactive.png](../../resource/vueReactive.png)  
 
 - 数据劫持
 
@@ -49,7 +49,7 @@ Observer对象利用Object.defineProperty()方法对数据进行监听，并借�
 而当视图发生更新时，仅需在compile增加input事件监听，完成数据修改即可
 
 流程图如下：  
-![reactive.png](../resource/reactive.png)
+![reactive.png](../../resource/reactive.png)
 
 [参考文档1](https://blog.nowcoder.net/n/8517450fe4fd4220b4078f9c61e42ec1)
 [参考文档2](https://segmentfault.com/a/1190000023824423)

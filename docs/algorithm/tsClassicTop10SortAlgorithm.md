@@ -75,7 +75,7 @@ SortAlgorithm.test();
 ## NO.2 选择排序法(SelectionSort)
 每次从未排序序列中选择一个最小值(最大值)放入已排序序列的末尾  
 + 图解：  
-![selectionSort.gif](resource/selectionSort.gif)
+![selectionSort.gif](./resource/selectionSort.gif)
 + ts实现：
 ```ts
 // 接上述类的静态方法
@@ -107,7 +107,7 @@ static selectionSort<T>(arr:T[], fn:COMPARE<T>):T[] {
 4. 向左移动target指针(target指向compare的指向的位置)，保持target始终指向本次遍历初始指向的元素
 5. 继续compare的下一次遍历，若不满足步骤3则说明target大于compare前面的元素，直接跳出内层循环，执行步骤2
 + 图解：  
-![insertionSort.gif](resource/insertionSort.gif)
+![insertionSort.gif](./resource/insertionSort.gif)
 + ts实现:
 ```ts
 static insertionSort<T>(arr:T[], fn:COMPARE<T>):T[]{
@@ -142,7 +142,7 @@ shellSort是insertionSort的升级版，算法假定大小不同的数字为均�
 2. 对组内使用插入排序法
 3. 将gap除2重复步骤1，直到gap等于1再进行最后一次插入排序即可获得排序好的数组
 + 图解
-![shellSort.gif](resource/shellSort.gif)
+![shellSort.gif](./resource/shellSort.gif)
 + ts实现
 ```ts
 static shellSort<T>(arr:T[], fn:COMPARE<T>):T[]{
@@ -178,7 +178,7 @@ static shellSort<T>(arr:T[], fn:COMPARE<T>):T[]{
 2. 对着两个子序列分别采用归并排序，将两个排序好的子序列合并成一个最终的排序序列
 3. 反复递归直到子序列不可分
 + 图解
-![mergeSort.gif](resource/mergeSort.gif)
+![mergeSort.gif](./resource/mergeSort.gif)
 + ts实现
 ```ts
 /**
@@ -229,7 +229,7 @@ static mergeSort<T>(arr:T[], fn:COMPARE<T>):T[]{
 2. 递归的对基准左右两边的数列进行快速排序。
 3. 合并左边序列、基准和右边序列并返回
 + 图解
-![quickSort.gif](resource/quickSort.gif)
+![quickSort.gif](./resource/quickSort.gif)
 + ts实现
 ```ts
 static quickSort<T>(arr:T[], fn:COMPARE<T>):T[]{
@@ -262,9 +262,9 @@ left(i)=2i+1
 right(i)=2i+2  
 超出索引的表示没有子节点，其层级和数组表示范例如下图：  
 
-![heap.webp](./resource/heap.webp)  
+![heap.png](./resource/heap.png)  
 
-![heapArray.webp](./resource/heapArray.webp)  
+![heapArray.png](./resource/heapArray.png)  
 
 高度为h的堆有h+1层，n个节点的堆高度为h=floor(log2(n))，层数为h+1，倒数第二层的索引为2^h-2
 + 步骤
@@ -348,7 +348,7 @@ static heapSort<T>(arr:T[], fn:COMPARE<T>):T[] {
 3. 对所有的计数累加（从C中的第一个元素开始，每一项和前一项相加）
 4. 反向填充目标数组：将每个元素i放在新数组的第C(i)项，每放一个元素就将C(i)减去1
 + 图解
-![countingSort.gif](resource/countingSort.gif)
+![countingSort.gif](./resource/countingSort.gif)
 + ts实现
 ```ts
 // TODO:待实现

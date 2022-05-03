@@ -227,7 +227,7 @@ this.$bus.$emit('hello',this.name)
   
 ## 生命周期  
   
-![avatar](https://cn.vuejs.org/images/lifecycle.png)  
+![lifecycle](https://cn.vuejs.org/images/lifecycle.png)  
 * 常用的生命周期钩子：  
     1.mounted: 发送ajax请求、启动定时器、绑定自定义事件、订阅消息等【初始化操作】。  
     2.beforeDestroy: 清除定时器、解绑自定义事件、取消订阅消息等【收尾工作】。  
@@ -375,7 +375,7 @@ vue通过插槽向子组件中传递html结构
 ```  
 ## vuex  
 vuex用于同一管理全局组件共享的数据,[官方文档](https://vuex.vuejs.org/zh/)  
-![avatar](https://vuex.vuejs.org/vuex.png)  
+![vuex.png](https://vuex.vuejs.org/vuex.png)  
   
 * 绑定vuex插件  
   
@@ -542,10 +542,7 @@ router.afterEach((to, from) => {
   }  
 }  
 ```  
-  
-# Vue3.0  
-[笔记](./vue3快速上手.md)  
-  
+
 ***  
 # Cookbook  
 参考资料[Cookbook](https://cn.vuejs.org/v2/cookbook/)中主要介绍了vue的编程技巧  
