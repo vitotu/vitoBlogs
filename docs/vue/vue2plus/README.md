@@ -138,3 +138,94 @@ class Solution {
 }
 Solution.test();
 ```
+### html解析
+对html的AST解析思路与上述预设算法基本相同，利用栈的先进后出特性对标签进行配对和对中间结果进行缓存整理  
+使用正则表达式进行词法分析
+```js
+class Solution {
+  static parse(str) {
+    let p = 0;
+    let rest = '';
+    let startRegExp = /^\<([a-z]+[1-6]?)(\s[^\<]+)?\>/; // 开始标记;
+    let endRegRxp = /^\<\/([a-z]+[1-6]?)\>/; // 结束标记
+    let wordRegExp = /^([^\<]+)\<\/[a-z]+[1-6]?\>/; // 结束标记结束前的文字;
+    let stack = [];
+    let cache = [ { 'children': [] } ]; // 初始容器中预设children属性
+    while(p < str.length - 1) {
+      rest = str.substring(p);
+      if(startRegExp.test(rest)){ // 处理开始标签
+        let tag = rest.match(startRegExp);
+        let attrsString = tag[2]; // 提取标签中的属性
+        tag = tag[1];
+        stack.push(tag); // 入栈标签名
+        cache.push({
+          'tag':tag, 'children':[], 'attrs': Solution.parseAttrs(attrsString) // 解析标签中的属性
+        })
+        const attrsLength = attrsString != null ? attrsString.length : 0;
+        p += tag.length + 2 + attrsLength; // 移动指针，'<>'长度为2所以加2
+      } else if (endRegRxp.test(rest)){ // 处理结束标签
+        let tag = rest.match(endRegRxp)[1];
+        let pop_tag = stack.pop();
+        if(tag === pop_tag){ // 检查结束标签是否与栈顶弹出的标签相同，相同则继续处理
+          let pop_arr = cache.pop();
+          if(cache.length > 0) { // 将弹出的标签对象添加到新栈顶的children属性上
+            cache[cache.length - 1].children.push(pop_arr);
+          }
+        } else { // 不同则抛出语法错误
+          throw new Error(pop_tag + '标签未封闭!!');
+        }
+        p += tag.length + 3; // 移动指针 '</>'长度为3，需要额外移动3个单位
+      } else if (wordRegExp.test(rest)) { // 处理文本节点
+        let word = rest.match(wordRegExp)[1];
+        if(!/^\s+$/.test(word)) { // 若文本节点不为空，则进行处理
+          cache[cache.length - 1].children.push({ // 对于文本节点直接加入栈顶children属性中即可
+            'text': word, 'type':3
+          });
+        }
+        p += word.length; // 移动指针
+      }else{
+        p++;
+      }
+    }
+    return cache[0].children[0]; // 遍历结束后返回最初容器中的内容
+  }
+  static parseAttrs(str){ // 解析标签的属性字符串
+    if(str == undefined) return [];
+    let inQuotes = false; // 是否处于引号中的标志位
+    let point = 0; // 断点位置指针
+    let result = [];
+    for(let i =0; i < str.length; i++){
+      let char = str[i];
+      if(char == '"'){ // 若遇到引号则将引号中标志位进行翻转，保证引号内为true
+        inQuotes = !inQuotes; // 保证属性值中出现空格不会出错，但出现引号则会有问题
+      } else if (char == ' ' && !inQuotes){ // 发现空格且不在引号内则断点至当前位置需要处理
+        if(!/^\s*$/.test(str.substring(point, i))) { // 断点至当前位置子串不为空则处理
+          result.push(str.substring(point, i).trim()); // 直接取的key="value"键值对
+          point = i; // 移动断点指针继续遍历
+        }
+      }
+    }
+    result.push(str.substring(point).trim()); // 将最后的键值对推入结果数组
+    result = result.map(item => { // 将key="value"键值对进行分离形成新数组
+      let cache = item.match(/^(.+)="(.+)"$/);
+      return {
+        name: cache[1],
+        value: cache[2]
+      };
+    });
+    return result;
+  }
+  static test() {
+    var templateString = `<div>
+      <h3 class="aa bb cc" data-n="7" id="mybox">你好</h3>
+      <ul>
+        <li>A</li>
+        <li>B</li>
+        <li>C</li>
+      </ul>
+    </div>`;
+    console.log(Solution.parse(templateString));
+  }
+}
+Solution.test();
+```
