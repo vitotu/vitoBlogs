@@ -93,3 +93,48 @@ watch在一开始初始化的时候，会读取一遍监听的数据的值，于
 因为读取了监听的data的属性，watch的watcher被收集在这个属性的收集器中  
 当设置了deep时  
 在读取data属性的时候，发现设置了deep而且值是一个对象，会递归遍历这个值，把内部所有属性逐个读取一遍，于是属性和它的对象值内每一个属性都会收集到watch的watcher  
+
+## AST(abstract syntax tree)抽象语法树
+将字符串转换为可利用的树状数据结构，为后续的DOM API和js处理提供支持，过滤不安全的DOM结构，便于浏览器渲染
+
+### 预设算法题
+解码字符串压缩算法，如：`3[a]`复原为`aaa`,`2[1[a]2[b]]`复原为`abbabb`  
+- 思路：利用栈数据结构存入重复频次，缓存栈存入字符容器，遍历字符串，每次入栈数字则缓存栈一起入栈空字符串容器，遇到字符则将字符放入缓存栈顶容器内，若遇到`]`号，则出栈频次，出栈缓存，并将出栈的缓存字符串冲入频次数后添加到新的栈顶容器中
+  遍历结束后将缓存栈顶(也是最后一个容器)中的字符串重复最后一个频次数返回即可
+- js实现
+```js
+class Solution {
+  static repeatStr(str) {
+    let p = 0;
+    let stack = [], cache = [];
+    let rest = str;
+    let regNum = /^(\d+)\[/; // 匹配并捕获数字开头的正括号模式
+    let regWord = /^(\w+)\]/; // 匹配并捕获字符开头的反括号模式
+    while(p < str.length - 1) {
+      rest = str.substring(p); // 跟随p指针每次返回剩余的字符串
+      if(regNum.test(rest)){ // 匹配到数字模式
+        let times = rest.match(regNum)[1]; // 提取数字
+        stack.push(Number(times)); // 字符转数字入栈
+        cache.push(''); // 使用空字符串作为容器压入缓存栈中
+        p += times.length + 1; // 移动指针数字长度外加'['长度
+      } else if (regWord.test(rest)){ // 匹配到字符模式
+        let word = rest.match(regWord)[1]; // 提取字符
+        cache[cache.length - 1] = word; // 将字符放入栈顶容器
+        p += word.length; // 移动指针字符长度
+      } else if (rest[0] == ']') { // 匹配到反括号
+        let times = stack.pop(); // 出栈频次
+        let word = cache.pop(); // 出栈字符容器
+        // 将出栈字符word重复times次放入新的栈顶
+        cache[cache.length - 1] += word.repeat(times);
+        p++ // 移动指针']'长度
+      }
+    }
+    return cache[0].repeat(stack[0]); // 遍历结束后还剩最后的容器和频次
+  }
+  static test() { // 测试用例
+    let data = '03[02[3[a]1[b]]4[d]]';
+    console.log(Solution.repeatStr(data)==='aaabaaabdddd'.repeat(3));
+  }
+}
+Solution.test();
+```
