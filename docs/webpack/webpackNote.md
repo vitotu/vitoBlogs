@@ -1,6 +1,6 @@
 
 # 概述webpack
-webpack是基于nodejs平台的，前端资源构建工具
+webpack是基于nodejs平台的，前端资源构建工具，同类工具还有vite、rollup、parcel等
 ## 5个核心概念
 * entry 打包入口起点
 * output 打包后资源输出配置

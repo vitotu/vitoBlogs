@@ -51,8 +51,7 @@ Observer对象利用Object.defineProperty()方法对数据进行监听，并借�
 流程图如下：  
 ![reactive.png](../../resource/reactive.png)  
 
-::: tip
-简单手写实现演示如下：
+::: tip 简单手写实现演示如下
 <iframe id="reactive-demo" height=80 width=100% frameborder=0 src="/demo/reactive.html"></iframe>
 
 [手写简单实现代码](./reactive.md)  
@@ -229,3 +228,70 @@ class Solution {
 }
 Solution.test();
 ```
+
+## 模板引擎mustache
+
+模板引擎用于将数据变为视图，如：  
+
+- 模板
+
+```html
+<div>
+  <ul>
+    {{#students}}
+    <li class="myli">
+      学生{{name}}的爱好是
+      <ol>
+        {{#hobbies}}
+        <li>{{.}}</li>
+        {{/hobbies}}
+      </ol>
+    </li>
+    {{/students}}
+  </ul>
+</div>
+```
+
+- 数据
+
+```js
+let data = {
+  students: [
+    { 'name': '小明', 'hobbies': ['编程', '游泳'] },
+    { 'name': '小红', 'hobbies': ['看书', '弹琴', '画画'] },
+    { 'name': '小强', 'hobbies': ['锻炼'] }
+  ]
+}
+```
+
+- 转换为
+
+```html
+<div>
+  <ul>
+    <li class="myli">学生小明的爱好是<ol>
+        <li>编程</li>
+        <li>游泳</li>
+      </ol>
+    </li>
+    <li class="myli">学生小红的爱好是<ol>
+        <li>看书</li>
+        <li>弹琴</li>
+        <li>画画</li>
+      </ol>
+    </li>
+    <li class="myli">学生小强的爱好是<ol>
+        <li>锻炼</li>
+      </ol>
+    </li>
+  </ul>
+</div>
+```
+
+除mustache之外，通过 a) 纯DOM的方法 b) 数组join方法 c) es6的模板字符串等方法也可进行转换  
+
+mustache算法 首先将模板字符串解析分词为 tokens 形式，然后将 tokens 结合数据解析为新的 dom 字符串  
+mustache 先于 vue 出现，后来被 vue 所采用，mustache官方[项目地址](https://github.com/janl/mustache.js)  
+::: tip 实现简单的mustache
+[源码](./mustache.md)
+:::
