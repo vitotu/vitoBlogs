@@ -1,10 +1,10 @@
 # 概述  
 vue2基础语法(解决怎么用问题)
-# vue2  
+## vue2
 参考尚硅谷的vue2教程
 视频教程[地址](https://www.bilibili.com/video/BV1Zy4y1K7SH?p=1)  
 
-## 模板语法：  
+## 模板语法
   
 在html中书写`{{表达式}}`,`v-指令:属性='表达式'`等语法样式，这些语法样式由Vue实例来解析。这种方式被成为模板语法  
   
@@ -544,7 +544,7 @@ router.afterEach((to, from) => {
 ```  
 
 ***  
-# Cookbook  
+## Cookbook  
 参考资料[Cookbook](https://cn.vuejs.org/v2/cookbook/)中主要介绍了vue的编程技巧  
   
 ## 添加实例property  

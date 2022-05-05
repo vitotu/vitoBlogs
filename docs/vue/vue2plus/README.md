@@ -1,6 +1,9 @@
 # 概述
+
 vue2进阶，深入理解vue2的原理
+
 ## 双向绑定与响应式
+
 - 响应式原理  
 
 vue2通过数据劫持，利用`Object.defineProperty(target, key, descriptor)`方法，设置get，set拦截读取和设置操作，通过发布订阅模式通知更新实现响应式  
@@ -13,6 +16,7 @@ Vue中双向数据大致可以划分三个模块：Observer、Compile、Watcher�
 >target目标对象  
 >key目标对象的属性  
 >descriptor属性描述符，格式如下：  
+
 ```js
 {
   value: undefined, // 属性的值
@@ -39,6 +43,7 @@ Object.defineProperty(obj, "name",{
 var str = obj.name;         // get方法被触发
 obj.name = "Vue是响应式的";  // set方法被触发
 ```
+
 - 发布订阅
 
 Observer对象利用Object.defineProperty()方法对数据进行监听，并借助dep对象添加订阅者，或发布更新，而watcher对象即为订阅者，初始化时利用get触发Observer中的get并强制将自己添加到dep对象中，完成订阅，当收到订阅消息后dep依次执行存储的watcher对象中的更新函数
@@ -61,6 +66,7 @@ Observer对象利用Object.defineProperty()方法对数据进行监听，并借�
 [参考文档2](https://segmentfault.com/a/1190000023824423)  
 
 ## computed原理
+
 computed属性在响应式的基础上增加了缓存，当computed捕获到依赖变化时会将缓存控制位dirty置为true，重新读取computed时会执行get进行重新计算，并将计算值进行缓存，计算完成后翻转dirty状态，方便再次读取时使用缓存  
 computed会让依赖的data数据项收集到computed的watcher，从而对应data数据项变化时，会同时通知computed和依赖computed(页面等)的地方。  
 
@@ -80,27 +86,39 @@ data改变首先调用computed - watcher的update方法，将dirty更改为true�
 [参考文档](https://zhuanlan.zhihu.com/p/357250216)
 
 ## watch监听原理
+
 接上文响应式基础简单理解：  
+
 - 监听的数据改变的时，watch 如何工作
+
 watch在一开始初始化的时候，会读取一遍监听的数据的值，于是，此时那个数据就收集到watch的watcher了  
 然后给watch设置的handler，watch会放入watcher的更新函数中  
 当数据改变时，通知watch的watcher进行更新，于是你设置的handler就被调用了  
+
 - 设置 immediate 时，watch 如何工作
+
 当设置了immediate时，就不需要在数据改变的时候才会触发。  
 而是在初始化watch时，在读取了监听的数据的值之后，便立即调用一遍你设置的监听回调，然后传入刚读取的值  
+
 - 设置了deep时，watch如何工作
+
 因为读取了监听的data的属性，watch的watcher被收集在这个属性的收集器中  
 当设置了deep时  
 在读取data属性的时候，发现设置了deep而且值是一个对象，会递归遍历这个值，把内部所有属性逐个读取一遍，于是属性和它的对象值内每一个属性都会收集到watch的watcher  
 
 ## AST(abstract syntax tree)抽象语法树
+
 将字符串转换为可利用的树状数据结构，为后续的DOM API和js处理提供支持，过滤不安全的DOM结构，便于浏览器渲染
 
 ### 预设算法题
+
 解码字符串压缩算法，如：`3[a]`复原为`aaa`,`2[1[a]2[b]]`复原为`abbabb`  
+
 - 思路：利用栈数据结构存入重复频次，缓存栈存入字符容器，遍历字符串，每次入栈数字则缓存栈一起入栈空字符串容器，遇到字符则将字符放入缓存栈顶容器内，若遇到`]`号，则出栈频次，出栈缓存，并将出栈的缓存字符串冲入频次数后添加到新的栈顶容器中
   遍历结束后将缓存栈顶(也是最后一个容器)中的字符串重复最后一个频次数返回即可
+
 - js实现
+
 ```js
 class Solution {
   static repeatStr(str) {
@@ -137,9 +155,12 @@ class Solution {
 }
 Solution.test();
 ```
+
 ### html解析
+
 对html的AST解析思路与上述预设算法基本相同，利用栈的先进后出特性对标签进行配对和对中间结果进行缓存整理  
 使用正则表达式进行词法分析
+
 ```js
 class Solution {
   static parse(str) {

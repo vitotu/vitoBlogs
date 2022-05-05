@@ -1,10 +1,11 @@
 
 # 十大经典排序算法python实现
+
 ![overviewSort.png](./resource/overviewSort.png)
 ![sortComplexity.png](./resource/sortComplexity.png)
 
-
 ## 冒泡排序法(bubbleSort)
+
 相邻元素比较大小进行互换
 ![bubbleSort.gif](./resource/bubbleSort.gif)
 
@@ -25,7 +26,6 @@ print(bubbleSort([5,5,5,2,3,8,1]))
 ```
 
     [1, 2, 3, 5, 5, 5, 8]
-
 
 ## 选择排序(选择最小值放入排序序列)
 
@@ -48,8 +48,8 @@ print(select_sort([5,5,5,2,3,8,1]))
 
     [1, 2, 3, 5, 5, 5, 8]
 
-
 ## 插入排序
+
 通过构建有序序列，对未排序的数据，在已知数列中从后向前扫描，记当前位置为temp，若扫描位的元素比temp大，则将该元素后移一位，直到找到比temp小的元素为止，把temp插入到该元素的后一位。
 ![insertionSort.gif](./resource/insertionSort.gif)
 
@@ -68,7 +68,6 @@ print(insert_sort([5,5,5,2,3,8,1]))
 ```
 
     [1, 2, 3, 5, 5, 5, 8]
-
 
 ## 希尔排序
 
@@ -100,8 +99,8 @@ print(shell_sort([592,401,874,141,348,72,911,887,820,283]))
 
     [911, 911, 911, 911, 887, 72, 911, 887, 911, 911]
 
-
 ## 归并排序
+
 把长度为n的输入序列分成两个长度为n/2的子序列，对着两个子序列分别采用归并排序，将两个排序好的子序列合并成一个最终的排序序列
 
 ![mergeSort.gif](./resource/mergeSort.gif)
@@ -134,8 +133,8 @@ print(merge_sort([5,5,5,2,3,8,1]))
 
     [1, 2, 3, 5, 5, 5, 8]
 
-
 ## 快速排序
+
 从数列中挑出一个元素作为基准，比基准小的元素全部排在左边，反之在右边。这个分区结束之后，基准尽量位于中间。递归的对基准左右两边的数列进行排序。
 ![quickSort.gif](./resource/quickSort.gif)
 
@@ -162,8 +161,8 @@ print(fastSort([5,5,5,2,3,8,1]))
 
     [1, 2, 3, 5, 5, 5, 8]
 
-
 ## 堆排序
+
 利用堆数据结构所设计的排序算法，通过每次弹出堆顶元素实现排序
 ![heapSort.gif](./resource/heapSort.gif)
 
@@ -181,8 +180,8 @@ print(heap_sort([5,5,5,2,3,8,1]))
 
     [1, 2, 3, 5, 5, 5, 8]
 
-
 ## 计数排序
+
 将输入数据值转化为键存储在额外开辟的数组空间中，找出待排序数组中最大的元素，建立该长度的数组c，统计数组中每个值为i的元素出现的次数，对所有计数累加，表示该元素位于有序表中第几项，反向填充目标数组，将每个元素i放在新数组第c[j]项，每放一个元素就将c[i]-1
 ![countingSort.gif](./resource/countingSort.gif)
 
@@ -204,8 +203,8 @@ print(count_sort([5,5,5,2,3,8,1]))
 
     [1, 2, 3, 5, 5, 5, 8]
 
-
 ## 桶排序
+
 假设输入数据服从均匀分布，将数据分到有限数量的桶里，每个桶再分别排序。假定一个定量长度的数组当空桶，遍历输入数据，并且把数据一个个放进对应的桶中，对每个不是空的桶进行排序，从不是空的桶里把排好序的数据拼接起来
 ![bucketSort](./resource/bucketSort.gif)
 
@@ -228,10 +227,9 @@ print(bucket_sort([5,5,5,2,3,8,1]))
 
     [1, 2, 3, 5, 5, 5, 8]
 
-
 ## 基数排序
-![radixSort.gif](./resource/radixSort.gif)
 
+![radixSort.gif](./resource/radixSort.gif)
 
 ```python
 def radix_sort(arr):
@@ -248,4 +246,3 @@ print(radix_sort([5,5,5,2,3,8,1]))
 ```
 
     [1, 2, 3, 5, 5, 5, 8]
-

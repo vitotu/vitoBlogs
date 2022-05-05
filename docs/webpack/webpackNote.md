@@ -1,21 +1,34 @@
 
-# 概述webpack
+# webpack基础用法
+
+## 概述
+
 webpack是基于nodejs平台的，前端资源构建工具，同类工具还有vite、rollup、parcel等
+
 ## 5个核心概念
+
 * entry 打包入口起点
 * output 打包后资源输出配置
 * loader(module) 处理非js、json文件
 * plugins 扩展webpack功能，如处理环境变量打包优化、压缩等
 * mode 指示webpack使用相应模式的配置，取值为development、production
----
-基本工作流程：
-- 加载配置文件
-- 根据文件中entry解析所依赖的所有module
-- 对每个module使用loader中的规则，将module转换为webpack能处理的资源
-- 并生成chunk文件输出，整个过程中plugin会利用hook函数在适当的时机运行
 
-# 基本配置
+---
+
+基本工作流程：
+
+1. 加载配置文件
+
+2. 根据文件中entry解析所依赖的所有module
+
+3. 对每个module使用loader中的规则，将module转换为webpack能处理的资源
+
+4. 并生成chunk文件输出，整个过程中plugin会利用hook函数在适当的时机运行
+
+## 基本配置
+
 使用webpack打包的项目，通常有webpack.config.js配置文件，以下以代码及注释的方式展示基本配置：  
+
 ```js
 /*
   webpack.config.js  webpack的配置文件，语法为nodejs的commonjs风格
@@ -161,9 +174,12 @@ module.exports = {
 }
 ```
 
-# 优化配置
-## HMR
+## 优化配置
+
+### HMR
+
 HMR 热模块替换，只打包发生变化的模块，提升开发时的构建速度
+
 ```js
 module.exports = {
   entry:['./src/js/index.js', './src/index.html'], // 多入口配置
@@ -186,13 +202,17 @@ if (module.hot) {
   });
 }
 ```
-## source-map
-source-map: 源代码到构建后代码映射（如果构建后代码出错了，通过映射可以追踪源代码错误） 
+
+### source-map
+
+source-map: 源代码到构建后代码映射（如果构建后代码出错了，通过映射可以追踪源代码错误）  
+
 ```js
 module.exports = { // 省略其他配置
   devtool: 'eval-source-map'
 }
 ``` 
+
 取值可以为`[inline-|hidden-|eval-][nosources-][cheap-[module-]]source-map`
 
 * source-map：外部;  错误代码准确信息和源代码的错误位置
@@ -206,6 +226,7 @@ module.exports = { // 省略其他配置
 内联 和 外部的区别：1. 外部生成了文件，内联没有 2. 内联构建速度更快
 
 开发环境：需要速度快，调试更友好
+
   * 速度快(eval>inline>cheap>...)
     eval-cheap-souce-map;eval-source-map
   * 调试更友好  
@@ -213,12 +234,14 @@ module.exports = { // 省略其他配置
   * 推荐使用 eval-source-map  / eval-cheap-module-souce-map
 
 生产环境：需要考虑源代码隐藏 调试友好
+
   * 内联会让代码体积变大，所以在生产环境不用内联
   * nosources-source-map 全部隐藏
   * hidden-source-map 只隐藏源代码，会提示构建后代码错误信息
   * 推荐使用source-map / cheap-module-souce-map
 
-## oneof
+### oneof
+
 ```js
 module.exports = {
   module:{
@@ -234,21 +257,25 @@ module.exports = {
   }
 }
 ```
-## 缓存
+
+### 缓存
+
 * babel缓存，二次构建时读取缓存可提高构建速度
 * 文件资源缓存，通过文件资源hash命名进行缓存
   * `[hash:位数]`: webpack每次构建时都会生成一个hash，重新打包会导致所有的缓存失效
   * `[chunkhash:位数]`: 根据chunk生成hash值，打包来源于同一个chunk时hash值就一样
   * `[contenthash:位数]`(推荐使用)：根据文件内容生成hash，每个文件的hash值不同，可以更好的利用缓存机制
 
-## tree shaking
+### tree shaking
+
 tree shaking 用于去除不会被使用的代码，减小代码体积；在配置`mode:production`并且js代码使用es6模块化即可启用tree shaking  
 
 tree shaking可能会把css,@babel/polyfill文件删掉,可在package.json中配置`"sideEffects": false`或`"sideEffects": ["*.css", "*.less"]`
 
 tree shaking无法应用于多层嵌套中三级及以上的模块
 
-## code split
+### code split
+
 ```js
 module.exports = { // 省略了其他配置
   entry: {
@@ -271,11 +298,14 @@ module.exports = { // 省略了其他配置
   },
 }
 ```
+
 * 代码拆分还可在代码中使用es6的`import(/* webpackChunkName: '单独打包的包名',webpackPrefetch: true */).then()`方式懒加载进行拆分,被这种方式引入的模块会被单独打包
 * 预加载 webpackPrefetch: 等其他资源加载完毕，浏览器空闲时加载资源
 
-## PWA
+### PWA
+
 PWA: 渐进式网络开发应用程序(离线可访问),依赖于workbox,和服务端(未做深入了解，后续补充)
+
 ```js
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 module.exports = {
@@ -319,8 +349,10 @@ if ('serviceWorker' in navigator) {
 }
 ```
 
-## externals
+### externals
+
 externals配置用于排除要打包的库
+
 ```js
 module.exports = {
   externals: {
@@ -333,9 +365,14 @@ module.exports = {
 }
 ```
 
-## dll
+### dll
+
 顾名思义动态链接库Dynamic-link library，用于单独打包某些库,而第二次构建时就不用再次对这部分进行打包，提升构建速度  
-ps: 此技术趋于过时
+
+::: Tip
+此技术趋于过时
+:::
+
 ```js
 const webpack = require('webpack');
 const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin');
@@ -384,7 +421,8 @@ module.exports = {
 
 ```
 
-## resolve解析配置
+### resolve解析配置
+
 ```js
 module.exports = {
  // 解析模块的规则
@@ -400,7 +438,8 @@ module.exports = {
 }
 ```
 
-## devServer
+### devServer
+
 ```js
 module.exports = {
   devServer: {
@@ -432,7 +471,8 @@ module.exports = {
 }
 ```
 
-## optimization配置
+### optimization配置
+
 ```js
 // 代码压缩插件uglify已停止维护，使用terser代替
 const TerserWebpackPlugin = require('terser-webpack-plugin');
@@ -479,5 +519,6 @@ module.exports = {
 }
 ```
 
-# webpack5
+## webpack5
+
 [参看](./webpack5Note.md)

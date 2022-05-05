@@ -1,13 +1,20 @@
-# 概述
+# TypeScript基础用法
+
+## 概述
+
 typescript是js的超集，最终将被转换为js代码执行，与js一样都是弱类型的(允许隐式类型转换)。ts有静态类型(编译阶段类型检查)，更严格的语法检查，并完全兼容js语法。
 
 TODO:本笔记知识简略的了解ts，具体使用还需详细学习[参考文档](https://ts.xcatliu.com/introduction/index.html)
 
-# 开发环境搭建
+## 开发环境搭建
+
 ts同样依赖nodejs开发环境，使用`npm i -g typescript`安装ts编译器，通过tsc命令对ts文件进行编译  
 工程开发中使用webpack结合typescript和ts-loader进行开发
-## 编译选型
+
+### 编译选型
+
 使用ts项目的目录下通常有tsconfig.json配置文件，常见配置如下：
+
 ```json
 {
   "include":["src/**/*", "指定编译文件所在目录"],
@@ -32,7 +39,9 @@ ts同样依赖nodejs开发环境，使用`npm i -g typescript`安装ts编译器�
   }
 }
 ```
+
 在使用webpack打包工具时，除tsconfig.json文件外，还需要在webpack.config.js文件中添加ts-loader
+
 ```js
 module.exports = {
   module: {
@@ -46,13 +55,16 @@ module.exports = {
 }
 ```
 
-# 基本类型
+## 基本类型
+
 ts中声明类型时需要指明变量类型，一旦指定变量类型，则该该变量不能存储其他类型的值
+
 ```typescript
 let 变量: 类型; // 变量类型声明
 let 变量 = 值; // 根据值自动推断变量类型
 let 变量: 类型 = 值; // 声明类型并赋值
 ```
+
 常见的类型有：  
   |  类型   |       例子        |              描述              |
   | :-----: | :---------------: | :----------------------------: |
@@ -71,11 +83,13 @@ let 变量: 类型 = 值; // 声明类型并赋值
   |  bigint |    100n           |       es6中引入的大数字       |
 
 * 字面量指定类型
+
 ```typescript
 let color: 'red' | 'blue' | 'black'; // color仅能取指定的三种颜色
 let num: 1 | 2 | 3 | 4 | 5; // num仅能取所列出的整数
 let unionType: string | number; // unionType可取string或number类型
 ```
+
 * any/unknown/void/never
   * any会关闭ts的类型检查，若将any变量赋值给其他变量，则会导致其他变量的类型失效，失去ts的意义，尽量避免使用any
   * void无任何类型，修饰函数时表示，无返回值或返回undefined，修饰变量时，变量只能取null，undefined和其他void类型变量
@@ -91,8 +105,10 @@ let unionType: string | number; // unionType可取string或number类型
 
 * 类型别名可以给类型取一个新名字：`type 新别名 = 类型`，
 
-# 对象类型
-## class类|抽象类|接口
+## 对象类型
+
+### class类|抽象类|接口
+
 ```ts
 class 类型名1 {
   属性名: 类型;
@@ -127,8 +143,10 @@ class guy extends 抽象类 implements Person, 接口2 { // 继承抽象类并�
 }
 ```
 
-## 泛型
+### 泛型
+
 泛型用于解决定义函数或类时，不确定要使用的数据类型问题，通过`<T>`定义泛型，后即可使用'T'表示该类型，具体类型可在调用时指定，实例：
+
 ```ts
 function test<T, K>(arg1: T, arg2: K): T {
   return arg1; // 泛型类似于占位符，不一定使用T,K表示
@@ -149,7 +167,8 @@ class MyClass<T extends MyInter>{ // 限制T的类型范围,必须为MyInter的�
 }
 ```
 
-## 函数
+### 函数
+
 ```ts
 // 使用？定义了可选参数去后不可出现确定参数，默认参数将被视为可选参数，但不受前一条件约束，rest参数为一数组类型
 function fn(确定参数: 类型, 可选参数?: 类型, 默认参数: string = 'name', ...rest: any[]): 返回类型{
@@ -162,7 +181,8 @@ interface func {
   (arg1: string, arg2: number): boolean; // 接口的方式定义函数形状
 }
 ```
+
 重载允许一个函数接受不同数量或类型的参数时，作出不同的处理。
 TODO：详细完善重载
 
-# 声明文件
+## 声明文件

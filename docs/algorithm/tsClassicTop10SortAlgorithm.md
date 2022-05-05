@@ -1,14 +1,17 @@
 # ts实现十大经典排序算法
 
 ## NO.1 冒泡排序法(bubbleSort)
+
 1. 遍历长度为n的数组，比较相邻位置的大小
 2. 将较大的放置右边，保证了第一次遍历后数组末尾为最大
 3. 将遍历长度减1，重复上述操作，直到遍历长度为2即可得到从小到大的排序的数组  
 
 若想要从大到小排序，则将较小的放置在右边即可  
+
 + 图解：
 ![bubbleSort.gif](./resource/bubbleSort.gif)
 + ts实现:
+
 ```ts
 /**
  * @description: 定义比较函数接口
@@ -73,10 +76,13 @@ SortAlgorithm.test();
 ```
 
 ## NO.2 选择排序法(SelectionSort)
+
 每次从未排序序列中选择一个最小值(最大值)放入已排序序列的末尾  
+
 + 图解：  
 ![selectionSort.gif](./resource/selectionSort.gif)
 + ts实现：
+
 ```ts
 // 接上述类的静态方法
 static selectionSort<T>(arr:T[], fn:COMPARE<T>):T[] {
@@ -97,18 +103,23 @@ static selectionSort<T>(arr:T[], fn:COMPARE<T>):T[] {
 ```
 
 ## NO.3 插入排序法(InsertionSort)
+
 通过构建有序序列，对未排序的数据，在已排序数列中从后向前扫描  
 记当前位置为temp，若扫描位的元素比temp大，则将该元素后移一位  
 直到找到比temp小的元素为止，把temp插入到该元素的后一位。  
+
 + 步骤：
+
 1. 将列表看做排好序的前半部分和没排序的后半部分，使用target指针从第二个元素起遍历列表
 2. 使用compare指针，将排好序的前半部分从后向前进行遍历
 3. 若target < compare则交换所指向的值
 4. 向左移动target指针(target指向compare的指向的位置)，保持target始终指向本次遍历初始指向的元素
 5. 继续compare的下一次遍历，若不满足步骤3则说明target大于compare前面的元素，直接跳出内层循环，执行步骤2
+
 + 图解：  
 ![insertionSort.gif](./resource/insertionSort.gif)
 + ts实现:
+
 ```ts
 static insertionSort<T>(arr:T[], fn:COMPARE<T>):T[]{
   // 该算法对元素操作太多，仅适合用于链表类数组排序
@@ -131,19 +142,24 @@ static insertionSort<T>(arr:T[], fn:COMPARE<T>):T[]{
 ```
 
 ## NO.4 希尔排序(shellSort)
+
 shellSort是insertionSort的升级版，算法假定大小不同的数字为均匀分布，  
 通过间距插入排序法在每次迭代中尽可能的将数字插入到其大小合适的位置，  
 最后可得到精确的位置，即排序好的数组。  
 
 通常shellSort的比较次数和数字交换次数会小于insertionSort  
 因此性能表现更好即平均算法复杂度更小O( n^1.3 )，但其最坏算法复杂度相同O( n^2 )  
+
 + 步骤
+
 1. 设置间距gap，通过gap间距将数组分割gap个组，通常gap取length/2仅保留整数
 2. 对组内使用插入排序法
 3. 将gap除2重复步骤1，直到gap等于1再进行最后一次插入排序即可获得排序好的数组
+
 + 图解
 ![shellSort.gif](./resource/shellSort.gif)
 + ts实现
+
 ```ts
 static shellSort<T>(arr:T[], fn:COMPARE<T>):T[]{
   let length = arr.length;
@@ -174,12 +190,15 @@ static shellSort<T>(arr:T[], fn:COMPARE<T>):T[]{
 ## NO.5 归并排序(mergeSort)
 
 + 步骤
+
 1. 把长度为n的输入序列分成两个长度为n/2的子序列
 2. 对着两个子序列分别采用归并排序，将两个排序好的子序列合并成一个最终的排序序列
 3. 反复递归直到子序列不可分
+
 + 图解
 ![mergeSort.gif](./resource/mergeSort.gif)
 + ts实现
+
 ```ts
 /**
  * @description: 归并排序中用于合并左右两个数组
@@ -224,13 +243,17 @@ static mergeSort<T>(arr:T[], fn:COMPARE<T>):T[]{
 ```
 
 ## NO.6 快速排序(quickSort)
+
 + 步骤
+
 1. 从数列中挑出一个元素作为基准，比基准小的元素全部排在左边，反之在右边。
 2. 递归的对基准左右两边的数列进行快速排序。
 3. 合并左边序列、基准和右边序列并返回
+
 + 图解
 ![quickSort.gif](./resource/quickSort.gif)
 + ts实现
+
 ```ts
 static quickSort<T>(arr:T[], fn:COMPARE<T>):T[]{
   let length = arr.length;
@@ -253,7 +276,9 @@ static quickSort<T>(arr:T[], fn:COMPARE<T>):T[]{
 ```
 
 ## NO.7 堆排序(heapSort)
+
 利用堆数据结构所设计的排序算法，通过每次弹出堆顶元素实现排序
+
 + 堆数据结构
 堆是一种二叉树，子节点从左到右填充，父节点必定大于/小于其子节点，对应最大堆/最小堆  
 堆通常使用数组的方式存储，数组节点索引和堆节点对应如下：  
@@ -267,7 +292,9 @@ right(i)=2i+2
 ![heapArray.png](./resource/heapArray.png)  
 
 高度为h的堆有h+1层，n个节点的堆高度为h=floor(log2(n))，层数为h+1，倒数第二层的索引为2^h-2
+
 + 步骤
+
 1. 对数组进行建堆buildHeap
   1). 从倒数第二层的最后一个节点是 2^h - 2 向前遍历到根节点0
   2). 对每个节点进行heapify
@@ -278,9 +305,11 @@ right(i)=2i+2
    1). 对步骤1中的堆，堆顶与堆尾交换位置，记堆长度减1，数组末尾为已排好序的序列
    2). 将交换后的堆顶进行heapify，维持最大堆或最小堆条件
    3). 遍历数组到倒数第二个节点，每次重复1)~2)步骤，完成后即可获得排序好的数组
+
 + 图解
 ![heapSort.gif](./resource/heapSort.gif)
 + ts实现
+
 ```ts
 /**
  * @description: 对任意数组进行建堆
@@ -341,20 +370,26 @@ static heapSort<T>(arr:T[], fn:COMPARE<T>):T[] {
 ```
 
 ## NO.8 计数排序法(countingSort)
+
 计数排序法将输入的数据值转化为键存储在额外开辟的数组空间中，是一种线性复杂度的排序算法，计数排序要求输入的数据必须是有确定范围的整数
+
 + 步骤
+
 1. 找出待排序的数组arr中最大max和最小min的元素，开辟长度为max-min的数组C
 2. 统计arr中每个值为i的元素出现的次数，存入数组C的第i项
 3. 对所有的计数累加（从C中的第一个元素开始，每一项和前一项相加）
 4. 反向填充目标数组：将每个元素i放在新数组的第C(i)项，每放一个元素就将C(i)减去1
+
 + 图解
 ![countingSort.gif](./resource/countingSort.gif)
 + ts实现
+
 ```ts
 // TODO:待实现
 ```
 
 ## n数之和
+
 ```ts
 class Demo {
   static nSum(nums:number[], target:number, n:number):number[][]{

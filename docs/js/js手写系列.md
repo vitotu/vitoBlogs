@@ -1,7 +1,10 @@
 # js手写实现系列
+
 ## 深拷贝
+
 JSON.parse(JSON.stringify())的方式无法复制函数等数据类型，因此不是完备的深拷贝
 Object.assign为浅层拷贝，对象深层嵌套时拷贝的是引用
+
 ```js
 class Demo {
 /**
@@ -71,7 +74,9 @@ class Demo {
   }
 }
 ```
+
 ## compose函数
+
 ```js
 // 传入函数数组，从右向左结合的合并函数
 class Demo {
@@ -89,9 +94,12 @@ class Demo {
   }
 }
 ```
+
 ## LRU缓存机制
+
 LRU (最近最少使用) 缓存机制，命中频次越小越有可能被清理的机制  
 利用原生Map是有序的特性
+
 ```js
 class LRUCache {
   constructor(limit){
@@ -129,7 +137,9 @@ class LRUCache {
 }
 LRUCache.test();
 ```
+
 ## 可连续调用的sum函数
+
 ```js
 class Demo {
   static sum(...args) {
@@ -147,8 +157,11 @@ class Demo {
 }
 Demo.test();
 ```
+
 ## 简单的querySting编解码
+
 解码面临：
+
   1. 如何使用正则解析 qs
   2. 如何正确转义汉字
   3. 如何正确处理数组
@@ -157,6 +170,7 @@ Demo.test();
 实际工作中推荐使用qs库
 
 简单编码约定条件：
+
   1. 对 null/undefined/object 编码为空字符
   2. 对 key/value 记得 encodeURIComponent
   3. 不考虑数组及嵌套对象等复杂操作
@@ -236,7 +250,9 @@ class Solution {
 }
 Solution.test();
 ```
+
 ## 数组系列操作
+
 ```js
 class Solution {
   /**
@@ -263,8 +279,11 @@ class Solution {
 }
 Solution.test()
 ```
+
 ## 0ms的setTimeout
+
 现象：
+
 ```js
 let a = performance.now();
 setTimeout(() => {
@@ -293,10 +312,12 @@ setTimeout(() => {
 }, 0);
 // 前面打印都是4ms以下，后面几层大于4ms
 ```
+
 原因：浏览器团队初始时按照操作系统事件粒度100ms左右设计，后续为了优化性能设计成了1ms左右，但笔记本厂商反馈耗电问题，最后基于benchmark测试设计成了4ms  
 详细参考[文档](https://juejin.cn/post/6846687590616137742)
 
 绕过4ms限制的方法：利用window.postMessage()机制
+
 ```js
 class Demo {
   static zeroTimeout(){
