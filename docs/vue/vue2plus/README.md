@@ -1,6 +1,4 @@
-# 概述
-
-vue2进阶，深入理解vue2的原理
+# vue2进阶知识汇总整理
 
 ## 双向绑定与响应式
 
@@ -8,7 +6,7 @@ vue2进阶，深入理解vue2的原理
 
 vue2通过数据劫持，利用`Object.defineProperty(target, key, descriptor)`方法，设置get，set拦截读取和设置操作，通过发布订阅模式通知更新实现响应式  
 Vue中双向数据大致可以划分三个模块：Observer、Compile、Watcher，如图：  
-![vueReactive.png](../../resource/vueReactive.png)  
+![vueReactive.png](./resource/vueReactive.png)  
 
 - 数据劫持
 
@@ -54,12 +52,12 @@ Observer对象利用Object.defineProperty()方法对数据进行监听，并借�
 而当视图发生更新时，仅需在compile增加input事件监听，完成数据修改即可
 
 流程图如下：  
-![reactive.png](../../resource/reactive.png)  
+![reactive.png](./resource/reactive.png)  
 
 ::: tip 简单手写实现演示如下
-<iframe id="reactive-demo" height=80 width=100% frameborder=0 src="/demo/reactive.html"></iframe>
+<iframe id="reactive-demo" height=100 width=100% frameborder=0 src="/demo/reactive.html"></iframe>
 
-[手写简单实现代码](./reactive.md)  
+[代码](./reactive.md)  
 :::
 
 [参考文档1](https://blog.nowcoder.net/n/8517450fe4fd4220b4078f9c61e42ec1)  
@@ -75,12 +73,12 @@ computed会让依赖的data数据项收集到computed的watcher，从而对应da
 computed-watcher.evaluted被调用，进而computed-watcher.get被调用，Dep.target被设置为computed-watcher，旧值页面watcher被缓存起来。  
 3. computed计算会读取data，此时data就收集到computed-watcher。
 也就是computed-watcher也会被保存到data的依赖收集器dep中（用于下一步）。  
-computed计算完毕，释放Dep.target，并且Dep.target恢复上一个watcher（页面watcher）。    
+computed计算完毕，释放Dep.target，并且Dep.target恢复上一个watcher（页面watcher）。
 4. 在computed.watcher.get退出之前，手动watcher.depend，让data再收集一次Dep.target，于是data又收集到之前缓存了的页面watcher。
 
-综上，此时data的dep依赖收集器=[computed - watcher，页面-watcher]    
+综上，此时data的dep依赖收集器=[computed - watcher，页面-watcher]
 data改变，正序遍历通知，computed先更新，页面再更新。  
-data改变首先调用computed - watcher的update方法，将dirty更改为true，表示缓存已无效，注意：此时不会重新计算。    
+data改变首先调用computed - watcher的update方法，将dirty更改为true，表示缓存已无效，注意：此时不会重新计算。
 在调用computed - watcher.update之后，再调用 页面-watcher，通知页面更新。页面更新时，会重新读取computed的值。此时，由于dirty=true，执行computed - evaluate方法，重新计算computed。  
 
 [参考文档](https://zhuanlan.zhihu.com/p/357250216)
@@ -315,4 +313,27 @@ mustache算法 首先将模板字符串解析分词为 tokens 形式，然后将
 mustache 先于 vue 出现，后来被 vue 所采用，mustache官方[项目地址](https://github.com/janl/mustache.js)  
 ::: tip 实现简单的mustache
 [源码](./mustache.md)
+:::
+
+## 虚拟DOM和Diff算法
+
+snabbdom是著名的虚拟DOM库，diff算法的鼻祖，vue源码借鉴了snabbdom，[snabbdom地址](https://github.com/snabbdom/snabbdom)  
+虚拟DOM:用JavaScript对象描述DOM的层次结构。DOM中的一切属性都在虚拟DOM中有对应的属性。
+snabbdom使用渲染函数(h函数)生成虚拟DOM，通过diff算法将虚拟DOM转换为真实DOM
+
+### h函数
+
+h函数使用解析好的tokens来递归的生成虚拟节点VNode对象，便于后续diff算法比较
+
+### diff算法
+
+新旧节点的key和标签的标签名相同则认为是同一节点，同一个VNode才进行精细化比较，只进行同层比较不进行跨层比较  
+
+- 更新策略：
+- TODO
+
+::: tip 简单手写实现演示如下
+<iframe id="vDom-demo" height="100px" width="100%" frameborder=0 src="/demo/vDom.html"></iframe>
+
+[源码](./vDom.md)
 :::
