@@ -111,7 +111,7 @@ web浏览器通常将global作为window对象的一部分实现,因此全局作�
 
 #### Math对象  
 
-Math对象的属性通常是数学计算中常用到的一些特殊值如Math.E,Math.LN10,Math.LN2,Math.LOG2E,Math.LOG10E,Math.PI,Math.SQRT1_1,Math.SQRT2;  
+Math对象的属性通常是数学计算中常用到的一些特殊值如Math.E, Math.LN10, Math.LN2, Math.LOG2E, Math.LOG10E, Math.PI, Math.SQRT1_1, Math.SQRT2;  
 min(),max()方法可以接受任意多个数值参数,返回其中最小或最大的值,若想应用与数组可以使用apply()方法,如`Math.max.apply(Math, arrays)`  
 Math.ceil()向上舍入,Math.floor()向下舍入,Math.round()四舍五入  
 Math.random()方法返回0-1之间的一个随机数,其他范围的随机数需要结合其他的数学函数进行计算构造  
@@ -481,11 +481,11 @@ moveTo()和moveBy()方法分别时移动窗口到x,y位置和移动窗口x,y距�
   
 #### 窗口大小  
 
-在IE9+,Safari,FireFox中window.outerWidth,window.outerHeight返回浏览器窗口本身的尺寸(包含标签栏,导航栏等),window.innerWidth,window.innerHeight返回页面视图容器(viewport)大小.  
+在IE9+, Safari, FireFox中window.outerWidth, window.outerHeight返回浏览器窗口本身的尺寸(包含标签栏,导航栏等), window.innerWidth, window.innerHeight返回页面视图容器(viewport)大小.  
 在chrome中这两组属性返回的都是页面视图容器大小.  
-document.documentElement.clientWidth,document.documentElement.clientHeight和document.body.clientWidth,document.body.clientWidth中也保存了视口信息, 对于IE6前一组在标准模式下有效,后一组用于混杂模式,chrome中则都可以用.  
+document.documentElement.clientWidth, document.documentElement.clientHeight和document.body.clientWidth, document.body.clientWidth中也保存了视口信息, 对于IE6前一组在标准模式下有效,后一组用于混杂模式,chrome中则都可以用.  
 实际使用中要获取视口大小,优先使用window属性  
-另外和窗口位置一样,窗口大小也有resizeTo(),resizeBy()方法  
+另外和窗口位置一样,窗口大小也有resizeTo(), resizeBy()方法  
   
 #### 导航和打开窗口  
 
@@ -518,8 +518,8 @@ window.print(),window.find()对话框则时异步的
 ### location对象  
 
 window.location和document.location指向的是同一个对象  
-location对象主要包含如下属性:hash,host,hostname,href,pathname,port,protocol,search,分别对应当前页面url的不同部分.  
-通过location.search获取到的查询字符串参数需要进行解析,修改除hash外的属性,页面都会以新的url重载,此外也可通过location.assign(url)方法直接重定向到新的url,最后通过location.reload()可重载当前页面,传入true时,强制从服务器重载当前页面.  
+location对象主要包含如下属性:hash, host, hostname, href, pathname, port, protocol, search, 分别对应当前页面url的不同部分.  
+通过location.search获取到的查询字符串参数需要进行解析,修改除hash外的属性,页面都会以新的url重载,此外也可通过location.assign(url)方法直接重定向到新的url, 最后通过location.reload()可重载当前页面,传入true时,强制从服务器重载当前页面.  
   
 ### navigator对象  
 
@@ -602,18 +602,18 @@ cloneNode() 传入true时可用于深拷贝一个节点,即复制节点及其子
 Document类型表示文档，在浏览器中document对象时window对象的一个属性，可以当做全局对象来访问  
 
 1. document对象的子节点可以是DocumentType，Element，ProcessingInstruction或Comment，其documentElement属性始终指向`<html>`元素,其body属性则指向`<body>`元素,另外与`<html>`元素为同一级别的注释可能也会被解析为节点  
-2. document对象还有title,URL,domain,referrer属性,其中title和domain可以被修改  
-3. document提供了getElementById(),getElementsByTagName(),getElementsByName()方法  
+2. document对象还有title, URL, domain, referrer属性,其中title和domain可以被修改  
+3. document提供了getElementById(), getElementsByTagName(), getElementsByName()方法  
 4. document对象有一些特殊的集合,anchors所有带name特性的`<a>`元素;forms所有的`<form>`元素;images所有的`<image>`元素;links所有带href的`<a>`元素  
 5. document的implementation属性提供了document实现了那些功能的信息,对于特殊功能或属性需要进行一致性检测(是否存在及能力测试)  
-6. document对象可以将输出流写入到网页中,通过write(),writeln(),open(),close()四个方法实现,其中write()和writeln()方法通常在DOM加载过程中调用,可将传入字符串格式的html代码作为元素插入页面中,若在DOM加载完成后调用该方法,则插入的元素将会覆盖原有页面.  
+6. document对象可以将输出流写入到网页中,通过write(), writeln(), open(), close()四个方法实现,其中write()和writeln()方法通常在DOM加载过程中调用,可将传入字符串格式的html代码作为元素插入页面中,若在DOM加载完成后调用该方法,则插入的元素将会覆盖原有页面.  
   
 #### Element类型  
 
 Element类型用于表现xml或html元素，通过nodeName和tagName可以访问到元素的标签名  
 
-1. 每个html元素中都有标准特性,id,title,lang,dir(语言方向),className(与class对应),这些属性都可读可写  
-2. 操作特性的方法有getAttribute(),setAttribute(),removeAttribute()；getAttribute()方法可以访问到标准特性和自定义特性,但在访问style和onclick这样的属性时返回的均为字符串  
+1. 每个html元素中都有标准特性,id, title, lang, dir(语言方向), className(与class对应), 这些属性都可读可写  
+2. 操作特性的方法有getAttribute(), setAttribute(), removeAttribute()；getAttribute()方法可以访问到标准特性和自定义特性,但在访问style和onclick这样的属性时返回的均为字符串  
 3. setAttribute()可用于替换或创建属性,但:  
 
 ```JavaScript  
@@ -622,7 +622,7 @@ alert(div.getAttribute('mycolor')); // null (IE除外)
 ```  
 
 像上例直接设置属性,该属性不会自动变成元素的特性  
-4. attributes属性包含一个NamedNodeMap,元素的每个特性都由一个Attr节点表示,并包含在该对象中,NamedNodeMap有下列方法getNamedItem(name),removeNamedItem(name),setNamedItem(node),item(pos)返回pos处的节点.其中removeNamedItem和removeAttribute效果相同.attributes通常用于遍历元素的属性  
+4. attributes属性包含一个NamedNodeMap, 元素的每个特性都由一个Attr节点表示,并包含在该对象中,NamedNodeMap有下列方法getNamedItem(name), removeNamedItem(name), setNamedItem(node), item(pos)返回pos处的节点.其中removeNamedItem和removeAttribute效果相同.attributes通常用于遍历元素的属性  
 5. document.createElement()传入标签名可以创建一个新元素,返回该元素的引用.创建后的元素需要插入到DOM中才能被显示,插入后对元素的修改将立即体现在页面上  
   
 #### Text类型  
@@ -742,7 +742,7 @@ var selected = document.querySelector(".selected");
 ### 元素遍历  
 
 对于元素间的空格, 会返回文本节点，因此定义了一组不含文本节点的属性：  
-childElementCount,firstElementChild,lastElementChild,previousElementSibling,nextElementSibling.  
+childElementCount, firstElementChild, lastElementChild, previousElementSibling, nextElementSibling.  
 
 ### HTML5  
 
@@ -805,8 +805,8 @@ scrollIntoView()可以在所有HTML元素上调用,通过滚动浏览器窗口�
 
 #### 文档模式
 
-页面的文档模式决定了可以使用什么功能，到IE9总共有4种文档模式IE5,IE7,IE8,IE9;  
-可通过标签指定`<meta http-equiv="X-UA-Compatible" content="IE={IEVersion}">`其中IEVersion的取值可以是:Edge,EmulateIE9,EmulateIE8,EmulateIE7,9,8,7,5  
+页面的文档模式决定了可以使用什么功能，到IE9总共有4种文档模式IE5, IE7, IE8, IE9;  
+可通过标签指定`<meta http-equiv="X-UA-Compatible" content="IE={IEVersion}">`其中IEVersion的取值可以是:Edge, EmulateIE9, EmulateIE8, EmulateIE7, 9, 8, 7, 5  
 
 #### children属性  
 
@@ -847,8 +847,8 @@ NamedNodeMap类型增加了getNamedItemNS(namespaceURI, localName), removeNamedI
 #### 与命名空间无关的变化  
 
 DocumentType类型新增了3个属性:publicId、systemId和internalSubset  
-Document类型新增了importNode()方法和 defaultView,implementation属性  
-Node类型增加了isSupported(),isSameNode(),isEqualNode(),setUserData(),getUserData()方法  
+Document类型新增了importNode()方法和 defaultView, implementation属性  
+Node类型增加了isSupported(), isSameNode(), isEqualNode(), setUserData(), getUserData()方法  
 框架元素增加了contentDocument属性  
   
 ### 样式  
@@ -897,20 +897,20 @@ NodeIterator和TreeWalker对象用于辅助完成DOM的顺序遍历，这两个�
 
 #### NodeIterator  
 
-document.createNodeIterator(root,whatToShow,filter,entityReferenceExpansion)方法用于创建NodeIterator类,  
-该类主要有nextNode()和previousNode()方法，nextNode()首次调用返回根节点,最后一个节点调用时返回null,previousNode()方法类似  
+document.createNodeIterator(root, whatToShow, filter, entityReferenceExpansion)方法用于创建NodeIterator类,  
+该类主要有nextNode()和previousNode()方法，nextNode()首次调用返回根节点,最后一个节点调用时返回null, previousNode()方法类似  
 
 #### TreeWalker  
 
 该类使用document.createTreeWalker()方法创建,接受参数与NodeIterator的创建方法类似  
-此类型在NodeIterator的基础上增加了parentNode(),firstChild(),lastChild(),nextSibling(),previousSibling(),currentNode()方法  
+此类型在NodeIterator的基础上增加了parentNode(), firstChild(), lastChild(), nextSibling(), previousSibling(), currentNode()方法  
   
 #### 范围  
 
-使用document.createRange()方法可用于创建Range类型实例,该实例拥有startContainer,startOffset,endContainer,endOffset,commonAncestorContainer等属性,  
-selectNode(refNode),selectNodeContents(refNode)方法来选择范围,setStartBefore(refNode),setStartAfter(refNode),setEndBefore(),setEndAfter()可用于精确设置上述属性  
+使用document.createRange()方法可用于创建Range类型实例,该实例拥有startContainer, startOffset, endContainer, endOffset, commonAncestorContainer等属性,  
+selectNode(refNode), selectNodeContents(refNode)方法来选择范围,setStartBefore(refNode), setStartAfter(refNode), setEndBefore(), setEndAfter()可用于精确设置上述属性  
 setStart()和setEnd()方法传入参考节点和偏移量用于实现复杂范围选择  
-创建范围后,范围内的各节点都只是相应的文档的指针;deleteContents(),extractContents(),insertNode(),surroundContents()环绕范围插入 等操作方法,都会对文档产生影响,而cloneContents()将返回范围中节点的副本  
+创建范围后,范围内的各节点都只是相应的文档的指针;deleteContents(), extractContents(), insertNode(), surroundContents()环绕范围插入 等操作方法,都会对文档产生影响,而cloneContents()将返回范围中节点的副本  
 范围中未选择任何节点称为折叠范围collapse(bool)方法用来将普通范围变为折叠范围,bool值为true时,光标落在返回开头,反之对应,且对应collapsed属性对应更新,此方法可用于确认两个节点是否紧邻  
 compareBoundaryPoints()用于比较两范围是否有重合部分,cloneRange()复制范围,detach()解除对范围的引用  
 上述方法在IE8及以下不适用，IE8有文本范围createTextRange()与上述概念类似  
@@ -976,11 +976,11 @@ btn.onclick = function() {
 
 #### DOM中的事件对象  
 
-响应函数都会默认传入event对象,触发的事件类型不同有不同的属性和方法,但他们的公共方法/属性有bubbles,preventDefault(),eventPhase,stopPropagation(),target等  
+响应函数都会默认传入event对象,触发的事件类型不同有不同的属性和方法,但他们的公共方法/属性有bubbles, preventDefault(), eventPhase, stopPropagation(), target等  
 
 #### IE中的事件对象  
 
-通过DOM0指定的响应函数时,event作为全局变量存在;DOM2指定时(attachEvent()方法添加),会传入event;公共方法或属性有cancelBubble(对应stopPropagation()方法),returnValue(对应preventDefault()方法),srcElement(对应target),type等  
+通过DOM0指定的响应函数时,event作为全局变量存在;DOM2指定时(attachEvent()方法添加), 会传入event;公共方法或属性有cancelBubble(对应stopPropagation()方法), returnValue(对应preventDefault()方法), srcElement(对应target), type等  
 
 #### 跨浏览器的事件对象  
 
@@ -990,7 +990,7 @@ btn.onclick = function() {
 
 #### UI事件  
 
-UI事件指的是那些不一定与用户操作有关的事件.UI事件主要有DOMActivate(元素是否被激活,不推荐使用此属性),load,unload,abort,error,select,resize,scroll  
+UI事件指的是那些不一定与用户操作有关的事件.UI事件主要有DOMActivate(元素是否被激活,不推荐使用此属性), load, unload, abort, error, select, resize, scroll  
 
 + load事件  
   
@@ -1010,13 +1010,13 @@ scroll事件也是在window对象上触发,通过`<html>`元素反应这一变�
   
 #### 焦点事件  
 
-焦点事件会在页面元素获得或失去焦点时触发.焦点事件有：blur,DOMFocusIn,DOMFocusOut,focus,focusin,focusout,这些事件不冒泡,其中最常用的是focus,blur.  
-当焦点从一个元素移向另一个元素时,会依次触发下列事件focusout,focusin,blur,DOMFocusOut,focus,DOMFocusIn  
+焦点事件会在页面元素获得或失去焦点时触发.焦点事件有：blur, DOMFocusIn, DOMFocusOut, focus, focusin, focusout, 这些事件不冒泡,其中最常用的是focus, blur.  
+当焦点从一个元素移向另一个元素时,会依次触发下列事件focusout, focusin, blur, DOMFocusOut, focus, DOMFocusIn  
   
 #### 鼠标与滚轮事件  
 
-DOM3级定义了9个鼠标事件：click(单击左键或回车触发),dclick(双击),mousedown,mouseenter,mouseleave,mousemove,mouseout,mouseover,mouseup  
-除了mouseenter和mouseleave,所有鼠标事件都会冒泡,也可被取消,如取消mousedowm或mouseup,click事件就不会触发  
+DOM3级定义了9个鼠标事件：click(单击左键或回车触发), dclick(双击), mousedown, mouseenter, mouseleave, mousemove, mouseout, mouseover, mouseup  
+除了mouseenter和mouseleave, 所有鼠标事件都会冒泡,也可被取消,如取消mousedowm或mouseup, click事件就不会触发  
 
 + 客户区坐标位置  
   
@@ -1037,7 +1037,7 @@ mouseover发生时主目标为获得光标的元素,相关元素为失去光标�
   
 + 更多事件信息  
   
-detail属性提供了元素被单击次数的信息,此外IE还另外支持了altLeft,ctrlLeft,shiftLeft,offsetX,offsetY等属性  
+detail属性提供了元素被单击次数的信息,此外IE还另外支持了altLeft, ctrlLeft, shiftLeft, offsetX, offsetY等属性  
   
 + 鼠标滚轮事件  
   
@@ -1046,7 +1046,7 @@ FireFox则支持DOMMouseScroll事件,滚轮信息放在了detail属性中,向前
   
 + 触摸设备  
   
-触屏设备中没有鼠标，不支持dclick事件，轻击可单击元素会触发mousemove事件,若内容没有因此变化,就会依次发生mousedown,mouseup,click事件.两个手机在屏幕上滑动且页面也移动会触发mousewheel和scroll事件  
+触屏设备中没有鼠标，不支持dclick事件，轻击可单击元素会触发mousemove事件,若内容没有因此变化,就会依次发生mousedown, mouseup, click事件.两个手机在屏幕上滑动且页面也移动会触发mousewheel和scroll事件  
   
 + 无障碍性问题  
   
@@ -1124,7 +1124,7 @@ gesturestart(多指触屏触发),gesturechange(多指任意位置变化触发),g
 
 #### DOM中的事件模拟  
 
-通过使用document.createEvent()方法创建event对象,该方法接收要创建的事件类型字符串:UIEvents,MouseEvents,MutationEvents,HTMLEvents之一,再对event对象进行初始化后,通过document.dispatchEvent()方法触发事件  
+通过使用document.createEvent()方法创建event对象,该方法接收要创建的事件类型字符串:UIEvents, MouseEvents, MutationEvents, HTMLEvents之一,再对event对象进行初始化后,通过document.dispatchEvent()方法触发事件  
 
 + 模拟鼠标事件  
   
@@ -1254,10 +1254,10 @@ dataTransfer对象时event对象的一个属性,用于在拖放操作时实现�
 
 #### dropEffect和effectAllowed  
 
-作为dataTransfer对象的两个属性,dropEffect表示被拖拽元素能够执行哪种放置行为,取值有none,move,copy,link.不同的值仅会导致光标的不同样式,具体操作还需要开发人员自己实现,该属性在ondragenter中使用  
-effectAllowed属性表示放置目标允许哪种dropEffect,取值为dropEffect取值种类的组合,与dropEffect一样具体业务逻辑需自行实现,该属性在ondragstart中使用  
+作为dataTransfer对象的两个属性,dropEffect表示被拖拽元素能够执行哪种放置行为,取值有none, move, copy, link.不同的值仅会导致光标的不同样式,具体操作还需要开发人员自己实现,该属性在ondragenter中使用  
+effectAllowed属性表示放置目标允许哪种dropEffect, 取值为dropEffect取值种类的组合,与dropEffect一样具体业务逻辑需自行实现,该属性在ondragstart中使用  
   
-此外dataTransfer对象还有addElement(element),clearData(format)setDragImage(element, x, y),types等属性或方法  
+此外dataTransfer对象还有addElement(element), clearData(format)setDragImage(element,  x,  y), types等属性或方法  
   
 #### 可拖动  
 
@@ -1280,10 +1280,10 @@ try {
 ```  
 
 catch会接受一个error对象，该对象中常用的属性有message，  
-错误类型Error派生出了EvalError,RangeError,ReferenceError,SyntaxError,TypeError,URIError等类型  
+错误类型Error派生出了EvalError, RangeError, ReferenceError, SyntaxError, TypeError, URIError等类型  
 通过throw操作符可以抛出错误,  
 没有通过try-catch处理的错误都会触发window对象的error事件,Image对象src错误也会触发该事件  
-常见的错误类型有类型转换错误(显式/隐式转换),数据类型错误,通信错误  
+常见的错误类型有类型转换错误(显式/隐式转换), 数据类型错误,通信错误  
 通过设置Image对象的src属性,可以向服务器发送请求,进而传递错误记录给服务器  
 
 ### 调试技术  
@@ -1388,7 +1388,7 @@ SSE适合于常规服务器,单向通讯(读),webSocket适合双向通讯(聊天
 
 #### 安全的类型检测  
 
-对于原生的类型，安全的检测方法是利用toString()方法返回类的属性来判断，如：`alert(Object.prototype.toString.call(value));`value为数组类型会输出`[object Array]`  
+对于原生的类型，安全的检测方法是利用toString()方法返回类的属性来判断，如：`alert(Object.prototype.toString.call(value));` value为数组类型会输出`[object Array]`  
 
 #### 作用域安全的构造函数  
 
