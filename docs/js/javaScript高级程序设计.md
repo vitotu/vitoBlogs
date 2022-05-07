@@ -589,13 +589,13 @@ history.length //保存历史记录的数量属性
 #### node类型  
 
 所有的节点都继承自node,每个节点都有一个 nodeType 属性,用于表明节点的类型,其值用12个数值常量来表示:  
-Node.ELEMENT_NODE(1);Node.ATTRIBUTE_NODE(2);Node.TEXT_NODE(3);Node.CDATA_SECTION_NODE(4);Node.ENTITY_REFERENCE_NODE(5);Node.ENTITY_NODE(6);Node.PROCESSING_INSTRUCTION_NODE(7);Node.COMMENT_NODE(8);Node.DOCUMENT_NODE(9);Node.DOCUMENT_TYPE_NODE(10);Node.DOCUMENT_FRAGMENT_NODE(11);Node.NOTATION_NODE(12)  
+Node.ELEMENT_NODE(1); Node.ATTRIBUTE_NODE(2); Node.TEXT_NODE(3); Node.CDATA_SECTION_NODE(4); Node.ENTITY_REFERENCE_NODE(5); Node.ENTITY_NODE(6); Node.PROCESSING_INSTRUCTION_NODE(7); Node.COMMENT_NODE(8); Node.DOCUMENT_NODE(9); Node.DOCUMENT_TYPE_NODE(10); Node.DOCUMENT_FRAGMENT_NODE(11); Node.NOTATION_NODE(12)  
 此外节点还有nodeName和nodeValue属性  
 每个节点中都有一个childNodes属性,指向了一个NodeList对象,NodeList对象是一种类数组对象,DOM结构的变化能够自动的反映在NodeList对象上  
   
-节点关系类属性有childNodes,parentNode,previousSibling(前一个节点),和nextSibling(后一个节点),firstChild,lastChild,hasChildNodes(),ownerDocument(根节点).  
-操作节点的方法有appendChild(),insertBefore(),replaceChild(),removeChild()  
-cloneNode()传入true时可用于深拷贝一个节点,即复制节点及其子节点.复制后的副本节点没有指定父节点,需要使用其他方法插入到文档中  
+节点关系类属性有childNodes, parentNode, previousSibling(前一个节点), 和nextSibling(后一个节点), firstChild, lastChild, hasChildNodes(), ownerDocument(根节点).  
+操作节点的方法有appendChild(), insertBefore(), replaceChild(), removeChild()  
+cloneNode() 传入true时可用于深拷贝一个节点,即复制节点及其子节点.复制后的副本节点没有指定父节点,需要使用其他方法插入到文档中  
   
 #### Document类型  
 
@@ -839,10 +839,10 @@ scrollIntoView()和scrollIntoViewIfNeeded()的作用对象是元素的容器,而
 HTML不支持XML命名空间,但XHTML支持XML命名空间。命令空间可用于避免页面中不同语言的冲突。  
 命名空间要使用xmlns特性来指定。XHTML的命名空间是 <http://www.w3.org/1999/xhtml>  
 相应的类型变化：  
-Node类型增加了localName,namespaceURI,prefix属性isDefaultNamespace(namespaceURI),lookupNamespaceURI(prefix),lookupPrefix(namespaceURI)方法  
-Document类型增加了createElementNS(namespaceURI, tagName),createAttributeNS(namespaceURI, attributeName),getElementsByTagNameNS(namespaceURI, tagName)方法  
-Element类型增加了getAttributeNS(namespaceURI,localName),getAttributeNodeNS(namespaceURI,localName),getElementsByTagNameNS(namespaceURI, tagName),hasAttributeNS(namespaceURI,localName),removeAttriubteNS(namespaceURI,localName),setAttributeNS(namespaceURI,qualifiedName,value),setAttributeNodeNS(attNode)方法  
-NamedNodeMap类型增加了getNamedItemNS(namespaceURI,localName),removeNamedItemNS(namespaceURI,localName),setNamedItemNS(node)方法  
+Node类型增加了localName, namespaceURI, prefix属性isDefaultNamespace(namespaceURI), lookupNamespaceURI(prefix), lookupPrefix(namespaceURI)方法  
+Document类型增加了createElementNS(namespaceURI, tagName), createAttributeNS(namespaceURI, attributeName), getElementsByTagNameNS(namespaceURI, tagName)方法  
+Element类型增加了getAttributeNS(namespaceURI, localName), getAttributeNodeNS(namespaceURI, localName), getElementsByTagNameNS(namespaceURI, tagName), hasAttributeNS(namespaceURI, localName), removeAttriubteNS(namespaceURI, localName), setAttributeNS(namespaceURI, qualifiedName, value), setAttributeNodeNS(attNode)方法  
+NamedNodeMap类型增加了getNamedItemNS(namespaceURI, localName), removeNamedItemNS(namespaceURI, localName), setNamedItemNS(node)方法  
 
 #### 与命名空间无关的变化  
 
@@ -1068,7 +1068,7 @@ compositionstart,IME文本复合系统打开时触发的事件,compositionupdate
 #### 变动事件  
 
 DOM2级的变动(mutation)事件能在DOM中的某一部分发生变化时触发,变动事件的种类有:  
-DOMSubtreeModified,DOMNodeInserted,DOMNodeRemoved,DOMNodeInsertedIntoDocument,DOMNodeRemovedFromDocument,DOMAttrModified,DOMCharacterDataModified  
+DOMSubtreeModified, DOMNodeInserted, DOMNodeRemoved, DOMNodeInsertedIntoDocument, DOMNodeRemovedFromDocument, DOMAttrModified, DOMCharacterDataModified  
 
 + 删除节点  
   

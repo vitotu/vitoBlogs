@@ -1,6 +1,3 @@
-# 手写实现简单的reactive
-
-```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -76,7 +73,7 @@
         }
       }
     }
-    class Observer { // TODO：没能支持数组类型的响应式
+    class Observer {
       static observe(data) {
         if(typeof data != 'object' || ! data) {
           return
@@ -90,11 +87,10 @@
         Observer.observe(val); // 递归的设置响应式
         Object.defineProperty(data, key, {
           get() { // 拦截读取操作，并收集watcher对象
-            Dep.target && dep.addSub(Dep.target); 
-            // TODO：无法对读取对象更深层次收集依赖
+            Dep.target && dep.addSub(Dep.target);
             return val;
           },
-          set(newVal) { // TODO:设置的新值为对象时，新的对象内部没有响应式
+          set(newVal) {
             if(newVal !== val){
               val = newVal;
               dep.notify(); // 当值变动时，通知watcher对象进行更新操作
@@ -159,4 +155,3 @@
   </script>
 </body>
 </html>
-```

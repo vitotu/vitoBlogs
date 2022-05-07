@@ -5,6 +5,7 @@
 - 响应式原理  
 
 vue2通过数据劫持，利用`Object.defineProperty(target, key, descriptor)`方法，设置get，set拦截读取和设置操作，通过发布订阅模式通知更新实现响应式  
+而对于Array类型的数据通过改写push, pop, shift, unshift, splice, sort, reverse方法拦截写操作，并对数组内每个对象进行响应式设置  
 Vue中双向数据大致可以划分三个模块：Observer、Compile、Watcher，如图：  
 ![vueReactive.png](./resource/vueReactive.png)  
 
@@ -319,7 +320,7 @@ mustache 先于 vue 出现，后来被 vue 所采用，mustache官方[项目地�
 
 snabbdom是著名的虚拟DOM库，diff算法的鼻祖，vue源码借鉴了snabbdom，[snabbdom地址](https://github.com/snabbdom/snabbdom)  
 虚拟DOM:用JavaScript对象描述DOM的层次结构。DOM中的一切属性都在虚拟DOM中有对应的属性。
-snabbdom使用渲染函数(h函数)生成虚拟DOM，通过diff算法将虚拟DOM转换为真实DOM
+snabbdom使用渲染函数(h函数)生成虚拟DOM，通过diff算法将虚拟DOM转换为真实DOM，并提交真实DOM渲染任务
 
 ### h函数
 
@@ -327,10 +328,28 @@ h函数使用解析好的tokens来递归的生成虚拟节点VNode对象，便�
 
 ### diff算法
 
-新旧节点的key和标签的标签名相同则认为是同一节点，同一个VNode才进行精细化比较，只进行同层比较不进行跨层比较  
+采用深度优先遍历，把树形结构按层级分解，只比较同级元素
+同一VNode的判定标准：新旧VNode的key和sel(标签名)相同(ps:只以此为标准，并不代表两VNode完全相同，因此还会进行精细化比较)  
+判定为同一个VNode然后进行精细化比较，只进行同层比较不进行跨层比较(不会进行父子VNode交叉比较，算是一种算法效率的权衡)  
 
-- 更新策略：
-- TODO
+单个VNode的精细化比较策略：
+
+1. 若新旧VNode指向内存中同一对象则无需更新
+2. 比较VNode的text是否相同，否则更新对应的真实DOM文本node
+3. 若旧VNode和新VNode中都存在children VNode序列，则调用同层比较策略进行比较
+4. 若旧VNode中不存在children VNode，而新VNode中存在，则将新VNode中全部children VNode插入到旧VNode对应的真实DOM中
+
+同层比较策略：
+
+1. 使用左右双指针对撞分别对新旧序列进行遍历，跳过空VNode
+2. 若旧序列左指针指向VNode(以下简称旧左VNode，其他简称以此类推)与新左VNode相同，则递归调用精细化比较策略，右移新旧序列的左指针
+3. 判定新旧序列的右指针指向VNode是否相等，若相等，则递归进行精细化比较，并左移新旧序列的右指针
+4. 判定旧左VNode和新右VNode是否相等，若相等(表明该node被移动到了后方，因此进行对应更新)，则对两VNode递归进行精细化比较，同时将旧左VNode对应真实DOM的node移动到旧右VNode对应真实DOM的node后方，右移旧左指针，左移新右指针
+5. 判定旧右VNode和新左VNode是否相等，若相等(表明该node被移动到了前方，因此进行对应更新)，对两VNode递归进行精细化比较，同时将旧右VNode对应真实DOM的node移动到旧左VNode对应真实DOM的node前方，左移旧右指针，右移新左指针
+6. 若新旧左右指针均未匹配上，则利用辅助Map在旧左和旧右之间查找匹配新左节点，若不存在则创建并在旧左VNode对应真实DOM的node之前插入新左VNode，若存在则进行精细化比较，并在真实DOM中移动对应节点到旧左位置之前，将当前匹配的旧左VNode置空，方便后续跳过该节点的遍历，右移新左指针
+7. 遍历结束的条件为新序列或旧序列指针对撞完成
+8. 遍历完成后若，新序列中还有VNode剩余(说明旧序列先遍历完成)，循环创建并插入新序列中剩余VNode
+9. 若旧序列中还有VNode剩余则循环删除剩余的VNode
 
 ::: tip 简单手写实现演示如下
 <iframe id="vDom-demo" height="100px" width="100%" frameborder=0 src="/demo/vDom.html"></iframe>
