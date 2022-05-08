@@ -211,7 +211,7 @@ source-map: 源代码到构建后代码映射（如果构建后代码出错了�
 module.exports = { // 省略其他配置
   devtool: 'eval-source-map'
 }
-``` 
+```
 
 取值可以为`[inline-|hidden-|eval-][nosources-][cheap-[module-]]source-map`
 
@@ -227,18 +227,18 @@ module.exports = { // 省略其他配置
 
 开发环境：需要速度快，调试更友好
 
-  * 速度快(eval>inline>cheap>...)
+* 速度快(eval>inline>cheap>...)
     eval-cheap-souce-map;eval-source-map
-  * 调试更友好  
+* 调试更友好  
     souce-map;cheap-module-souce-map;cheap-souce-map  
-  * 推荐使用 eval-source-map  / eval-cheap-module-souce-map
+* 推荐使用 eval-source-map  / eval-cheap-module-souce-map
 
 生产环境：需要考虑源代码隐藏 调试友好
 
-  * 内联会让代码体积变大，所以在生产环境不用内联
-  * nosources-source-map 全部隐藏
-  * hidden-source-map 只隐藏源代码，会提示构建后代码错误信息
-  * 推荐使用source-map / cheap-module-souce-map
+* 内联会让代码体积变大，所以在生产环境不用内联
+* nosources-source-map 全部隐藏
+* hidden-source-map 只隐藏源代码，会提示构建后代码错误信息
+* 推荐使用source-map / cheap-module-souce-map
 
 ### oneof
 

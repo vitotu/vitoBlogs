@@ -1,12 +1,17 @@
-# nginx配置和相对url
+# web网络通信知识汇总
+
+## nginx配置和相对url
+
 当html中静态资源使用了相对url时，不同的访问方式会产生奇怪的现象  
 假设html中含有以下资源  
+
 ```html
 < img src="img1.png"/>
 < img src="./img2.png"/>
 < img src="xyz/img3.png"/>
 < img src="/xyz/img4.png"/>
 ```  
+
 1、访问地址为 www.abc.com/123 时  
 图片地址分别会被解析为:  
 www.abc.com/img1.png  
@@ -25,6 +30,7 @@ www.abc.com/xyz/img4.png
 自动通过301重定向自动将www.abc.com/123转换为www.abc.com/123/  
 但如果nginx进行了转发，则会出现上述1、2情况  
 此时nginx配置多类似与：  
+
 ```nginx.conf
 server {
   listen 80;
@@ -44,9 +50,10 @@ server {
 }
 ```
 
-# 基础概念
+## 基础概念
 
 TCP/IP分层：应用层、传输层、网络层和数据链路层
+
 * 应用层：HTTP,FTP,DNS等
 * 传输层：TCP,UDP
 * 网络层：IP
@@ -58,11 +65,15 @@ HTTP有get、post、put(上传文件)、head(类似与get，但只用于确认�
 
 由于一次TCP通信需要“三次握手，四次挥手”多次请求会造成不必要的时间开销，因此HTTP/1.1默认支持了持久化连接和管线化连接(可持续发送请求,不用等上一请求响应)
 
-# cookie
+## cookie
+
 由于http是无状态协议,因此引入cookie进行状态管理  
 cookie本质上是一种存储与共享机制
-## cookie与身份认证
+
+### cookie与身份认证
+
 session和jwt都是基于cookie的web身份认证机制
+
 * session机制：用户登录时，服务端创建session并给浏览器返回sessionId，浏览器将sessionId存储在cookie中并与域名做好关联，下次请求时带上该sessionId，由服务端验证sessionId有效性
 * token机制：流程上，token与sessionId类似，但token机制中服务端不用维护类似与session的状态
   * 简单的token由`header.payload.sign`组成，header中存储解密或签名的算法并用base64编码，payload中用户存储数据、uid、过期时间等数据同样进行base64编码，sign是用`header.payload`的base64编码和设置的密码进行加密
@@ -71,8 +82,10 @@ session和jwt都是基于cookie的web身份认证机制
 
 [参考文档](https://learnku.com/articles/30051)
 
-# http报文
+## http报文
+
 http请求报文由报文首部、报文主体构成，以空行分隔
+
 * 报文首部，由请求行及首部字段构成
   * 请求行通常格式为`<请求方法> <uri或*> <http版本>`以空格分隔
 * 通用首部字段
@@ -113,9 +126,8 @@ http请求报文由报文首部、报文主体构成，以空行分隔
   * User-Agent 传递浏览器或客户端等用户代理信息
 * 实体首部字段 用于补充实体部分信息
 
-
-
 http响应报文
+
 * 报文首部，由状态行及首部字段构成
   * 状态行的常见格式为`<http版本> <状态码> <reason字段,可选>`同样以空格分隔
 * 通用首部字段
@@ -153,6 +165,7 @@ http响应报文
   * Last-Modified 资源上次修改事件
 
 其他首部字段：
+
 * Set-Cookie 指定客户端要保存的cookie内容
 * Cookie 客户端请求中携带的Cookie信息
 
@@ -161,7 +174,8 @@ http响应报文
 针对缓存代理，首部字段又可分为End-to-end首部和hop-by-hop首部  
 http/1.1中hop-by-hop逐跳首部字段有8个：Connection、Keep-Alive、Proxy-Authenticate、Proxy-Authorization、Trailer、TE、Transfer-Encoding、Upgrade。其他均为end-to-end端到端首部
 
-# 响应状态码
+## 响应状态码
+
 类别：
 <table>
   <thead>
@@ -177,6 +191,7 @@ http/1.1中hop-by-hop逐跳首部字段有8个：Connection、Keep-Alive、Proxy
 </table>
 
 常见的状态码：
+
 * 1** 信息响应
   * 100 continue 客户端可以继续，通常客户端想要上传较大数据量时，提前征询服务器状况是否能够接收，避免不必要的网络开销
   * 101 Switching Protocols 即将切换协议，用于响应请求头中Upgrade字段
@@ -203,26 +218,33 @@ http/1.1中hop-by-hop逐跳首部字段有8个：Connection、Keep-Alive、Proxy
   * 503 service unavailable 服务器暂时无法处理请求
   * 504 Gateway timeout 网关超时
 
-# 服务器类别
+## 服务器类别
+
 * web服务器：单台物理主机可对应多台服务器，部署多个服务
 * 代理服务器：接收客户端的请求，转发给其他服务器。会对资源进行缓存的叫缓存代理，不对报文做任何处理的叫透明代理
 * 网关：网关能给通信线路上的服务器提供非http协议的服务,提高网络通信的安全性
 * 隧道：隧道可建立一条客户端到目标服务器的通信线路并使用ssl等加密手段进行加密，提供安全的通信服务
 
+## https
 
-# https
 ssl/tls、证书、非对称加密(公钥、私钥)
 加密、认证、完整性
 
-# http的发展
+## http的发展
+
 Ajax解决了部分更新问题、Comet解决服务端向客户端推送的问题、SPDY加入了安全性、首部压缩、多路复用、请求优先级、推送、服务器提示等功能，但对一个ip多域名的情况改善有限  
 webSocket是全新的协议，具备推送、减少通信量的特点，其基于http连接`Upgrade:websocket`字段，更改通信协议到ws
-# http/1.1
+
+## http/1.1
+
 http/1.1通过默认开启keep-alive复用已建立的TCP连接(请求头设置Connection:Keep-Alive，且服务端响应中也含此字段，表明此TCP连接可以复用,这个过程在http/1.1中时默认的)  
 另外服务器通常通过响应头keep-alive：timeout=5, max=1000设置连接保持的最小时长(s)和此连接可发送的最大请求数,不同服务器默认超时时长不同nginx是75秒;  
 timeout时间内没有数据传输，服务器会以75s的间隔发送10次探测报文，若仍然无响应则会关闭连接
-# http2
+
+## http2
+
 相对于http/1.1，http2有以下几点改进
+
 * 头部压缩
   * 索引表
   * 哈夫曼编码
@@ -230,10 +252,12 @@ timeout时间内没有数据传输，服务器会以75s的间隔发送10次探�
 * 链路复用，复用同一链路，充分利用了等待响应的链路空载时间
   * 相比于http1.1的管线化，链路复用利用二进制帧的特性可乱序响应，不会存在队头阻塞问题
 
+## 辨析
 
-# 辨析
-## 浏览器的强缓存和协商缓存
+### 浏览器的强缓存和协商缓存
+
 浏览器有三级缓存机制：
+
 1. 先检查内存中是否有缓存资源
 2. 然后检测磁盘中是否有缓存资源
 3. 若还没找到则进行网络请求
@@ -245,6 +269,7 @@ timeout时间内没有数据传输，服务器会以75s的间隔发送10次探�
   * 协商缓存最终由服务器来决定是否使用缓存，即客户端与服务器之间存在一次通信。若命中缓存则服务器返回304
 
 请求流程，浏览器在第一次请求后缓存资源，再次请求时，会进行下面两个步骤：
+
 * 浏览器获取缓存中的资源，根据缓存的响应header中expires和cache-control字段来判断缓存是否有效(是否命中)
   1. Cache-Control字段一般设置为max-age=3600,表示资源在响应报文创建时间开始3600秒内都有效，使用该字段时Expires字段将失效，字段含义[详见](#http报文)
 * 若没有命中强缓存，浏览器将发送请求进行协商缓存，这次请求会带上IF-Modified-Since或IF-None-Match字段，取值分别为第一次请求或上次请求返回的Last-Modified或Etag字段
@@ -257,13 +282,15 @@ ctrl+f5将导致强缓存和协商缓存都失效，但仅f5刷新，协商缓�
 ![avatar](../resource/browserCache.png)
 [参考文档](https://segmentfault.com/a/1190000021661656)
 
-## 跨域问题
+### 跨域问题
+
 此处仅讨论ajax请求跨域，其他跨域问题(cookie,iframe,LocalStorage等跨域)暂不做讨论：  
 前端调用的后端接口不属于同一个域(域名、端口号或协议不同)，就会产生跨域问题。  
 浏览器考虑cookie等安全问题设置了同源策略造成了ajax请求跨域限制，发送跨域的XHR请求时，浏览器会发送options预检请求判断服务端是否设置cors允许跨域，若未设置则拦截跨域的xhr请求  
 
 CORS是一个W3C标准，全称是”跨域资源共享”（Cross-origin resource sharing）它允许浏览器向跨源服务器，发出XMLHttpRequest请求，从而克服了AJAX只能同源使用的限制。  
 cors将请求分为两类，同时满足以下两个条件即为简单请求，否则为复杂请求：
+
 * 请求方法为:HEAD,POST,GET
 * 请求头仅包含字段:Accept,Accept-Language,Content-Language,Last-Event-ID,Content-Type(取值限于application/x-www-form-urlencoded、 multipart/form-data、text/plain)  
 TODO：复杂请求和简单请求在跨域的不同表现
@@ -275,14 +302,16 @@ TODO：复杂请求和简单请求在跨域的不同表现
 * `header contains multiple values '*,*'` 后端响应字段中配置重复
 
 解决方法：
+
 * JSONP 通过`<script>`标签的src属性实现跨域请求，这种方式只支持get请求，因此不推荐使用
-* 修改服务端(包括http服务器和应用服务器) 
+* 修改服务端(包括http服务器和应用服务器)
   * 被调用方解决，通常是在后端的api应用服务器或http服务器上添加指定字段Access-Control-Allow-Origin,Access-Control-Allow-Methods,Access-Control-Allow-Headers等
   * 调用方解决，即反向代理，将被调用方的域名代理到调用方域名下
 * postMessage
 * nodejs正向代理
 * websocket协议跨域
-+ 手写JSONP实现
+* 手写JSONP实现
+
 ```js
 // 在html中添加如下代码用于请求端
 const url = `http://127.0.0.1:3007/`
@@ -343,26 +372,32 @@ module.exports = function(ctx, body) {
 ps1:根据同源策略，不同域不可共享cookie，但实际上浏览器实现是同一个ip下的多个端口下的cookie是共享的
 ps2:ajax请求基于XMLHttpRequest(XHR)，获取数据后无需立即展示，不会导致页面刷新；而普通http请求则会导致页面刷新
 
-## CDN原理和优缺点
+### CDN原理和优缺点
+
 内容分发网络Content Delivery Network通过增加一层缓存层，将网站内容发布到离用户较近的边缘节点，是的用户可以就近取得所需内容；  
 因此具有了优点：
+
 1. 提升用户访问响应速度
 2. 跨运营商网络加速
 3. 分散了服务器及网络压力
 4. 提升了抗网络攻击风险能力
+
 缺点：
+
 1. 实时性差
 2. 缓存可能同步不及时
 
-## DNS解析
+### DNS解析
+
 DNS属于应用层，基于UDP协议，用于将域名转换为ip地址
 hosts文件：本机hosts解析配置
 域名：mail(三级域名).ccav(二级域名).com(顶级域名)
 域名服务器：
-- 本地域名服务器
-- 根域名服务器
-- 顶级域名服务器
-- 权限域名服务器
+
+* 本地域名服务器
+* 根域名服务器
+* 顶级域名服务器
+* 权限域名服务器
 
 从host到本地域名服务器是由客户端进行递归查询  
 而本地域名服务器到根域名服务器是由本地域名服务器进行迭代查询  

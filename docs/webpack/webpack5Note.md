@@ -1,4 +1,6 @@
-# webpack5
+# webpack进阶知识
+
+## webpack5
 
 此版本重点关注以下内容:
 
@@ -8,11 +10,11 @@
 - 清除处于怪异状态的内部结构，同时在 v4 中实现功能而不引入任何重大更改.
 - 通过引入重大更改来为将来的功能做准备，以使我们能够尽可能长时间地使用 v5.
 
-## 下载
+### 下载
 
 - npm i webpack@next webpack-cli -D
 
-## 自动删除 Node.js Polyfills
+### 自动删除 Node.js Polyfills
 
 早期，webpack 的目标是允许在浏览器中运行大多数 node.js 模块，但是模块格局发生了变化，许多模块用途现在主要是为前端目的而编写的。webpack <= 4 附带了许多 node.js 核心模块的 polyfill，一旦模块使用任何核心模块（即 crypto 模块），这些模块就会自动应用。
 
@@ -25,19 +27,19 @@ webpack 5 会自动停止填充这些核心模块，并专注于与前端兼容�
 - 尽可能尝试使用与前端兼容的模块。
 - 可以为 node.js 核心模块手动添加一个 polyfill。错误消息将提示如何实现该目标。
 
-## Chunk 和模块 ID
+### Chunk 和模块 ID
 
 添加了用于长期缓存的新算法。在生产模式下默认情况下启用这些功能。
 
 `chunkIds: "deterministic", moduleIds: "deterministic"`
 
-## Chunk ID
+### Chunk ID
 
 你可以不用使用 `import(/* webpackChunkName: "name" */ "module")` 在开发环境来为 chunk 命名，生产环境还是有必要的
 
 webpack 内部有 chunk 命名规则，不再是以 id(0, 1, 2)命名了
 
-## Tree Shaking
+### Tree Shaking
 
 1. webpack 现在能够处理对嵌套模块的 tree shaking
 
@@ -75,7 +77,7 @@ export function test() {
 
 3. webpack 现在能处理对 Commonjs 的 tree shaking
 
-## Output
+### Output
 
 webpack 4 默认只能输出 ES5 代码
 
@@ -83,7 +85,7 @@ webpack 5 开始新增一个属性 output.ecmaVersion, 可以生成 ES5 和 ES6 
 
 如：`output.ecmaVersion: 2015`
 
-## SplitChunk
+### SplitChunk
 
 ```js
 // webpack4
@@ -98,7 +100,7 @@ minSize: {
 }
 ```
 
-## Caching
+### Caching
 
 ```js
 // 配置缓存
@@ -114,28 +116,31 @@ cache: {
 
 缓存将存储到 `node_modules/.cache/webpack`
 
-## 监视输出文件
+### 监视输出文件
 
 之前 webpack 总是在第一次构建时输出全部文件，但是监视重新构建时会只更新修改的文件。
 
 此次更新在第一次构建时会找到输出文件看是否有变化，从而决定要不要输出全部文件。
 
-## 默认值
+### 默认值
 
 - `entry: "./src/index.js`
 - `output.path: path.resolve(__dirname, "dist")`
 - `output.filename: "[name].js"`
 
-## 更多内容
+### 更多内容
 
-https://github.com/webpack/changelog-v5
+<https://github.com/webpack/changelog-v5>
 
-# webpack高级
+## webpack高级
+
 对于脚手架，以vue-cli为例，vue2集成了webpack构建工具，使用`npx vue-cli-service inspect --mode=development > [文件名]`命令可将vue2使用的配置生成文件
 
-## loader
+### loader
+
 loader主要用于处理webpack不能处理的资源，其本质是一个函数，详细参考[官方文档](https://www.webpackjs.com/api/loaders/)  
 以下为一个简单的babel-loader:
+
 ```js
 const { getOptions } = require('loader-utils'); // 获取传入loader的options选项
 const { validate } = require('schema-utils'); // 验证传入options是否符合schema规则
@@ -180,10 +185,13 @@ module.exports.pitch = function (remainingRequest, precedingRequest, data) {
 }
 ```
 
-## plugin
+### plugin
+
 plugin是一个类，因此使用时需要new操作符实例化  
 plugin通过hook，捕获在每个编译(compilation)中触发的所有关键事件。在编译的每一步，plugin都具备完全访问webpack的compiler对象的能力，如果情况合适，还可以访问当前compilation对象。
-* tapable是webpack的核心工具，提供了plugin接口,简单的tapable类：
+
+- tapable是webpack的核心工具，提供了plugin接口,简单的tapable类：
+
 ```js
 const { SyncHook, SyncBailHook, AsyncParallelHook, AsyncSeriesHook } = require('tapable');
 
@@ -245,7 +253,8 @@ l.tap();
 l.start();
 ```
 
-* 简单的copy插件
+- 简单的copy插件
+
 ```js
 const path = require('path');
 const fs = require('fs');
@@ -337,7 +346,8 @@ module.exports = CopyWebpackPlugin;
 
 [官方文档](https://www.webpackjs.com/api/plugins/)
 
-## webpack基本工作流程
+### webpack基本工作流程
+
 1. 初始化 Compiler：webpack(config) 得到 Compiler 对象
 2. 开始编译：调用 Compiler 对象 run 方法开始执行编译
 3. 确定入口：根据配置中的 entry 找出所有的入口文件。
