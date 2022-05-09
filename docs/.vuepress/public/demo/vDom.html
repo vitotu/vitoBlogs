@@ -147,7 +147,7 @@
             VDom.patchVNode(oldCh[oldRI], newCh[newLI]);
             parentElm.insertBefore(oldCh[oldRI].elm, oldCh[oldLI].elm);
             oldRI--;
-            oldLI++;
+            newLI++;
           } 
           else { // 若左右指针均未匹配上，在旧序列左右指针范围内通过key对新序列左指针对应节点进行查找
             if(!keyMap){ // 辅助查找对象为空则，先填充辅助查找对象

@@ -245,7 +245,12 @@ this.$bus.$emit('hello',this.name)
     1.销毁后借助Vue开发者工具看不到任何信息。  
     2.销毁后自定义事件会失效，但原生DOM事件依然有效。  
     3.一般不会在beforeDestroy操作数据，因为即便操作数据，也不会再触发更新流程了。  
-  
+
+- 父子组件生命周期执行顺序
+    1. 加载过程：父组件beforeCreate => 父组件created => 父组件beforeMount => 子组件beforeCreate => 子组件created => 子组件 beforeMount => 子组件mounted => 父组件mounted
+    2. 更新过程：父组件beforeUpdate => 子组件beforeUpdate => 子组件updated => 父组件updated
+    3. 销毁过程：父组件beforeDestroy => 子组件 beforeDestroy => 子组件 destroyed => 父组件 destroyed
+
 ## 组件化编程  
 
 Vue中使用组件的三大步骤：  
@@ -290,7 +295,18 @@ ps：构造函数的prototype显式原型属性与其实例化后的实例的__p
   export {createMessage}  // 暴露函数，调用方引入该函数并调用即可使用MyMessage组件
   ```
 
-## 脚手架  
+## 组件间通信的方式
+
+TODO：详细展开
+
+- props & emit
+- EventBus 事件总线
+- vuex
+- provide & inject
+- $parent & $children ref属性和refs引用的方式
+- 发布订阅模式
+
+## 脚手架
   
 main.js文件中使用`render: h => h(App)`的原因是  
 通过脚手架import的vue只包含核心功能没有模板解析器，因此不能使用template配置项，需要使用render函数接收到的createElement函数(简写为h)去指定具体内容  
