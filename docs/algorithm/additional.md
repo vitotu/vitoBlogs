@@ -36,32 +36,39 @@ var shallowCopy = function(obj){
   + 可通过二分查找法找到i
 
 ```js
-var Solution = function(w) {
-    pre = new Array(w.length).fill(0); // 辅助存储区间(仅存右边界即可)
-    pre[0] = w[0];
-    for (let i = 1; i < w.length; ++i) {
-        pre[i] = pre[i - 1] + w[i];
+class Solution {
+  static randomWrapper(w){
+    let cache = [];
+    if(!w ||  w.length < 1) return -1;
+    cache[0] = w[0]; // 取其右边界从1开始
+    for(let i = 1; i < w.length; i++){
+      cache[i] = cache[i - 1] + w[i]
     }
-    this.total = pre[pre.length - 1];
-};
-// Solution([3,1,2,4,4,6,1,3,7,9,11]);
-
-Solution.prototype.pickIndex = function() {
-    const x = Math.floor((Math.random() * this.total)) + 1;
-    const binarySearch = (x) => {
-        let low = 0, high = pre.length - 1;
-        while (low < high) {
-            const mid = Math.floor((high - low) / 2) + low;
-            if (pre[mid] < x) {
-                low = mid + 1;
-            } else {
-                high = mid;
-            }
+    let total = cache[cache.length - 1];
+    return function() {
+      let x = Math.floor(Math.random()*total + 1);
+      const BinarySearch = () => {
+        let left = 0, right = cache.length - 1;
+        while(left < right){
+          let mid = Math.floor((right - left) / 2) + left;
+          if(cache[mid] < x) left = mid + 1; 
+          else right = mid;
         }
-        return low;
+        return left;
+      }
+      return BinarySearch();
     }
-    return binarySearch(x);
-};
+  }
+  static test() {
+    const example = [3, 14, 1, 7];
+    const pickNumber = Solution.randomWrapper(example);
+    let i = 10;
+    while(i--){
+      console.log(pickNumber());
+    }
+  }
+}
+Solution.test();
 ```
 
 ## 异步并发控制
