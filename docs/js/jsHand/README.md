@@ -5,6 +5,39 @@
 JSON.parse(JSON.stringify())的方式无法复制函数等数据类型，因此不是完备的深拷贝
 Object.assign为浅层拷贝，对象深层嵌套时拷贝的是引用
 
+TODO：还需要考虑的问题，对于Object类型：
+
++ 原型链修复
++ 不可枚举的key是否要复制
++ Symbol类型的key是否要复制
+
+::: tip 相关知识点
+
+for...of(依赖iterator接口)和for...in(对key进行遍历)的区别
+
+获取对象的key方法的区别，如下：
+
+```js
+class Demo {
+  static a() {
+    console.log('a')
+  }
+  static b() {
+    console.log('b')
+  }
+}
+for(let key in Demo){}; // 自身可枚举和继承的可枚举
+Object.keys(Demo); // 自身可枚举
+Object.getOwnPropertyNames(Demo); // 自身非symbol所有键值
+Object.getOwnPropertySymbols(Demo); // 自身symbol键值
+Reflect.ownKeys(Demo); // 自身所有键值 
+//以上均不含'__'开头的隐藏键值
+```
+
+:::
+
++ js实现
+
 ```js
 class Demo {
 /**

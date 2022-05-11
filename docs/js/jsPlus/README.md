@@ -291,7 +291,7 @@ function throttle(fn, interval) {
 ```
 
 ### flatMap手写实现
-
+<!-- TODO:迁移到手写系列中 -->
 flatMap用于将数组展开，并map映射，但官方支持中，实际上是先map后flat，因此会造成如下问题:
 
 ```js
@@ -323,7 +323,7 @@ Demo.test()
 ```
 
 ## js运行机制  
-
+<!-- TODO：迁移到浏览器原理中 -->
 js执行是会将对象放在堆(heap)中，将基础变量以及对象的引用(指针)放在栈(stack)中;  
 js还维护了一个执行栈与数据栈意义不同  
 
