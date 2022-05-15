@@ -2139,3 +2139,115 @@ class Solution {
   }
 }
 ```
+
+## NO.41 数据流中的中位数
+
+题目：如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值，若果从数据流中读出偶数个数值，那么中位数就是所有数值排序后中间两个数的平均值
+
++ 解题思路：由于输入是数据流，因此需要维护一个容器，存储每次输入的数据。要获得中位数，可以维护一个排序数组容器，每次可以从中间索引位置获得中位数。但考虑到中位数的特性，可以维护一个最大堆left和最小堆right，保证最大堆中的所有元素left小于最小堆中right中的所有元素，并且两堆的大小相差不大于1，因此取出中位数时，可以直接取堆顶元素
++ 步骤：
+  1. 初始化两个辅助堆
+  2. 对数据流中的数据进行入堆，若当前长度为奇数则向最小堆right中推入元素
+  3. 向right中推入元素num时，先判断num是否小于left的堆顶，若小于则需要先入left堆，然后从left堆中取出堆顶元素，入堆right中，保持两堆平衡。若不小于则直接入堆right
+  4. 取出中位数时，若数据流总长度为奇数，则直接取right堆顶，若为偶数，则取两堆顶元素求平均
+
++ js实现
+
+```js
+
+class Heap { // 先实现了堆数据结构
+  constructor(compare, arr=[]){
+    this.compare = compare; // 比较函数，用于控制生产最大堆或最小堆
+    this.arr = arr; // 初始化array
+    if(arr && Array.isArray(arr)){ // 建堆代码与此题无关
+      this._buildDown2Top(); // 若初始化arr不为空，则对arr建堆
+    }
+  }
+  get size() {
+    return this.arr.length;
+  }
+  _buildDown2Top() { // 建堆代码与此题无关
+    for(let i = this.size - 1; i >= 0; i--){
+      this._down(i, this.size - 1);
+    }
+  }
+  _buildTop2Down() { // 建堆代码与此题无关
+    for(let i = 0; i < this.size; i++){
+      this._up(i, this.size - 1);
+    }
+  }
+  _down(parent, end) { // 向下递归堆化
+    if(parent < 0 || parent > end) return;
+    let left = parent * 2 + 1;
+    let right = left + 1;
+    this._compareNode(parent, left, right, 'down', end);
+  }
+  _up(child, end){ // 向上递归堆化
+    if(child < 0 || child > end) return;
+    let parent = Math.floor((child - 1) / 2);
+    let left = parent * 2 + 1;
+    let right = left + 1;
+    this._compareNode(parent, left, right, 'up', end);
+  }
+  _compareNode(parent, left, right, type, end){ // 每个节点对通用对比函数
+    let target = parent;
+    if(left <= end && this.compare(this.arr[target], this.arr[left])){
+      target = left;
+    }
+    if(right <= end && this.compare(this.arr[target], this.arr[right])){
+      target = right;
+    }
+    if(target !== parent){
+      let temp = this.arr[target];
+      this.arr[target] = this.arr[parent];
+      this.arr[parent] = temp;
+      type === 'up' ? this._up(parent, end) : this._down(target, end);
+    }
+  }
+  push(num) {
+    this.arr.push(num);
+    this._up(this.size - 1, this.size - 1);
+  }
+  pop() {
+    if(this.size <= 0) return undefined;
+    let result = this.arr[0];
+    this.arr[0] = this.arr[this.size - 1];
+    this.arr.pop();
+    this._down(0, this.size - 1);
+    return result;
+  }
+  peek(){
+    if(this.size <= 0) return undefined;
+    return this.arr[0];
+  }
+}
+
+var MedianFinder = function() {
+  this.arr = [];
+  this.left = new Heap((a, b) => a < b); // 最大堆
+  this.right = new Heap((a, b) => a > b); // 最小堆
+};
+MedianFinder.prototype.addNum = function(num) {
+  this.arr.push(num);
+  let target = num;
+  if(this.arr.length & 1){ // 总长度为奇数，则插入到右边的最小堆中
+    if(this.left.size > 0 && this.left.peek() > target){
+      this.left.push(target); // 若推入数字小于left则先入left，在将left堆顶入right
+      target = this.left.pop();
+    }
+    this.right.push(target);
+  } else {
+    if(this.right.size > 0 && this.right.peek() < target){
+      this.right.push(target); // 与上方功能类似
+      target = this.right.pop();
+    }
+    this.left.push(target);
+  }
+};
+MedianFinder.prototype.findMedian = function() {
+  let size = this.arr.length;
+  if(size === 0) return undefined;
+  if(size & 1) return this.right.peek();
+  else return (this.left.peek() + this.right.peek()) / 2;
+};
+```
