@@ -2251,3 +2251,33 @@ MedianFinder.prototype.findMedian = function() {
   else return (this.left.peek() + this.right.peek()) / 2;
 };
 ```
+
+## NO.42 连续子数组的最大和
+
+题目：输入一个整形数组，数组中有正数也有负数。数组中的一个或连续多个整数组成一个子数组。求所有子数组的和的最大值。要求时间复杂度为O(n)
+
++ 解题思路：
+  + 思路1：使用sum变量存储累加和，当sum小于或等于0时再累加只能让数字更小，因此丢弃sum值，并赋予当前遍历的值item，每次遍历判断sum是否比暂存的max大，若大则将max更新为最新的sum
+  + 思路2：动态规划
++ js实现思路1：
+
+```js
+class Solution {
+  static maxSubArray(arr){
+    if(!arr || !Array.isArray(arr)) return;
+    let max = arr[0];
+    let sum = 0;
+    for(let item of arr){
+      if(sum <=0) sum = item;
+      else sum += item;
+      if(sum > max) max = sum;
+    }
+    return max;
+  }
+  static test() {
+    const example = [-2,1,-3,4,-1,2,1,-5,4];
+    console.log(Solution.maxSubArray(example) === 6);
+  }
+}
+Solution.test();
+```

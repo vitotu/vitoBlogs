@@ -2296,6 +2296,11 @@ class Solution:
 
 题目：输入一个整形数组，数组中有正数也有负数。数组中的一个或连续多个整数组成一个子数组。求所有子数组的和的最大值。要求时间复杂度为O(n)
 
++ 解题思路：
+  + 思路1：使用sum变量存储累加和，当sum小于或等于0时再累加只能让数字更小，因此丢弃sum值，并赋予当前遍历的值item，每次遍历判断sum是否比暂存的max大，若大则将max更新为最新的sum
+  + 思路2：动态规划
++ js实现思路1：
+
 ```python
 class Solution:
     def FindGreatestSumOfSubArray(self, array):
