@@ -94,6 +94,13 @@ else
 fi
 ```
 
+#### xargs指令
+
+将标准输入转换为命令行参数，`|`管道连接符将左侧的标准输出连接到右边的标准输入，但部分命令行工具不支持标准输入作为参数，仅支持命令行参数，因此xargs通常与管道符一起使用  
+如：`echo "output" | xargs echo`，xargs调用形式为`xargs [-options] [command]`  
+单独使用xargs命令等同于`xargs echo`并等待用户输入，按下ctrl+d结束输入，并输出用户输入的内容  
+xargs默认使用空格`\s`和换行符`\n`作为分隔符，拆分标准输入为多个命令行参数，通过`-d`参数可更改分隔符
+
 ## ubuntu下mysql8.0的使用
 
 ### 忘记root密码解决方案
@@ -132,3 +139,29 @@ docker cp <本地文件路径> <容器id>:<容器路径> # 向docker容器中复
 ```
 
 [参考文档](https://yeasy.gitbook.io/docker_practice)
+
+## ssh
+
+### ssh配置代理访问github
+
++ win10环境: ~/.ssh/config 文件中添加以下内容(程序路径替换为自己的git安装路径)
+
+```.ssh/config
+Host github.com
+  ProxyCommand "C:\Program Files\Git\mingw64\bin\connect.exe" -S 127.0.0.1:1080 %h %p
+```
+
+其中：
+`Host github.com` ： 仅github使用该代理
+`-S` 选项指sock协议默认sock5，指向代理服务器ip及端口
+
++ Ubuntu环境: ~/.ssh/config 文件中添加以下内容
+
+```.ssh/config
+Host github.com
+	User git
+	ProxyCommand nc -X 5 -x 192.168.9.100:10808 %h %p
+```
+
+利用了nc进行代理，其中
+`-X 5` 参数表示选定了sock5作为通信协议
