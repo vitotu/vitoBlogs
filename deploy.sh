@@ -26,6 +26,7 @@ fi
 # 拉取更新
 git pull
 # 复制打包文件到当前目录
+rm -rf ./*
 cp -rf ../docs/.vuepress/dist/. ./
 # 如果是发布到自定义域名
 # echo 'www.yourwebsite.com' > CNAME
