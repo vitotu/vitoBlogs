@@ -2281,3 +2281,48 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.43 `[1,n]`整数中1出现的次数
+
+题目：输入一个整数n，求`[1,n]`这n个整数的十进制表示中1出现的次数。例如，输入12，则`[1,12]`这些整数中包含1的数字有1，10,11和12,数字1一共出现了5次
+
++ 解题思路：此题本质可按照排列组合来处理
+
+将1~n，个、十、百、千···等各位置出现1的次数相加，即为总次数  
+设当前为i的值为cur，则高位组成的值为high、低位组成的值为low，当前为乘率为digit  
+
+1. 当cur=0，出现1的次数为`high*digit`，以n=2304的十位为例:  
+![S4O43-1.png](./resource/S4O43-1.png)
+2. 当cur=1，出现1的次数为`high*digit + low + 1`，以n=2314的十位为例:  
+![S4O43-2.png](./resource/S4O43-2.png)
+3. 当cur>1时，出现1的次数为`(high + 1) * digit`，以n=2324的十位为例:  
+![S4O43-3.png](./resource/S4O43-3.png)
+
+循环遍历每一位，终止条件为cur和high同时为0，[参考leetcode路飞](https://leetcode.cn/problems/1nzheng-shu-zhong-1chu-xian-de-ci-shu-lcof/solution/mian-shi-ti-43-1n-zheng-shu-zhong-1-chu-xian-de-2/)
+此题转换为排列组合后，关键在于确定cur出现1的数字范围，限定范围后，可按照排列组合的方式确定，组合数
+
+```js
+class Solution {
+  static countDigitOne = function(n) {
+    if(n <= 0) return 0;
+    if(n <= 9) return 1;
+    let high = Math.floor(n / 10); // 初始值
+    let cur = n % 10, low = 0, digit = 1;
+    let res = 0;
+    while(high !== 0 || cur !== 0){ // 当不同时为0时继续遍历
+      if(cur === 0) res += high * digit; // 根据不同的情况计算不同的排列
+      else if(cur === 1) res += high * digit + low + 1;
+      else res += (high + 1) * digit;
+      low += digit * cur; // 更新各变量
+      cur = high % 10;
+      high = Math.floor(high / 10);
+      digit *= 10;
+    }
+    return res;
+  }
+  static test() {
+    console.log(Solution.countDigitOne(13));
+  }
+}
+Solution.test();
+```

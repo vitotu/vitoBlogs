@@ -2325,31 +2325,35 @@ class Solution:
 
 题目：输入一个整数n，求[1,n]这n个整数的十进制表示中1出现的次数。例如，输入12，则[1,12]这些整数中包含1的数字有1，10,11和12,1一共出现了5次
 
++ 解题思路：此题本质可按照排列组合来处理
+
+将1~n，个、十、百、千···等各位置出现1的次数相加，即为总次数  
+设当前为i的值为cur，则高位组成的值为high、低位组成的值为low，当前为乘率为digit  
+
+1. 当cur=0，出现1的次数为`high*digit`，以n=2304的十位为例:  
+![S4O43-1.png](./resource/S4O43-1.png)
+2. 当cur=1，出现1的次数为`high*digit + low + 1`，以n=2314的十位为例:  
+![S4O43-2.png](./resource/S4O43-2.png)
+3. 当cur>1时，出现1的次数为`(high + 1) * digit`，以n=2324的十位为例:  
+![S4O43-3.png](./resource/S4O43-3.png)
+
+循环遍历每一位，终止条件为cur和high同时为0，[参考leetcode路飞](https://leetcode.cn/problems/1nzheng-shu-zhong-1chu-xian-de-ci-shu-lcof/solution/mian-shi-ti-43-1n-zheng-shu-zhong-1-chu-xian-de-2/)
+此题转换为排列组合后，关键在于确定cur出现1的数字范围，限定范围后，可按照排列组合的方式确定，组合数
+
 ```python
 class Solution:
-    def NumberOf1(self,strN):
-        """递归的计算含有1的数量"""
-        if not strN:
-            return 0
-        first = ord(strN[0]) - ord('0')
-        length = len(strN)
-        if length == 1 and first == 0:
-            return 0
-        if length == 1 and first > 0:
-            return 1
-        numFirstDigit = 0
-        if first > 1:
-            numFirstDigit = pow(10, length - 1)
-        elif first == 1:
-            numFirstDigit = int(''.join(strN[1:])) + 1
-        numOtherDigts = first*(length - 1)*pow(10, length - 2)
-        numRecursive = self.NumberOf1(strN[1:])
-        return numFirstDigit + numOtherDigts + numRecursive
-    def NumberOf1Between1AndN_Solution(self, n):
-        """主函数，判断输入数字是否有效，并将其转换成字符型列表，算法复杂度O(logn)"""
-        if n <= 0:
-            return 0
-        return self.NumberOf1(list(str(n)))
+    def countDigitOne(self, n: int) -> int:
+        digit, res = 1, 0
+        high, cur, low = n // 10, n % 10, 0
+        while high != 0 or cur != 0:
+            if cur == 0: res += high * digit
+            elif cur == 1: res += high * digit + low + 1
+            else: res += (high + 1) * digit
+            low += cur * digit
+            cur = high % 10
+            high //= 10
+            digit *= 10
+        return res
 # test code
 # 代码已在牛客网通过测试
 ```
