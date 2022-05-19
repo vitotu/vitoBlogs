@@ -1,0 +1,6 @@
+# vuex基础到原理
+
+Vuex是vue的状态管理模式。它采用集中式存储管理应用的所有组件的状态，并以相应的规则保证状态以一种可预测的方式发生变化。
+Vuex实现了一个单项数据流，通过创建一个全局的 State 数据，组件通过commit操作触发mutation或通过dispatch触发action间接触发mutation来操作state中的数据  
+通常Mutation用于同步的修改state中的数据，而action用于异步的使用mutation，保证不会有写入冲突  
+state的响应式借用vue组件的data选项实现，getter方法及响应式则与vue组件的computed属性相似

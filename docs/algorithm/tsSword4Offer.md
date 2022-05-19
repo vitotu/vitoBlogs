@@ -2326,3 +2326,41 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.44 数字序列中某一位的数字
+
+题目：数字以0123456789101112131415...的格式序列化到一个字符序列中。在这个序列中，第5位(从0开始计数)是5，第13位是1，第19为是4，等等。请写一个函数，求任意第n位对应的数字
+
++ 解题思路：将数字分段按照位数，`[1-9]`,`[10-99]`,`[100-999]`···；对应位数digit分别为1,2,3,···(`digit++`)；每段起始数字start为，1,10,100,···(`start*=10`)；对应每段区间字符数count为`9*start*digit`
+  1. 首先输入n是从0开始的，所以相当于序列化字符串的索引，若n > count 则对n进行遍历，直到不满足该条件，求得n所在数字区间
+  2. 利用该区间的起始数字及位数，求得n所在数字num。注意：每段区间start的个位数均从0开始,因此n需减1，再除digit取整(第一段区间除外，但由于含0，所以规则同样有效)
+  3. 取得n所在数字num后`((n - 1) $ digit)`即为n所在字符的索引
+
+[思路参考路飞](./TODO)
+
+```js
+class Solution {
+  static findNthDigit(n) {
+    let start = 1, digit = 1, count = 9;
+    while(n > count){
+      n -= count;
+      start *= 10;
+      digit++;
+      count = 9 * start * digit
+    }
+    let num = start + Math.floor((n - 1) / digit);
+    return Number((num).toString()[(n - 1) % digit]);
+  }
+  static test() {
+    let example = [5, 13, 19]
+    example.forEach(i => {
+      console.log(Solution.findNthDigit(i));
+    })
+  }
+}
+Solution.test();
+```
+
+## NO.45 把数组排成最小的数
+
+题目：输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数组中最小的一个。例如，输入数组{3,32,321}，则打印出这三个数字能排成的最小数字321323
