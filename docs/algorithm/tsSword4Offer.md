@@ -2394,7 +2394,7 @@ Solution.test();
 ```js
 class Solution {
   static translateNum(num) {
-    let dp = [1, 1], x, y = num % 10; // 初始化y为个位数
+    let dp = [1, 1], x, y = num % 10; // 初始化y为个位数, dp初始无数字和1位数字的翻译方法均为1
     while(num !== 0) {
       num  = Math.floor(num / 10); // 从右向左遍历
       x = num % 10; // 首次遍历x为十位数
