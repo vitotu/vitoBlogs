@@ -2364,3 +2364,51 @@ Solution.test();
 ## NO.45 把数组排成最小的数
 
 题目：输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数组中最小的一个。例如，输入数组{3,32,321}，则打印出这三个数字能排成的最小数字321323
+
++ 解题思路：定义比较大小的函数Compare，在此函数中尝试尝试拼接数字a,b，若ab > ba 则任务a > b 返回对应bool值即可；使用排序算法对数组进行排序即可获得最小数字的排列
+
+```js
+class Solution {
+  static minNumber(nums) {
+    return nums.sort(Solution._compare).join('');
+  }
+  static _compare(a, b) {
+    let left = Number((a).toString() + b);
+    let right = Number((b).toString() + a);
+    return left - right;
+  }
+  static test() {
+    let example = [3,30,34,5,9];
+    console.log(Solution.minNumber(example));
+  }
+}
+Solution.test();
+```
+
+## NO.46 把数字翻译成字符串
+
+题目：给定一个数字，我们按照如下规则把它翻译为字符串：0翻译成'a'，1翻译为'b'，....，11翻译为'l'，...，25翻译为'z'。一个数字可能有多个翻译。例如，12258有5中不同的翻译，分别是'bccfi','bwfi','bczi','mcfi','mzi'。请编程实现一个函数，用来计算一个数字有多少种不同的翻译方法。
+
++ 解题思路：设n位数翻译方法是f(n)种,则第n位单独翻译时有f(n-1)中翻译方法，若第n位、第n-1位可以整体翻译时,翻译则可选择整体翻译或分别翻译，因此翻译方法有`f(n-2) + f(n-1)`种。可使用动态规划，从右向左遍历各位上的数字，其中n位上的数字为0时无法进行整体翻译
+
+```js
+class Solution {
+  static translateNum(num) {
+    let dp = [1, 1], x, y = num % 10; // 初始化y为个位数
+    while(num !== 0) {
+      num  = Math.floor(num / 10); // 从右向左遍历
+      x = num % 10; // 首次遍历x为十位数
+      let temp = 10 * x + y; // 计算xy组合是否在整理可翻译的范围内，并计算最近的dp值
+      let target = (temp >= 10 && temp <= 25) ? dp[0] + dp[1] : dp[1];
+      dp[0] = dp[1]; // 更新dp值
+      dp[1] = target;
+      y = x; // 更新下一轮递归的y值
+    }
+    return dp[1];
+  }
+  static test() {
+    console.log(Solution.translateNum(12258));
+  }
+}
+Solution.test();
+```
