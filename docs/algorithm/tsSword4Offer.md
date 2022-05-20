@@ -2412,3 +2412,34 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.47 礼物的最大价值
+
+题目:在一个m*n的棋盘的每一格都放有一个礼物，每个礼物都有一定的价值(价值大于0).你可以从棋盘的左上角开始拿格子里的礼物，并每次向右或者向下移动一格，直到达到棋盘的右下角。给定一个棋盘及其上面的礼物，请计算你最多能拿到多少价值的礼物？
+
++ 解题思路：区别于回溯法，本题使用动态规划，考虑到第`dp[i][j]`处的礼物价值仅与格子`grid[i][j]`、上方`dp[i-1][j]`和左方`dp[i][j-1]`的价值有关，因此可以对棋盘grid进行遍历，为节省内存可以直接在grid上修改价值，将grid转换为dp，最后dp矩阵右下角即为能最多拿到的礼物价值
+
+```js
+class Solution {
+  static maxValue(grid){
+    for(let i = 0; i < grid.length; i++){
+      for(let j = 0; j < grid[0].length; j++){
+        if(i === 0 && j === 0) continue; // 初始位置价值就等于其本身
+        if(i === 0) grid[i][j] += grid[i][j-1]; // 位于第一行，至与左边的值有关
+        else if(j === 0) grid[i][j] += grid[i - 1][j]; // 位于第一列
+        else grid[i][j] += Math.max(grid[i - 1][j], grid[i][j - 1])
+      }
+    }
+    return grid[grid.length - 1][grid[0].length - 1] // 返回右下角的值
+  }
+  static test() {
+    let example = [
+      [1,3,1],
+      [1,5,1],
+      [4,2,1]
+    ];
+    console.log(Solution.maxValue(example))
+  }
+}
+Solution.test();
+```
