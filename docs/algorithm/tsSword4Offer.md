@@ -2443,3 +2443,128 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.48 最长不含重复字符的字符串
+
+题目：请从字符串中找出一个最长的不包含重复字符的子字符串，计算该最长子字符串的长度。假设字符串中只包含'a'-'z'的字符。例如，在字符串"arabcacfr"中，最长的不含重复字符的子字符串是"acfr"，长度为4.
+
++ 解题思路：滑动窗口
+  1. 双指针left和right滑动窗口，利用hash表辅助存储在窗口内字符出现的次数
+  2. right指针遍历字符串扩大窗口，每次遍历时更新hash表
+  3. 判断新加入的字符次数大于1则，在left侧缩小窗口，直到窗口内不包含重复字符
+  4. 比较区间和res的大小，并更新res值，遍历完成后即可得到最大的长度
++ 解题思路二：动态规划，
+  1. `dp[j]`代表以`s[j]`结尾的最长不重复子字符串的长度，在j左侧与右边界`s[j]`最近的相同字符串记为`s[i]`
+  2. 当`dp[j-1] < j - i`时，说明`s[i]`在区间外，`dp[j] = dp[j - 1] + 1`
+  3. 当`dp[j - 1] >= j -i`时，`s[i]`在区间内`dp[j] = j - i`
+  4. 遍历整个字符串得到dp数组中最大数值即为最大长度(最大值可边遍历边判断, 因此无需记录dp数组)
+
+::: tip 动态规划也可使用双指针
+
+1. 利用j指针遍历s，利用hash存储`s[j]`最后出现的索引位置
+2. 根据上一轮`i`和`hash[s[j]]`，更新左边界`i = max(hash[s[j]], i)`，保证区间内无重复字符
+3. 更新`res = max(res, j - i)`
+
+:::
+
+```js
+class Solution {
+  // 滑动窗口实现
+  static lengthOfLongestSubstring(s){
+    let window = {}; // 滑动窗口hash
+    let left = 0, right = 0, res = 0; // 初始化左右指针和长度记录
+    while(right < s.length){ // 向右扩大窗口
+      let char = s[right++];
+      if(window[char]) window[char]++; // 向hash中添加该字符记录
+      else window[char] = 1;
+      while(window[char] > 1){ // 在hash中发现重复字符,left指针缩小窗口
+        let tmp = s[left++]; // 获取退出窗口的字符
+        window[tmp]--; // 将该字符记录减1，通常此时tmp与char是相等的
+      }
+      res = Math.max(res, right - left); // 每轮遍历记录最大符合要求的长度
+    }
+    return res;
+  }
+  // 动态规划思路实现
+  static lengthOfLongestSubstring2(s){
+    let res = 0, i = -1, hash = {}; // 因为j从0开始遍历i必须初始化为-1，保证j-i为区间长度(左开右闭区间)
+    for(let j = 0; j < s.length; j++){
+      // 优先判断hash中是否右重复字符(此处必须用undefined比较，因为索引0位为false)，若右更新i值
+      if(hash[s[j]] !== undefined) i = Math.max(hash[s[j]], i);
+      hash[s[j]] = j; // 更新hash字符对应索引位
+      res = Math.max(res, j - i); // 更新最新dp
+    }
+    return res;
+  }
+  static test() {
+    let example = 'pwwkew'
+    console.log(Solution.lengthOfLongestSubstring(example));
+  }
+}
+Solution.test();
+```
+
+## NO.49 丑数
+
+题目：我们把只包含因子2,3,5的数成为丑数，求从小到大的顺序的第1500个丑数。例如，6,8都是丑数，但14不是，因为它包含因子7.习惯上我们把1当做第一个丑数。
+
++ 解题思路：动态规划，根据丑数的性质有"丑数 = 某较小的丑数 × 某因子(2,3,5)"，设某较小丑数在dp中的索引为a, b, c分别对应因子2, 3, 5。可得长度为n 的丑数序列dp中`dp[n+1] = min(dp[a]*2, dp[b]*3, dp[c]*5)`，且a, b, c需要满足以下条件：
+  1. `dp[a]*2 > dp[n] >= dp[a-1]*2`,第一个乘2后大于`dp[n]`的丑数
+  2. `dp[b]*3 > dp[n] >= dp[b-1]*3`,第一个乘3后大于`dp[n]`的丑数
+  3. `dp[c]*5 > dp[n] >= dp[c-1]*5`,第一个乘5后大于`dp[n]`的丑数
+
++ 步骤：
+  1. 动态规划列表`dp[i]`表示第`i+1`个丑数(从0开始)
+  2. 取满足条件的a, b, c索引值更新`dp[i]`值
+  3. 分别判断a, b, c维持其仍满足新`dp[i]`的条件，(具体来说更新后的`dp[i]`必定等于其中一个的对应丑数×因子，找出其索引并加1)
+  4. 循环n次后输出末位数即可
+
+```js
+class Solution {
+  static nthUglyNumber(n){
+    let dp = new Array(n).fill(1); // 根据n，先分配dp长度
+    let a = 0, b = 0, c = 0; // a,b,c为第一个丑数，索引为0
+    for(let i = 1; i < n; i++){ // 从1开始遍历到n-1，遍历n-1次
+      // 只需计算条件左边的值，后续索引更新维持条件右变的值
+      let n2 = dp[a] * 2, n3 = dp[b] * 3, n5 = dp[c] * 5;
+      dp[i] = Math.min(n2, n3, n5); // 更新dp[i]
+      // 维持右边界条件
+      if(dp[i] === n2) a++;
+      if(dp[i] === n3) b++;
+      if(dp[i] === n5) c++;
+    }
+    return dp[dp.length - 1];
+  }
+  static test() {
+    console.log(Solution.nthUglyNumber(10))
+  }
+}
+Solution.test();
+```
+
+## NO.50 第一个只出现一次的字符
+
+在字符串 s 中找出第一个只出现一次的字符。如果没有，返回一个单空格。 s 只包含小写字母。
+
++ 解题思路：遍历一遍s字符串，使用hash表统计每个字符出现的次数，再遍历一遍s字符串，查找对应字符出现次数为1的字符，返回即可
++ 优化：第二遍遍历时，可利用顺序hash表，直接遍历hash表，获取到第一个出现次数为1的字符返回即可
+
+```js
+class Solution {
+  static firstUniqChar(s) {
+    let cache = new Map(); // js原生对象不能保证key按定义顺序输出，所以使用内置Map
+    for(let char of s){
+      if(cache.has(char)) cache.set(char, cache.get(char)+1);
+      else cache.set(char, 1);
+    }
+    for(let item of cache){
+      if(item[1] === 1) return item[0];
+    }
+    return ' '
+  }
+  static test() {
+    console.log(Solution.firstUniqChar(''));
+  }
+}
+Solution.test();
+```
