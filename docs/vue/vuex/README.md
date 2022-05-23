@@ -19,11 +19,11 @@ vuex需要在vm实例化时,绑定实例对象到vm上,因此通常的做法时,
   
 - vuex配置项  
 如上图vuex有  
-  actions: 响应组件中对应的`this.$store.dispatch('key', params)`动作  
-  mutations: 响应组件或actions中的`this.$store.commit('KEY', params)`动作,用于操作数据  
+  actions: 响应组件中对应的`this.$store.dispatch('key', params)`动作(通常与后端api进行交互，异步的提交mutation操作数据)
+  mutations: 响应组件或actions中的`this.$store.commit('KEY', params)`动作,用于同步操作数据
   state: 用于存储数据  
-  getters: 用于将state中的数据加工,类似于组件的计算属性  
-  
+  getters: 用于将state中的数据加工,类似于组件的计算属性，通过属性方式访问时会缓存结果，通过方法的方式访问时，每次都会进行调用
+
 - vuex库上的map方法  
   
 `mapState(['state1', 'state2'])`和`mapGetters(['getter1'])`均可用于生成计算属性从state或getters中获取对应的数据  
@@ -59,3 +59,50 @@ this.$store.commit('a/MUTA1', params) // 与上类似
 ...mapMutations('a', ['MUTA1', 'MUTA2'])  
 ...mapActions('a', ['act1', 'act2'])  
 ```
+
+默认情况下(namespaced为false)的情况，模块内部的mutations、actions、getters是注册到全局命名空间的，仅state是局部作用  
+vuex的根模块和子模块之间是通过树形结构组织起来的
+
+## 源码0-初始化和模块安装
+
+源码[项目地址](https://github.com/vuejs/vuex.git)  
+查看版本3.6.2的src目录主要文件：  
+├── module  // vuex模块化处理 主要是对state的处理，最后构建成一棵 module tree  
+│   ├── module.js // 主要导出一个Module类 vuex中模块的功能  
+│   └── module-collection.js // 主要导出一个ModuleCollection类  
+├── plugins  // 两个插件  
+│   ├── devtool.js  // 调试  
+│   ├── logger.js   // 日志  
+├── helpers.js  // map系列辅助函数 api  
+├── index.esm.js  // 用于es module的打包  
+├── index.js   // 入口文件 抛出 Store和 mapActions 等api 用于commonjs的打包  
+├── mixin.js   // 提供install方法，用于注入$store  
+├── store.js  // vuex的核心代码 store 仓库  
+├── util.js  // 一些工具函数库，如deepClone、isPromise、assert  
+
+```js
+// vuex的使用需要经历以下阶段(伪代码中省略了需要引入的库)
+Vue.use(Vuex); // 插件机制
+const store = new Vuex.Store({...options}) // 实例化store
+new Vue({ // 挂载到vm实例上
+  store,
+  ...
+}).$mount('#app');
+```
+
+- 全局安装
+
+index.js文件中暴露了源自store.js的Store和install方法，以及辅助函数和日志插件  
+
+install方法中判断是否重复安装否则利用Vue.mixin将vuexInit混入beforeCreate钩子中  
+
+vuexInit方法将vue的options.store挂载到`this.$store`上,若不存在则从父组件的`$store`上取，借助vue组件实例化过程能够保证所有组件中`$store`指向同一对象store  
+
+- 实例化Store
+
+Store中实例化了一个vue对象，借助该vue对象的data和computed属性实现state和getters的响应式，内部维持了一个ModuleCollection对象，用于收集子模块依赖和处理namespaced命名空间，保存module树  
+Store实例提供了commit、dispatch、get/set state等方法，在构造函数中主要过程有：
+
+  1. 利用ModuleCollection递归的注册子模块形成模块树
+  2. installModule函数将options(state、actions、mutations等配置)依次注册到当前store中
+  3. resetStoreVM函数中新建一个vm实例用于state和getters的响应式
