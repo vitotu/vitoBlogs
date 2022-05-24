@@ -2572,3 +2572,40 @@ Solution.test();
 ## NO.51 数组中的逆序对
 
 题目：在数组中有两个数字，如果前面一个数字大于后面的数字，则两个数字组成一个逆序对。输入一个数组，求出这个数组中的逆序对的总数。例如在数组{7,5,6,4}中，一共存在5个逆序对，分别是(7,6),(7,5),(7,4),(6,4),(5,4).
+
++ 解题思路：利用归并排序法，进行分而治之，在归并阶段当右序列元素r比左序列元素l小时，则说明l元素及其后的所有左序列元素都与r元素构成逆序对，因此只需要在不满足`left[l] <= right[r]`时统计left剩余元素数`left.length - l`即可，对于右序列先遍历完成的情况已包含在内，无需特殊处理
+
+```js
+class Solution {
+  static reversePairs(nums){
+    let length = nums.length;
+    if(length < 2) return {arr:nums, count:0};
+    let m = Math.ceil(length / 2);
+    let lRes = Solution.reversePairs(nums.slice(0, m));
+    let rRes = Solution.reversePairs(nums.slice(m));
+    let merge = Solution._mergeArray(lRes.arr, rRes.arr);
+    return {arr:merge.arr, count:lRes.count+rRes.count+merge.count};
+  }
+  static _mergeArray(left, right){
+    let arr = [];
+    let count = 0;
+    let l = 0, r = 0;
+    while(l < left.length && r < right.length){
+      if(left[l] <= right[r]) arr.push(left[l++])
+      else{ // 每次添加右子序列元素时，统计逆序数
+        arr.push(right[r++]);
+        count += left.length - l; // 每个元素与左序列剩余的所有元素构成逆序对
+      }
+    }
+    arr.push(...left.slice(l)); // 因在添加右子序列时统计过逆序对，此处不再统计
+    arr.push(...right.slice(r));
+    return {arr, count};
+  }
+  static test() {
+    let example = [7, 5 ,6, 4];
+    let result = Solution.reversePairs(example);
+    console.log(result);
+  }
+}
+Solution.test();
+```
