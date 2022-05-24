@@ -63,7 +63,7 @@ this.$store.commit('a/MUTA1', params) // 与上类似
 默认情况下(namespaced为false)的情况，模块内部的mutations、actions、getters是注册到全局命名空间的，仅state是局部作用  
 vuex的根模块和子模块之间是通过树形结构组织起来的
 
-## 源码0-初始化和模块安装
+## 源码简读
 
 源码[项目地址](https://github.com/vuejs/vuex.git)  
 查看版本3.6.2的src目录主要文件：  
@@ -104,5 +104,12 @@ Store中实例化了一个vue对象，借助该vue对象的data和computed属性
 Store实例提供了commit、dispatch、get/set state等方法，在构造函数中主要过程有：
 
   1. 利用ModuleCollection递归的注册子模块形成模块树
-  2. installModule函数将options(state、actions、mutations等配置)依次注册到当前store中
-  3. resetStoreVM函数中新建一个vm实例用于state和getters的响应式
+  2. installModule函数将options(state、actions、mutations等配置)依次注册到store对象上，其中state为树形结构，而mutation、action等方法均以namespace字符串为key进行wrap并挂载到store的对应属性上，对于childModule则进行递归调用注册安装
+  3. resetStoreVM函数中新建一个vm实例利用data和computed属性设置state和getters的响应式，并在oldVM存在时销毁oldVM
+
+ps：不要在生产环境将strict设置为true，strict通过`_withCommit`拦截非commit的方式修改state的行为，需要深度监听state树，严重影响性能
+
+- 模块动态注册与卸载
+
+调用store实例的registerModule(path, module)方法可动态注册模块，逻辑与初始化store逻辑相同，先挂载到模块树上，然后调用installModule和resetStoreVM方法  
+unregisterModule(path)用于卸载动态注册的模块，不可卸载创建store时的注册的模块，方法中将通过Vue.delete删除state，重置并重载getters、mutations等方法，从模块树中删除该模块
