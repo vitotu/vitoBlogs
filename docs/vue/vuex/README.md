@@ -17,12 +17,14 @@ vuex用于同一管理全局组件共享的数据,[官方文档](https://vuex.vu
 vuex需要在vm实例化时,绑定实例对象到vm上,因此通常的做法时,创建一个js文件引入vue和vuex,在文件中使用Vue.use(Vuex)应用插件,随后创建并暴露`const store = new Vuex.Store({actions, mutations,state})`对象.  
 在main.js文件中引入该对象,并配置到vue实例配置对象中`new Vue({...,store})`  
   
-- vuex配置项  
-如上图vuex有  
-  actions: 响应组件中对应的`this.$store.dispatch('key', params)`动作(通常与后端api进行交互，异步的提交mutation操作数据)
-  mutations: 响应组件或actions中的`this.$store.commit('KEY', params)`动作,用于同步操作数据
-  state: 用于存储数据  
-  getters: 用于将state中的数据加工,类似于组件的计算属性，通过属性方式访问时会缓存结果，通过方法的方式访问时，每次都会进行调用
+- vuex配置项 
+如上图vuex常用配置项有  
+  - actions: 响应组件中对应的`this.$store.dispatch('key', params)`动作(通常与后端api进行交互，异步的提交mutation操作数据)
+  - mutations: 响应组件或actions中的`this.$store.commit('KEY', params)`动作,用于同步操作数据
+  - state: 用于存储数据  
+  - getters: 用于将state中的数据加工,类似于组件的计算属性，通过属性方式访问时会缓存结果，通过方法的方式访问时，每次都会进行调用
+  - modules：用于配置其他子模块，子模块中可配置namespaced开启命名空间
+  - plugins:`Array<function>`，所有的function都将被传入store实例用于插件功能扩展，插件中不允许直接修改state
 
 - vuex库上的map方法  
   
@@ -63,7 +65,7 @@ this.$store.commit('a/MUTA1', params) // 与上类似
 默认情况下(namespaced为false)的情况，模块内部的mutations、actions、getters是注册到全局命名空间的，仅state是局部作用  
 vuex的根模块和子模块之间是通过树形结构组织起来的
 
-## 源码简读
+## 源码核心简读
 
 源码[项目地址](https://github.com/vuejs/vuex.git)  
 查看版本3.6.2的src目录主要文件：  
@@ -107,7 +109,8 @@ Store实例提供了commit、dispatch、get/set state等方法，在构造函数
   2. installModule函数将options(state、actions、mutations等配置)依次注册到store对象上，其中state为树形结构，而mutation、action等方法均以namespace字符串为key进行wrap并挂载到store的对应属性上，对于childModule则进行递归调用注册安装
   3. resetStoreVM函数中新建一个vm实例利用data和computed属性设置state和getters的响应式，并在oldVM存在时销毁oldVM
 
-ps：不要在生产环境将strict设置为true，strict通过`_withCommit`拦截非commit的方式修改state的行为，需要深度监听state树，严重影响性能
+ps：不要在生产环境将strict设置为true，strict通过`_withCommit`拦截非commit的方式修改state的行为，需要深度监听state树，严重影响性能  
+不可在v-model中使用store属性，因为严格模式中仅支持使用commit方法修改store属性，需要进行双向绑定时需要通过`get/set`的computed属性或通过监听input或change事件去修改
 
 - 模块动态注册与卸载
 
