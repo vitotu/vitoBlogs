@@ -2609,3 +2609,57 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.52 两个链表的第一个公共节点
+
+题目：输入两个链表，找出它们的第一个公共节点。
+
++ 解题思路：设公共节点数量为c，链表headA的节点数量为a, headB的节点数量为b，则指针A需要走`a-c`步,B指针需要走`b - c`步，使用A指针遍历headA然后再遍历headB到公共节点需要的步数为`a + b - c`，使用B指针遍历headB然后遍历headA到公共节点需要的步数为`b + a - c`，两指针需要步数相同且此时指向同一节点，因此可以合并遍历，最终A,B指向为第一个公共节点,若为null则没有公共节点
+
+```js
+class LinkNote {
+  constructor(val=undefined, next=undefined){
+    this.val = val;
+    this.next = next;
+  }
+}
+class Solution {
+  static getIntersectionNode(headA, headB){
+    let pa = headA, pb = headB;
+    while(pa !== pb){
+      pa = pa ? pa.next : headB;
+      pb = pb ? pb.next : headA;
+    }
+    return pa;
+  }
+  static test() {
+    let example = [
+      [4, 1],
+      [5, 0, 1],
+      [8, 4, 5]
+    ];
+    let headA = new LinkNote(example[0][0]);
+    let headB = new LinkNote(example[1][0]);
+    let common = new LinkNote(example[2][0]);
+    let pa = headA, pb = headB, pc = common, i = 1;
+    while(i < example[0].length || i < example[1].length){
+      if(i < example[0].length) {
+        pa.next = new LinkNote(example[0][i]);
+        pa = pa.next;
+      }
+      if(i < example[1].length) {
+        pb.next = new LinkNote(example[1][i]);
+        pb = pb.next;
+      }
+      if(i < example[2].length) {
+        pc.next = new LinkNote(example[2][i]);
+        pc = pc.next;
+      }
+      i++;
+    }
+    pa.next = common, pb.next = common;
+    console.log(Solution.getIntersectionNode(headA, headB))
+  }
+}
+Solution.test();
+```
