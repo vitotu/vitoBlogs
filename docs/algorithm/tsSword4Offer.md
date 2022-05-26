@@ -2663,3 +2663,41 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.53 在排序数组中查找数字
+
+### 题目一：数字在排序数字中出现的次数
+
+统计一个数字在排序数组中出现的次数。例如，输入排序数组{1,2,3,3,3,3,4,5}和数字3，由于3在这个数组中出现了4次，因此输出4
+
++ 解题思路:利用二分查找法，target在nums中的左右边界,设置遍历条件为`i<=j`进行过度遍历，遍历结束时`i>j`，因此可以从i,j中取得边界。对数组进行两轮二分查找，依次取得左右边界left,right，返回长度为`right - left - 1`
+
+```js
+class Solution {
+  static search(nums, target){
+    let i = 0, j = nums.length - 1;
+    while(i <= j){ // 二分查找右边界
+      let m = Math.floor((i + j) / 2);
+      if(nums[m] <= target) i = m + 1;
+      else j = m - 1;
+    }
+    // 遍历结束后j指针必定指向target如果存在的话，而i则刚好指向右边界
+    let right = i;
+    if(j >= 0 && nums[j] !== target) return 0; // 判断区间内是否存在target，不存在则直接返回
+    // 重置i的值并二分查找左边界
+    i = 0;
+    while(i <= j){ // 
+      let m = Math.floor((i + j) / 2);
+      if(nums[m] < target) i = m + 1;
+      else j = m - 1;
+    }
+    let left = j;
+    return right - left - 1; // 返回左右边界区间内的长度
+  }
+  static test() {
+    let example = [5,7,7,8,8,10];
+    console.log(Solution.search(example, 5))
+  }
+}
+Solution.test();
+```
