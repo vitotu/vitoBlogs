@@ -116,3 +116,7 @@ ps：不要在生产环境将strict设置为true，strict通过`_withCommit`拦�
 
 调用store实例的registerModule(path, module)方法可动态注册模块，逻辑与初始化store逻辑相同，先挂载到模块树上，然后调用installModule和resetStoreVM方法  
 unregisterModule(path)用于卸载动态注册的模块，不可卸载创建store时的注册的模块，方法中将通过Vue.delete删除state，重置并重载getters、mutations等方法，从模块树中删除该模块
+
+## 手写实现
+
+TODO
