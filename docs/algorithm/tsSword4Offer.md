@@ -2701,3 +2701,60 @@ class Solution {
 }
 Solution.test();
 ```
+
+### 题目二：[0,n-1]中缺失的数字  
+
+一个长度为n-1的递增排序数组中的所有数字都是唯一的，并且每一个数字都在范围[0,n-1]之内。在范围[0,n-1]之内的n个数字有且只有一个数字不在该数组中，请找出该数字。
+
++ 解题思路：题目前提为所有数都为整数。可将数组分为左右两组，左边的数组元素都与其索引相等，右边数组元素都不与其索引相等，缺失的数字即为右边数组的首个元素。
++ 步骤：
+  + 使用二分法确定边界当`l <= r`时循环,计算中点`m = (r - l) / 2 + l`索引
+  + 若`nums[m] = m`，则首位元素一定在闭区间`[m+1,r]`中，因此执行`l = m+1`
+  + 若`nums[m] != m`，则首位元素一定在闭区间`[l, m - 1]`中，因此执行`r = m-1`
+  + 循环结束时l指向右数组首位元素，r指向左数组末尾元素
+
+```js
+class Solution {
+  static missingNumber(nums){
+    let len = nums.length;
+    let l = 0, r = len -1, mid;
+    while(l <= r){
+      mid = Math.floor( (r - l) / 2 ) + l;
+      if(nums[mid] === mid) l = mid + 1;
+      else r = mid - 1;
+    }
+    return l;
+  }
+  static test() {
+    let example = [1];
+    console.log(Solution.missingNumber(example))
+  }
+}
+Solution.test();
+```
+
+## NO.54 二叉搜索树的第K大节点
+
+题目：给定一个二叉搜索树，请找出其中第k大的节点。例如，在下图中的二叉搜索树里，按节点数值大小顺序，第3大节点的值是4  
+![n54.png](./resource/n54.png)
+
++ 解题思路：二叉搜索树的中序遍历是有序数组，若定义'右->根->左'则是从大到小的序列，因此利用此特性可找到第k大的节点。先遍历右子树，在每次读取节点值的时候进行计数count，计数前判断当前count是否为0，若为0则说明上一轮已经找到该节点直接返回不再进行遍历，否则将count减1再判断是否为0，若为0则给闭包中的结果变量res赋值，然后遍历左子树.
+
+```js
+class Solution {
+  static kthLargest(root, k){
+    let count = k; // 记录读取节点值的次数
+    let res = 0; // 第k大的节点
+    const dfs = node => { // 利用二叉搜索树的中序遍历是单调的特性，进行中序遍历
+      if(!node) return; // 遇到叶子节点则直接返回
+      dfs(node.right); // 先遍历右子树表示从大到小遍历
+      if(count === 0) return // 当遍历节点值时对先对计数进行判断，若为0表示上一轮已获取到目标数据，直接返回即可
+      count -= 1; // 每次读取节点值将计数减1
+      if(count === 0) res = node.val; // 若读取节点之后计数为0则，该值为赋给闭包变量res保存
+      dfs(node.left); // 遍历查找左子树
+    }
+    dfs(root); // 开始遍历
+    return res;
+  }
+}
+```
