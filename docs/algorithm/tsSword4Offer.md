@@ -2758,3 +2758,69 @@ class Solution {
   }
 }
 ```
+
+## NO.55 二叉树的深度
+
+### 题目一：二叉树的深度
+
+输入一颗二叉树的根节点，求该树的深度。从根节点到叶节点依次经过的节点(含根、叶节点)形成树的一条路径，最长路径的长度为树的深度
+
++ 解题思路：使用深度优先遍历和动态规划，当前节点为空时直接返回0，不为空时深度取决于左右子树深度中最大的加1
+
+```js
+class TreeNoe {
+  constructor(val){
+    this.val = val;
+    this.left = null;
+    this.right = null;
+  }
+}
+class Solution {
+  static maxDepth(root){
+    if(!root) return 0;
+    return Math.max(Solution.maxDepth(root.left), Solution.maxDepth(root.right)) + 1;
+  }
+  static test() {
+    let root = new TreeNoe(3);
+    root.left = new TreeNoe(9);
+    root.right = new TreeNoe(20);
+    root.right.left = new TreeNoe(15);
+    root.right.right = new TreeNoe(7);
+    console.log(Solution.maxDepth(root));
+  }
+}
+Solution.test();
+```
+
+### 平衡二叉树
+
+输入一颗二叉树的根节点，判断该树是不是平衡二叉树。如果某二叉树中任意节点的左、右子树的深度相差不超过1，那么它就是一颗平衡二叉树。
+
++ 解题思路：与上题类似，采用递归的后序遍历，从最底层开始计算左右子树的高度，若发现高度差大于1则直接返回-1，并在左右子树遍历完成时判断返回高度，若为-1则说明不是平衡二叉树，进行剪枝直接返回-1不再对其他子树进行判断。若为平衡二叉树则正常计算高度
+
+```js
+class Solution { // TreeNode类接上题
+  static isBalanced(root){
+    return Solution.recur(root) === -1 ? false : true;
+  }
+  static recur(root){
+    if(!root) return 0; // 传入节点为空则返回深度0
+    let left = Solution.recur(root.left); // 获取左子树的高度
+    if(left === -1) return -1; // 判断高度并剪枝，右子树同样处理
+    let right = Solution.recur(root.right);
+    if(right === -1) return -1;
+    let abs = Math.abs(left - right); // 若是平衡树则，获得左右子树高度差
+    if(abs <= 1) return Math.max(left, right) + 1; // 高度差符合要求则返回正常高度
+    else return -1; // 高度差不符合要求则直接返回-1
+  }
+  static test() {
+    let root = new TreeNoe(3);
+    root.left = new TreeNoe(9);
+    root.right = new TreeNoe(20);
+    root.right.left = new TreeNoe(15);
+    root.right.right = new TreeNoe(7);
+    console.log(Solution.isBalanced(root));
+  }
+}
+Solution.test();
+```
