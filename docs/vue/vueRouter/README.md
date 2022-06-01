@@ -30,7 +30,7 @@ vue-router封装了一个全局混入，定义了两个挂载在原型上的变�
 
 - 路由的绑定与vuex类似  
 
-```JavaScript  
+```js
 // router/index.js  
 import VueRouter from 'vue-router'  
 import MyComponent from '../component/MyComponent' // 引入自定义组件  
@@ -87,7 +87,7 @@ new Vue({
   
 默认路由方式为push模式,url访问历史以push的方式记录,设置标签replace属性:`<router-link replace>`该路由模式改为replace模式,新的url访问历史将不断替换上一条记录  
 
-```JavaScript  
+```js
 this.$router.push(Object) // Object参数与标签中to参数类似  
 this.$router.replace(Object) // 以replace模式路由  
 this.$router.back() // 后退  
@@ -109,7 +109,7 @@ this.$router.go(n) // 前进或后退n条记录
 
 路由组件中独有的两个声明周期函数  
 
-```JavaScript  
+```js
 activated(){  
   // 被路由展示时触发  
   // 在此函数中启动激活交互所需的事件/定时器  
@@ -122,7 +122,7 @@ deactivated() {
   
 - 路由守卫  
   
-```JavaScript  
+```js
 // 全局路由守卫,初始化及每次路由切换之前被调用  
 router.beforeEach((to, from, next) => {  
   // to 要路由到的目标route  
@@ -151,8 +151,10 @@ router.afterEach((to, from) => {
 }  
 ```
 
+## 原理
+
+TODO
+
 ## 源码核心简读
 
 ## 手写实现
-
-TODO
