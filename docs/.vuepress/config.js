@@ -33,7 +33,11 @@ module.exports = {
         { text:'vue router', link:'/vue/vueRouter/'},
       ]},
       {text: 'html', link: '/html/'},
-      {text: 'css', link: '/css/'},
+      {text: 'css', items:[
+        { text:'图解css3', link: '/css/css3/'},
+        { text:'css进阶', link: '/css/css3plus/'},
+        { text:'scss', link: '/css/scss/'},
+      ]},
       {text: '浏览器', link: '/browser/'},
       {text: '网络通信', link: '/network/'},
       {text: 'Linux', link: '/linuxNote/'},
