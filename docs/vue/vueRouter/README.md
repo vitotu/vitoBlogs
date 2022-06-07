@@ -153,6 +153,7 @@ router.afterEach((to, from) => {
 
 ## 原理
 
+history 模式依赖于 `window.history.pushState()`，`replaceState()`等api完成跳转而无需重新加载页面
 TODO
 
 ## 源码核心简读
