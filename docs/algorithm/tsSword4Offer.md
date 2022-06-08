@@ -2824,3 +2824,73 @@ class Solution { // TreeNode类接上题
 }
 Solution.test();
 ```
+
+## NO.56 数组中数字出现的次数
+
+### 题目－：数组中只出现一次的两个数字
+
+一个整型数组里除了两个数字之外，其他数字都出现了两次。请写程序找出这两个只出现一次的数字。要求时间复杂度O(n)，空间复杂度O(1)。
+
++ 解题思路：因为要求了时间复杂度，所以不能使用暴力解法和哈希表来实现，考虑到除目标数外其他数都出现了两次，使用按位异或运算能将只出现一次的数字找出，但只出现一次的数字有两个，因此可以利用两个只出现一次的数字之间的不同，将数组分为两组分别进行异或求解  
+ps:因为m与相同的数字按位与，所得结果相同，因此不影响出现两次的数字的分组，但能分开仅出现一次的两个数组
+
++ 步骤：
+  1. 设置x,y变量初始值为0，用于存储两个数字，设置n为0表示整个数组异或的结果，设置m为1用于查找并保存x,y两数字二进制第一个不同的位
+  2. 遍历数组，用n对每个数字进行异或，计算出整个数组异或的结果
+  3. 将n和m按位与，若若等于0，将m左移一位，直到`(n&m) !== 0`
+  4. 再次遍历数组判断每个数组i和m按位与的结果，分为两组分别使用x和y进行异或
+  5. 遍历完成后返回x,y即可
+
+```js
+class Solution {
+  static singleNumbers(nums) {
+    let x = 0, y = 0, n = 0, m = 1;
+    for(let i of nums){
+      n ^= i;
+    }
+    while((n & m) === 0) m <<= 1;
+    for(let i of nums){
+      if(i&m) x ^= i;
+      else y ^= i;
+    }
+    return [x,y]
+  }
+  static test() {
+    let example = [1,2,10,4,1,4,3,3]
+    console.log(...Solution.singleNumbers(example));
+  }
+}
+Solution.test();
+```
+
+### 题目二：数组中唯一只出现一次的数字
+
+在一个数组中除一个数字只出现一次之外，其他数字都出现了三次，请找出那个只出现一次的数字
+
++ 解题思路：将数组中所有元素的二进制数的每一位相加，若能被3整除则只出现一次的数字在此位一定为0，否则为1，收集这些1即可得到该数(注意两次32位的数组遍历需反向)
+
+```js
+class Solution {
+  static singleNumbers(nums) {
+    if(!nums) return;
+    let bitSum = new Array(32).fill(0);
+    for(let i of nums){ // 收集每个数字的二进制对应位上1出现的次数
+      for(let j = 0; j < bitSum.length; j++){
+        bitSum[j] += i & 1;
+        i >>= 1;
+      }
+    }
+    let res = 0, m = 3;
+    for(let i = 31; i >= 0; i--){ // 反向遍历，提取余数为1的位数恢复该数字
+      res <<= 1;
+      res += bitSum[i] % m
+    }
+    return res;
+  }
+  static test() {
+    let example = [9,1,7,9,7,9,7]
+    console.log(Solution.singleNumbers(example));
+  }
+}
+Solution.test();
+```
