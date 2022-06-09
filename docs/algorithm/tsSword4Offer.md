@@ -2894,3 +2894,64 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.57 和为s的数字
+
+### 题目一：和为s的数字
+
+输入一个递增排序的数组和一个数字s，在数组中查找两个数，使得它们的和正好是s。如果有多对数字的和等于s，则输出任意一对即可
+
++ 解题思路：经典的两数之和，可采用哈希表等方式，由于本题是已经排好序的数组，则可使用双指针对撞的方式解题
+
+```js
+class Solution {
+  static twoSum(nums, target) {
+    if(!nums || nums.length < 2) return []
+    let left = 0, right = nums.length - 1, s = 0;
+    while(left < right){
+      s = target - nums[left];
+      if(s === nums[right]) return [nums[left], nums[right]]
+      else if(s > nums[right]) left++;
+      else right--;
+    }
+    return []
+  }
+  static test() {
+    let example = [10,26,30,31,47,60]
+    console.log(...Solution.twoSum(example, 40));
+  }
+}
+Solution.test();
+</script>
+```
+
+### 题目二：和为s的连续正数序列
+
+输入一个正数s，打印出所有和为s的连续正数序列(至少含有两个数)。例如，输入15，由于1+2+3+4+5=4+5+6=7+8=15，所以打印出3个连续序列1~5,4~6,7~8。
+
++ 解题思路：因为时连续的序列，可以使用双指针组成滑动窗口，遍历维护一个和s与目标数target进行判断，若相等则生成该闭区间的序列并保存，再判断是否大于等于target，移动左指针l，并更新和s，否则移动右指针r扩大窗口并更新和s，遍历结束条件为`l>=r`
+
+```js
+class Solution {
+  static findContinuousSequence(target) {
+    let l = 1, r = 2, s = 3, res = [];
+    while(l < r){
+      if(s === target){
+        res.push(Array.from(new Array(r+1).keys()).slice(l))
+      }
+      if(s >= target) {
+        s -= l;
+        l++;
+      } else {
+        r++;
+        s += r;
+      }
+    }
+    return res;
+  }
+  static test() {
+    console.log(...Solution.findContinuousSequence(15));
+  }
+}
+Solution.test();
+```
