@@ -2955,3 +2955,52 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.58 翻转字符串
+
+### 题目一：翻转单词顺序
+
+输入一个英文句子，翻转句子中单词的顺序，但单词内字符的顺序不变。为简单起见，标点符号和普通字母一样处理。例如输入字符串"I am a student"，则输出"student a am I"。
+
++ 解题思路：使用双指针反向遍历字符串，左右指针捕获单词，并推入结果数组中，最后使用join方法拼接字符串
+
+```js
+class Solution {
+  static reverseWords(s) {
+    if(!s) return '';
+    s = s.trim(); // 去除首尾空格
+    let j = s.length - 1, i = j;
+    let res = [];
+    while(i >= 0) {
+      while( i >= 0 && s[i] !== ' ') i--; // 找到首个空格字符
+      res.push(s.slice(i+1,j+1)); // 推入单词
+      while(s[i] === ' ') i--; // 跳过单词间的空格
+      j = i;
+    }
+    return res.join(' ');
+  }
+  static test() {
+    console.log(Solution.reverseWords('the sky is blue'));
+  }
+}
+Solution.test();
+```
+
+### 题目二：左旋字符串
+
+字符串的左旋转操作是把字符串的前面若干个字符转移到字符串的尾部。请定义一个函数实现字符串左旋转操作的功能。比如，输入字符串"abcdefg"和数字２，该函数将返回左旋转两位得到的结果"cdefgab"
+
++ 解题思路：通过slice方法剪切指定长度的字符串，然后反序进行拼接
+
+```js
+class Solution {
+  static reverseLeftWords(s, n) {
+    if(!s) return '';
+    return s.slice(n) + s.slice(0, n)
+  }
+  static test() {
+    console.log(Solution.reverseLeftWords('abcdefg', 2));
+  }
+}
+Solution.test();
+```
