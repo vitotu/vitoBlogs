@@ -3004,3 +3004,82 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.59 队列的最大值
+
+### 题目一：滑动窗口的最大值
+
+给定一个数组和滑动窗口的大小，请找出所有滑动窗口里的最大值。例如，如果输入数组{2,3,4,2,6,2,5,1}以及滑动窗口大小3，那么一共存在6个滑动窗口，他们的最大值分别是{4,4,6,6,6,5}。
+
++ 解题思路：在每轮滑动窗口中维护一个单调的双端队列，每次滑动窗口时，删除队列中比新加入的元素nums[i]要小的元素，判断若最大元素不在窗口内，则弹出该元素，向队尾中加入当前元素, 向结果数组中添加队头的最大元素，遍历完成后将最后一个窗口的最大值加入结果数组，返回结果数组即可
+
+```js
+class Solution {
+  static maxSlidingWindow (nums, k){
+    let result = [];
+    if(!nums || k <= 0) return result;
+    let deque = []; // 双端队列，存储窗口中元素对应nums中的索引，并维持了单调
+    // 对首个滑动窗口维护deque队列
+    for(let i = 0; i < k; i++){
+      while(deque && nums[i] >= nums[deque[deque.length - 1]]){
+        deque.pop() // 遍历队尾，找到比当前新加元素小的元素，从后方删除
+      }
+      deque.push(i);
+    }
+    // 滑动窗口
+    for(let i = k; i < nums.length; i++){
+      result.push(nums[deque[0]]) // 将维护的最大值推入结果数组
+      while(deque && nums[i] >= nums[deque[deque.length - 1]]){
+        deque.pop(); // 从后方删除小于nums[i]的值
+      }
+      // 当前最大值已滑出窗口，则将其删除(i-k)为窗口左边界
+      if(deque && deque[0] <= i - k) deque.shift();
+      deque.push(i);
+    }
+    result.push(nums[deque[0]])
+    return result;
+  }
+  static test() {
+    let example = {
+      test:[1,3,-1,-3,5,3,6,7],
+      k:3,
+      result:[3,3,5,5,6,7]
+    }
+    console.log(...Solution.maxSlidingWindow(example.test, example.k))
+    console.log(...example.result);
+  }
+}
+Solution.test();
+```
+
+### 题目二：队列的最大值
+
+请定义一个队列并实现函数max得到队列里的最大值，要求函数max，push_back和pop_front的时间复杂度都是O(1)。
+
++ 解题思路：与上题思路类似，额外维护一个单调队列，删除队列中小于新增元素的元素，出队时若是当前最大值，则将单调队列中最大值也出队
+
+```js
+class Solution {
+  constructor(){
+    this.data = [];
+    this.deque = [];
+  }
+  max_value(){
+    return this.deque.length > 0 ? this.deque[0] : -1;
+  }
+  push_back(value){
+    while(this.deque.length > 0 && value >= this.deque[this.deque.length - 1]) this.deque.pop();
+    this.data.push(value);
+    this.deque.push(value)
+  }
+  pop_front(){
+    if(this.data.length <= 0) return -1
+    let value = this.data.shift();
+    if(value === this.deque[0]) this.deque.shift();
+    return value
+  }
+  static test() {
+    let max_queue = new Solution(); // 暂无测试用例
+  }
+}
+```
