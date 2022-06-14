@@ -3083,3 +3083,87 @@ class Solution {
   }
 }
 ```
+
+## NO.60 n个骰子的点数
+
+题目：把n个骰子仍在地上，所有骰子朝上一面的点数之和为s。输入n，打印出s所有可能的值出现的概率。
+
++ 解题思路：可使用动态规划来做，n个骰子的取值范围x为`[n, 6n]`，即有`6n - n + 1 = 5n + 1`种取值，各取值的概率函数f(n, x)可以由n-1个骰子的概率函数f(n-1, x)推导而来，比如：取值为i的骰子可能由`f(n-1, x - 1),···，f(n-1, x - 5)`加和组成，因此也可以站在f(n-1,x)的角度看，每个取值都将对`f(n, x+1),···,f(n, x+6)`有贡献，因此先对f(n-1,x)进行遍历，对每个值累加计算其贡献值即可得到f(n, x)
+
+```js
+class Solution {
+  static dicesProbability(n){
+    if(n < 1) return;
+    let dp = new Array(6).fill(1/6); // 初始化一个骰子的概率情况
+    for(let i = 2; i < n+1; i++){
+      let tmp = new Array(5*i+1).fill(0) // 初始化i个骰子的情况，先填入0
+      for(let j = 0; j < dp.length; j++){ // 从i-1个骰子的情况开始遍历递推i个骰子的情况
+        for(let k = 0; k < 6; k++){
+          tmp[j+k] += dp[j] / 6 // 利用索引值作为点数，依次累加i-1个骰子对i个骰子各点数的贡献情况
+        }
+      }
+      dp = tmp
+    }
+    return dp
+  }
+  static test() {
+    console.log(...Solution.dicesProbability(2))
+  }
+}
+Solution.test();
+```
+
+## NO.61 扑克牌中的顺子
+
+题目：从扑克牌中随机抽出5张牌，判断是不是一个顺子，即这5张牌是不是连续的。2~10为数字本身，A为1，J为11，Q为12，K为13，而大、小王用0表示，可以看成任意数字。
+
++ 解题思路：顺子的条件为，没有重复的牌，最大牌max-最小牌min < 5，因此可以设置set集合遍历数组判断有重复的牌则直接返回，判断为0则跳过当前遍历，维护max和min变量，遍历结束后返回`max - min < 5`的结果即可
+
+```js
+class Solution {
+  static isStraight(nums){
+    if(!nums) return false;
+    let cache = new Set();
+    let min = 14, max = 0;
+    for(let num of nums){
+      if(num === 0) continue;
+      min = num < min ? num : min;
+      max = num > max ? num : max;
+      if(cache.has(num)) return false;
+      cache.add(num);
+    }
+    return max - min < 5;
+  }
+  static test() {
+    let example = [[1,2,3,4,5], [0,0,1,2,5]]
+    console.log(Solution.isStraight(example[1]));
+  }
+}
+Solution.test();
+```
+
+## NO.62 圆圈中最后剩下的数字
+
+题目：0,1,...,n-1这n个数字排成一个圆圈，从数字0开始，每次从这一个圆圈里删除第m个数字。求出这个圆圈里剩下的最后一个数字。
+
++ 解题思路：本题为约瑟夫环问题，通过模拟删除解题复杂度较高。可考虑动态规划算法，设f(n)为n个数字每次移除第m个数字后的结果，则f(n)移除一个数字后变为`f(n) = f'(n-1)`，数字变为n-1个，顺序为`m,m+1,···,m+x`，而f(n-1)也有n-1个数字，顺序为`0,1,···,x`，则f(n-1)和f'(n-1)的关系为`f'(n-1) = (f(n-1)+m)%n` 所以有递推关系`f(n) = (f(n-1) + m) % n`,初始值f(1)仅有一位数字，因此一定等于0
+
+```js
+class Solution {
+  static lastRemaining(n, m){
+    if(n < 1 || m < 1) return -1;
+    let last = 0; // 初始化f(1)的结果
+    for(let i = 2; i <= n; i++){
+      last = (last + m) % i; // 从n=2开始遍历递推，对i取余用于模拟圆环
+    }
+    return last;
+  }
+  static test() {
+    let example = [[5, 3, 3], [10, 17, 2]];
+    example.forEach(i => console.log(
+      Solution.lastRemaining(i[0], i[1]) === i[2]
+    ))
+  }
+}
+Solution.test();
+```
