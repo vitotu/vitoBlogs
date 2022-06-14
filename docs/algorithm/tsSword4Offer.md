@@ -3167,3 +3167,76 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.63 股票的最大利润
+
+题目：假设把某股票的价格按照时间先后顺序存储在数组中，请问买卖该股票一次可能获得的最大利润是多少？例如，一只股票在某些时间节点的价格为{9,11,8,5,7,12,16,14}。如果我们能在价格为5的时候买入，并在价格为16时卖出，则能收获最大的利润11.
+
++ 解题思路：使用动态规划，遍历价格数组，当前价格之前完成买卖操作的最大利润记为dp(i)，则dp(i)的值取取决于dp(i-1)和当前价格price减去截止目前最低价格minPrice中的最大值，即`dp(i) = max(dp(i-1), price - minPrice)`，因此在遍历时需要同时维护一个记录最小价格的变量和之前子数组的最大利润变量，遍历完成后返回最大利润即可
+
+```js
+class Solution {
+  static maxProfit(prices) {
+    let minPrice = Number.MAX_SAFE_INTEGER, profit = 0;
+    for(const price of prices){
+      minPrice = price < minPrice ? price : minPrice;
+      let tmp = price - minPrice;
+      profit = tmp > profit ? tmp : profit;
+    }
+    return profit
+  }
+  static test() {
+    let example = [7,6,4,3,1]
+    console.log(Solution.maxProfit(example));
+  }
+}
+Solution.test();
+```
+
+## NO.64 求1+2+...+n
+
+题目：求1+2+...+n，要求不能使用乘除法，for，while，if，else，switch，case等关键字及条件判断语句。
+
++ 解题思路：抛开限制此题解法有公式平均计算、迭代、递归，由于前两种方法需要使用到乘除和循环，因此排除，而递归中递归结束条件需要用到条件判断，条件判断可通过逻辑操作符短路来实现，因此可使用递归对该题进行求解
+
+```js
+class Solution {
+  static maxProfit(n) {
+    let res = 0;
+    const sumNums = n => {
+      n > 1 && sumNums(n - 1);
+      res += n;
+      return res
+    }
+    return sumNums(n);
+  }
+  static test() {
+    console.log(Solution.maxProfit(9));
+  }
+}
+Solution.test();
+</script>
+```
+
+## NO.65 不用加减乘除做加法
+
+题目：写一个函数，求两整数之和，要求在函数体内不得使用+-*/四则运算符号
+
++ 解题思路：两个二进制的无进位之和的结果与异或操作相同，而进位的部分的结果则和与运算并左移一位相同，因此可以考虑使用变量c存储进位，遍历直到进位为0即可获得求和结果(由于补码的存在，上述思路同样适用于负数)
+
+```js
+class Solution {
+  static add(a, b) {
+    while(b != 0){
+      let c = (a&b) << 1;
+      a ^= b;
+      b = c
+    }
+    return a;
+  }
+  static test() {
+    console.log(Solution.add(1, 1));
+  }
+}
+Solution.test();
+```
