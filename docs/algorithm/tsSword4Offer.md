@@ -3240,3 +3240,87 @@ class Solution {
 }
 Solution.test();
 ```
+
+## NO.66 构建乘积数组
+
+题目：给定一个数组A[0,1,...,n-1],请构建一个数组B[0,1,...,n-1]，其中B中的元素  
+$$ B[i]=A[0]\times A[1]\times ...\times A[i-1] \times A[i+1] \times ... \times A[n-1] $$  
+不能使用除法
+
++ 解题思路：将`B[i]`按照`A[i-1]`和`A[i+1]`分成前面乘积`C[i]`和后面乘积`D[i]`两部分，对于`C[i]=C[i-1]*A[i-1]`，`D[i]=D[i+1]*A[i+1]`，因此可以采用从沿着i增加的方向循环计算`C[i]`，再沿着i减少的方向计算`D[i]`，最终获得B
+
+```js
+class Solution {
+  static constructorArr(a){
+    let b = new Array(a.length).fill(1), tmp = 1;
+    for(let i = 1; i < a.length; i++)(
+      b[i] = b[i-1]*a[i-1] // 使用b数组缓存c[i]的结果
+    )
+    for(let i = a.length - 2; i >= 0; i--){
+      tmp *= a[i+1]; // 使用tmp变量缓存d[i]
+      b[i] *= tmp; // 将缓存的c[i]与d[i]相乘
+    }
+    return b;
+  }
+  static test() {
+    let example = {
+      test:[1,2,3,4,5],
+      result:[120,60,40,30,24]
+    }
+    console.log(...Solution.constructorArr(example.test));
+    console.log(...example.result);
+  }
+}
+Solution.test();
+```
+
+## NO.67 把字符串转换成整数
+
+题目：将一个字符串转换成一个整数(实现Integer.valueOf(string)的功能，但是string不符合数字要求时返回0)，要求不能使用字符串转换整数的库函数。 数值为0或者字符串不是一个合法的数值则返回0。
+
++ 解题思路:根据leetcode要求，对于超出范围的值直接显示最大或最小值，因此字符串需要优先处理的有，开头的空格、正负号;使用sign变量存储正负号，判断溢出需要优先判断结果res与`2**31 // 10`的大小，因为res后续计算需要乘10并加上当前位数，若判断溢出则根据正负号返回相应的最大或最小值，在累加遍历过程中遇到非数字字符直接跳出，返回结果时与sign变量相乘即可。
+
+```js
+class Solution {
+  static strToInt(str){
+    let res = 0, i = 0, sign = 1, len = str.length;
+    let int_max = 2**31 - 1,int_min = -(2**31), bndry = Math.floor(2**31 / 10);
+    if(!str) return 0;
+    while(str[i] === ' '){
+      i++;
+      if(i === len) return 0;
+    }
+    if(str[i] === '-') sign = -1;
+    if('+-'.includes(str[i])) i++;
+    for(const c of str.slice(i)){
+      if(c < '0' || c > '9') break;
+      if(res > bndry || res === bndry && c > '7'){
+        return sign === 1 ? int_max : int_min;
+      }
+      res = 10* res + (c - '0');
+    }
+    return sign * res;
+  }
+  static test() {
+    let example = {
+      test:['42', '-42', '4193 wi', 'wo 987', '-91283472332'],
+      result:[42, -42, 4193, 0, -2147483648]
+    }
+    example.test.forEach(str => console.log(Solution.strToInt(str)))
+    console.log(...example.result);
+  }
+}
+Solution.test();
+```
+
+## NO.68 树中两个节点的最低公共祖先
+
+题目：输入树的根节点和之中两个节点，求两个节点的最低公共祖先  
+
++ 思路一：判定为二叉搜索树  
+若是二叉搜索树，则通过比较两节点和根节点值的大小，来判断其位于根节点的左子树或右子树，递归判断根节点的子节点，若两节点分别位于子节点(包括根节点)的两侧，则该节点为两节点的最低公共祖先  
++ 思路二：若不是二叉搜索树，且有指向父节点的指针  
+若有指向父节点的指针，该问题可转换为求两个链表的第一个公共节点，该链表的尾节点都是指向根节点，可参考两链表的第一个公共节点的解法  
++ 思路三：若只是普通树，且没有指向父节点的指针  
+若只是普通树，则可采用深度优先遍历，找到两节点到根节点的路径，将其转换为求两链表的第一个公共节点。以下为此思路的代码(其中测试代码以下图为例)：  
+![n68.png](./resource/n68.png)
