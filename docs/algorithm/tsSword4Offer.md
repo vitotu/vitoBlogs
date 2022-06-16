@@ -3318,9 +3318,70 @@ Solution.test();
 题目：输入树的根节点和之中两个节点，求两个节点的最低公共祖先  
 
 + 思路一：判定为二叉搜索树  
-若是二叉搜索树，则通过比较两节点和根节点值的大小，来判断其位于根节点的左子树或右子树，递归判断根节点的子节点，若两节点分别位于子节点(包括根节点)的两侧，则该节点为两节点的最低公共祖先  
+若是二叉搜索树，则通过比较两节点和根节点值的大小，来判断其位于根节点的左子树或右子树，递归/遍历判断左子树或右子树，若两节点分别位于子节点(包括根节点)的两侧，则该节点为两节点的最低公共祖先  
 + 思路二：若不是二叉搜索树，且有指向父节点的指针  
 若有指向父节点的指针，该问题可转换为求两个链表的第一个公共节点，该链表的尾节点都是指向根节点，可参考两链表的第一个公共节点的解法  
 + 思路三：若只是普通树，且没有指向父节点的指针  
-若只是普通树，则可采用深度优先遍历，找到两节点到根节点的路径，将其转换为求两链表的第一个公共节点。以下为此思路的代码(其中测试代码以下图为例)：  
-![n68.png](./resource/n68.png)
+若只是普通树，则可采用深度优先遍历，找到两节点到根节点的路径，将其转换为求两链表的第一个公共节点。
++ 思路四：对与普通树，因为各节点的值都是唯一的，采用深度优先遍历时，若当前节点等于目标节点或为空可直接返回，否则对左子树和右子树进行递归判断，获得左子树和右子树的结果，若都为空说明当前子树没有找到两节点，若其中一个为空则返回另一个节点，若都不为空则说明当前节点即为公共祖先，返回当前节点。递归返回阶段最终能够获得公共节点。
+
+```js
+class TreeNode {
+  constructor(val=undefined){
+    this.val = val;
+    this.left = null;
+    this.right = null;
+  }
+}
+class Solution {
+  // 二叉搜索树情况的实现
+  static lowestCommonAncestor(root, p, q){
+    if(!root) return;
+    let point = root;
+    if(p.val < q.val){ // 保证p大于q能减少后续的判断复杂度
+      let tmp = p;
+      p = q;
+      q = tmp;
+    }
+    while(point){
+      if(point.val < q.val){
+        point = point.right;
+      }else if(point.val > p.val){
+        point = point.left;
+      } else break;
+    }
+    return point;
+  }
+  // 普通二叉树的情况
+  static lowestCommonAncestor2(root, p, q){
+    if(!root || root === p || root === q) return root;
+    let left = Solution.lowestCommonAncestor2(root.left, p, q);
+    let right = Solution.lowestCommonAncestor2(root.right, p, q);
+    if(!left && !right) return;
+    if(!left) return right;
+    if(!right) return left;
+    return root;
+  }
+  static test() {
+    let example = {
+      tree:[6,2,8,0,4,7,9,null,null,3,5],
+      tree2:[3,5,1,6,2,0,8,null,null,7,4],
+      test:[[2,8], [2,4],    [5,1], [5,4]],
+      result:[6,2,    3,5]
+    }
+    let build_tree = example.tree2;
+    const head = new TreeNode(build_tree[0]);
+    head.left = new TreeNode(build_tree[1]);
+    head.right = new TreeNode(build_tree[2]);
+    head.left.left = new TreeNode(build_tree[3]);
+    head.left.right = new TreeNode(build_tree[4]);
+    head.right.left = new TreeNode(build_tree[5]);
+    head.right.right = new TreeNode(build_tree[6]);
+    head.left.right.left = new TreeNode(build_tree[9]);
+    head.left.right.right = new TreeNode(build_tree[10]);
+    console.log(Solution.lowestCommonAncestor2(head, head.right,head.left));
+    console.log(Solution.lowestCommonAncestor2(head, head.left, head.left.right.right));
+  }
+}
+Solution.test();
+```

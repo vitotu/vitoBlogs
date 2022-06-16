@@ -41,7 +41,11 @@ module.exports = {
       {text: '浏览器', link: '/browser/'},
       {text: '网络通信', link: '/network/'},
       {text: 'Linux', link: '/linuxNote/'},
-      {text: '开发工具', link: '/devToolsNote/'},
+      {text: '开发构建工具', items:[
+        { text:'npm', link:'/devToolsNote/npm-note'},
+        { text:'webpack基础', link:'/webpack/webpackNote'},
+        { text:'webpack5', link:'/webpack/webpack5Note'},
+      ]},
       {text: '算法', link: '/algorithm/'},
       {text: 'github主页', link: 'https://github.com/vitotu'}      
     ],
