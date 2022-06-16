@@ -46,7 +46,13 @@ module.exports = {
         { text:'webpack基础', link:'/webpack/webpackNote'},
         { text:'webpack5', link:'/webpack/webpack5Note'},
       ]},
-      {text: '算法', link: '/algorithm/'},
+      {text: '算法', items:[
+        { text:'排序算法', link:'/algorithm/tsClassicTop10SortAlgorithm'},
+        { text:'剑指offer', link:'/algorithm/tsSword4Offer'},
+        { text:'常见算法', link:'/algorithm/common'},
+        { text:'排序算法python', link:'/algorithm/10sortedAlgorithm'},
+        { text:'剑指offer-python', link:'/algorithm/python_sword_for_offer'},
+      ]},
       {text: 'github主页', link: 'https://github.com/vitotu'}      
     ],
     sidebar: 'auto', // 侧边栏配置
