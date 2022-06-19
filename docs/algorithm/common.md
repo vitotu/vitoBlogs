@@ -52,3 +52,137 @@ Demo.test();
 ```
 
 ## 接雨水
+
+## topK优先队列问题
+
+背景：求数组中出现频率top k的元素
+
+思路：此类问题需要先进行一次遍历，通过map统计并保存元素出现的频次，然后遍历map可通过维护大小为k的最小堆(top k)或最大堆(low k)实现top k元素的获取
+
+```js
+// 通过遍历实现
+class Solution {
+  static duplicate(nums, k){
+    let result;
+    let cache = new Map();
+    for(const item of nums){
+      if(!cache.has(item)){
+        cache.set(item, 1)
+      }else{
+        let tmp = cache.get(item);
+        cache.set(item, tmp+1);
+      }
+    }
+    return (Array.from(cache)).sort((a, b) => a[1] <= b[1] ? 1 : -1).slice(0, k).map(item => item[0]);
+  }
+  static test(){
+    let nums = [1,2,3,3,4,5,5];
+    let k = 2
+    // 重复次数最多的前k个数字
+    console.log(Solution.duplicate(nums, k))
+  }
+}
+Solution.test();
+```
+
+```ts
+type compareFn<T> = (a:T, b:T) => boolean;
+class heap<T>{
+  private compare:compareFn<T>;
+  private arr:T[];
+  constructor(compare:compareFn<T>, arr:T[] = []){
+    this.compare = compare;
+    this.arr = arr;
+    if(this.arr.length > 0){
+      this.buildDown2Top();
+    }
+  }
+  get size():number {
+    return this.arr.length
+  }
+  get data():T[]{
+    return this.arr;
+  }
+  private compareNode(nodes:number[], type:string, end:number):void{
+    let [parent, left, right] = nodes;
+    if(parent < 0) return;
+    let target = parent;
+    if(left <= end && this.compare(this.arr[target],this.arr[left])) target = left;
+    if(right <= end && this.compare(this.arr[target], this.arr[right])) target = right;
+    if(target !== parent){
+      let temp = this.arr[target];
+      this.arr[target] = this.arr[parent];
+      this.arr[parent] = temp;
+      type === 'up' ? this.up(parent, end): this.down(target, end)
+    }
+  }
+  private up(child:number, end:number):void{
+    if(child < 0 || child > end) return;
+    let parent = Math.floor((child - 1) / 2);
+    let left = parent * 2 + 1, right = left + 1;
+    this.compareNode([parent, left, right], 'up', end);
+  }
+  private down(parent:number, end:number):void{
+    if(parent < 0 || parent > end) return;
+    let left = parent * 2 + 1, right = left + 1;
+    this.compareNode([parent, left, right], 'down', end); 
+  }
+  private buildDown2Top(){
+    for(let i = this.size - 1; i >= 0; i--) this.down(i, this.size - 1);
+  }
+  private buildTop2Down(){
+    for(let i = 0; i < this.size; i++) this.up(i, this.size - 1);
+  }
+  public push(item:T){
+    this.arr.push(item);
+    if(this.size > 1) this.up(this.size - 1, this.size - 1);
+  }
+  public pop():T | undefined{
+    if(this.size <= 0) return undefined;
+    let result = this.arr[0];
+    this.arr[0] = this.arr[this.size - 1];
+    this.arr.pop();
+    if(this.size > 1) this.down(0, this.size - 1);
+    return result;
+  }
+  public peek():T|undefined{
+    if(this.size <= 0) return undefined;
+    return this.arr[0];
+  }
+  public replace(item:T):void{
+    if(this.size <= 0) return;
+    this.arr[0] = item;
+    if(this.size > 1) this.down(0, this.size - 1);
+  }
+}
+class Solution{
+  static topKFrequent<T>(nums:T[], k:number):T[]|undefined{
+    if(nums.length < k) return undefined;
+    let countMap:Map<T, number>= new Map();
+    for(const item of nums){
+      if(countMap.has(item)){
+        let tmp = countMap.get(item);
+        countMap.set(item, tmp+1);
+      }else countMap.set(item, 1);
+    }
+    const compare = (a:[T,number], b:[T, number]) => a[1] > b[1] ? true : false;
+    let result:heap<[T, number]> = new heap(compare);
+    debugger
+    for(const item of countMap){
+      if(result.size < k) result.push(item);
+      else {
+        let tmp = result.peek();
+        if(item[1] > tmp[1]) {
+          result.replace(item);
+        }
+      }
+    }
+    return result.data.map(item => item[0])
+  }
+  static test(){
+    let example = [5,3,1,1,1,3,73,1], k = 2;
+    console.log(Solution.topKFrequent<number>(example, k));
+  }
+}
+Solution.test();
+```
