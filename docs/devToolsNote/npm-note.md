@@ -66,6 +66,23 @@ browserslist 用于告知要支持哪些浏览器（及其版本）
 
 该文件旨在跟踪被安装的每个软件包的确切版本，以便产品可以以相同的方式被 100％ 复制  
 package-lock.json 会固化当前安装的每个软件包的版本，当运行 npm install时，npm 会使用这些确切的版本。仅当使用npm update命令时才会更新  
+
+## pm2基础使用
+
+pm2是一个守护进程管理器，用于管理和保持应用程序在线
+启动一个应用程序`pm2 start <script> --<params>`
+
+### 常用命令
+
+```shell
+pm2 restart <app-name/id>
+pm2 reload <app-name/id>
+pm2 stop <app-name/id>
+pm2 delete <app-name/id>
+pm2 list
+```
+
+[官方文档](https://pm2.keymetrics.io/docs/usage/quick-start/)
   
 ## vscode 使用笔记  
 
