@@ -145,3 +145,19 @@ CSP (Content Security Policy) 网页安全政策，浏览器端的白名单制�
 `script-src`和`object-src`是必设的，除非设置了`default-src`, 攻击者只要能注入脚本，其他限制都可以规避  
 `script-src`不能使用`unsafe-inline`关键字（除非伴随一个`nonce`值），也不能允许设置`data:URL`  
 必须特别注意 JSONP 的回调函数。  
+
+## dom几何api
+
+- window.screenTop: 返回浏览器窗口到屏幕顶部边缘的CSS像素距离数值，window.screenLeft同理。
+- 元素.offsetTop: 只读属性，它返回当前元素border外边距相对于其offsetParent元素的border外边距的距离以像素计，元素.offsetLeft同理。
+- 元素.offsetWidth: 只读属性，返回一个元素的布局宽度(不含margin，body不含scroll bar)。元素.offsetHeight同理。
+
+![domWinGeometry](./resource/domWinGeometry.png)  
+
+- 元素.clientTop: 只读属性，返回一个元素顶部边框的宽度（以像素计）。不包括顶部外边距或内边距。元素.clientLeft同理。
+- 元素.clientWidth: 只读属性, 以像素计，内联元素以及没有 CSS 样式的元素的 clientWidth 属性值为 0。元素.clientWidth 属性表示元素的内部宽度(不含border和滚动条)。clientHeight同理
+- 元素.scrollTop：以像素计，一个元素的 scrollTop 值是这个元素的内容顶部（卷起来的）到它的视口可见内容（的顶部）的距离的度量。scrollLeft 同理
+- 元素.scrollWidth: 只读属性, 这个只读属性是元素内容宽度的一种度量，包括由于 overflow 溢出而在屏幕上不可见的内容。scrollHeight同理
+- document滚动相关的各属性获取方式有些不同，可以使用`document.scrollingElement.xxx`, `document.documentElement.xxx`
+
+![nodeWinGeometry](./resource/nodeWinGeometry.png)  
