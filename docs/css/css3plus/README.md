@@ -107,7 +107,7 @@ calc(), url(), rgb(), hsl(), rgba(), linear-gradient(),repeat()
 块级元素的内容宽度是其父元素的100%，其高度与其内容高度一致,按照书写顺序自上而下排布。  
 内联元素的height/width与内容一致。只会在文本或元素溢出时换行  
 
-### 弹性盒子flex布局  
+### flex布局  
 
 flex布局又称flex-box布局，在容器上设置`display:flex 或 inline-flex 或 -webkit-flex`属性  
 
@@ -122,13 +122,13 @@ flex布局又称flex-box布局，在容器上设置`display:flex 或 inline-flex
 flex-item上的属性：  
 
 + order属性定义项目的排列顺序。数值越小，排列越靠前，默认为0  
-+ flex-basis属性定义了item的空间大小，默认为auto元素尺寸  
++ flex-basis属性定义了item在主轴的空间大小(空间不足时可能缩小)，默认值为auto，若同时设置了width/height则flex-basis不为auto时拥有更高的优先级  
 + flex-grow属性定义了沿主轴方向放大比例，按比例分配剩余空间，默认为0  
 + flex-shrink属性定义了收缩比例，同时兼顾了item的最小大小  
 + flex由flex-grow、flex-shrink、flex-basis组成，特殊缩写值{initial:0 1 auto, auto:1 1 auto, none:0 0 auto, 1:1 1 0}  
 + align-self属性指定对应item的交叉轴方向的对齐方式，可覆盖align-items属性，取值auto(默认值) | flex-start | flex-end | center | baseline | stretch
 
-### 网格  
+### grid网格  
 
 grid网格布局
 容器上的属性：
@@ -159,7 +159,7 @@ grid网格布局
 + grid-area指定item放置区域，区域名在grid-template-areas属性中指定；还可用作grid-(row/column)-(start/end)属性的缩写形式`grid-area: <row-start> / <column-start> / <row-end> / <column-end>`
 + justify-self/align-self/place-self属性指定单元格内容的水平/垂直对齐方式，与(justify/align)-items属性的用法类似，而place-self则为两者缩写：`place-self: <align-self> <justify-self>;`
 
-### 浮动  
+### float浮动  
 
 + float指定元素沿其容器的左侧或右侧放置，该元素将被移出文档流。取值为left | right | none | inline-start | inline-end  
 + float将使用块布局，因此display设置为内联也无效，但float对flex元素不生效  
@@ -199,7 +199,7 @@ grid网格布局
 
 例如：在清除浮动中设置父元素overflow:hidden时创建了脱离根元素`<html>`的BFC，在计算父元素高度时，子元素即时浮动也能参与高度计算，因此能够撑开父元素高度
 
-### 定位  
+### position定位  
 
 position属性可取static(默认值),relative,fixed,absolute,sticky  
 
@@ -210,7 +210,7 @@ position属性可取static(默认值),relative,fixed,absolute,sticky
   + fixed相对于视口(浏览器窗口)进行定位，元素位置不随页面滚动而变化
 + sticky类似与relative和fixed的结合,该属性需配合方位属性使用，否则将失去fixed效果。当页面滚动，父元素开始脱离视口，且该元素将保持与视口不小于方位属性值距离，直到父元素完全脱离视口，该元素恢复relative并随父元素一起脱离视口  
 
-### CSS 表格布局  
+### table表格布局  
 
 表格布局可以利用table标签或将display属性设置为table实现，标签与css对应如下：
 
@@ -227,7 +227,7 @@ position属性可取static(默认值),relative,fixed,absolute,sticky
 设置相应的属性可以让元素表现得像表格中的相应元素  
 注意：由于flex，grid布局的出现，表格布局在逐渐淘汰，但在IE8,9上仍然时不错的解决方案
 
-### 多列布局  
+### column多列布局  
 
 创建类似于报纸的多列流式布局，顺序先列后行
 容器上设置的属性：
