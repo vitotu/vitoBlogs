@@ -243,6 +243,16 @@ function Person(name){
 子类在需要覆盖父类方法或属性时，添加相关属性或方法的代码需要在指定原型之前  
 若原型中存在引用类型，则该引用类型将被所有实例共享，且某一实例中修改了该引用类型将在影响其他实例;另外在创建子类实例时不能向超类构造函数中传递参数  
 
+```js
+function SuperType(){this.property = true}
+SuperType.prototype.getSuperValue = function(){return this.property}
+function SubType(){this.subProperty = false}
+SubType.prototype = new SuperType();
+SubType.prototype.getSubValue = function() {return this.subProperty}
+var instance = new SubType();
+console.info(instance.getSuperValue());
+```
+
 #### 借用构造函数  
 
 在子类构造函数中调用父类构造函数, 如:  
@@ -252,7 +262,7 @@ function SubType(){
   // 继承SuperType  
   SuperType.call(this);  
 }  
-```  
+```
 
 借用构造函数的优势在于可以通过子类构造函数向父类构造函数中传递参数  
 该模式存在公共方法无法复用等问题,因此用的很少  
@@ -261,6 +271,30 @@ function SubType(){
 
 组合原型链和借用构造函数两种方式的继承  
 父类构造函数仅定义属性,父类原型用于定义方法.子类的构造函数中使用借用构造函数模式继承父类定义的属性,子类的原型中使用原型链继承实例化父类,这种方式融合了原型链和借用构造函数的优点是一种常用的继承模式  
+
+```js
+function SuperType(name){
+  this.name = name;
+  this.colors = ['red', 'blue', 'green'];
+}
+SuperType.prototype.sayName = function() {console.info(this.name)};
+function SubType(name, age){
+  SuperType.call(this, name);
+  this.age = age;
+}
+SubType.prototype = new SuperType();
+SubType.prototype.constructor = SubType;
+SubType.prototype.sayAge = function() {console.info(this.age)};
+var instance1 = new SubType('Nicholas', 29);
+instance1.colors.push('black');
+console.info(instance1.colors);
+instance1.sayAge();
+instance1.sayName();
+var instance2 = new SubType('Greg', 27);
+console.info(instance2.colors);
+instance2.sayAge();
+instance2.sayName();
+```
 
 #### 原型式继承  
 
