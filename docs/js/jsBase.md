@@ -316,12 +316,24 @@ function inheritPrototype(subType, superType) {
   var prototype = object(superType.prototype); // 创建父类原型的副本  
   prototype.contructor = subType; // 修复contructor指针  
   subType.prototype = prototype;  // 替换子类的原型  
-}  
+}
+// 使用示例
+function SuperType(name){
+  this.name = name;
+  this.colors = ['red', 'blue', 'green'];
+}
+SuperType.prototype.sayName = function(){console.info(this.name)};
+function SubType(name, age){
+  SuperType.call(this, name);
+  this.age = age;
+}
+inheritPrototype(SubType, SuperType);
+SubType.prototype.sayAge = function(){console.info(this.age)};
 ```  
 
 通过上述模式完成子类继承父类的原型,避免了创建多余的属性.  
 > 使用的最多的继承模式式组合式继承,而寄生组合式继承式最理想的继承模式  
-  
+
 ## 函数表达式  
 
 在function关键字后跟指定的函数名的定义方式时函数声明，这种方式有函数声明提升效果  

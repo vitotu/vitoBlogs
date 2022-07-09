@@ -17,8 +17,8 @@ module.exports = {
       {text: 'JavaScript', items:[
         { text:'js基础', link:'/js/jsBase'},
         { text:'es6+基础', link:'/js/es6+/'},
-        { text:'js进阶', link:'/js/jsPlus/'},
-        { text:'js手写系列', link:'/js/jsHand/'},
+        { text:'js进阶', link:'/js/jsPlus'},
+        { text:'js手写系列', link:'/js/jsHand'},
         { text:'typescript', link:'/js/typescript/'},
         { text:'js读书笔记', items:[
           { text:'js异步编程', link:'/js/jsAsync/'},

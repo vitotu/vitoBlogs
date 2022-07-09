@@ -326,9 +326,33 @@ class Solution {
   static shuffle(arr){ // 数组洗牌函数，会改变原数组
     return arr.sort((x, y) => Math.random() - 0.5);
   }
+  /**
+   * @description: flatMap用于将数组展开，并map映射，
+   * 但官方支持中，实际上是先map后flat，因此会造成如下问题：
+   * [1,2,3,[4,5],6].flatMap(x => x + 1, this); // [2, 3, 4, '4,51', 7]
+   */
+  static flatMap(data, callback , ctx) {
+    if(Object.prototype.toString.call(data) === '[object Array]'){
+      return data.reduce((acc ,val) => {
+        let result = null;
+        if(Object.prototype.toString.call(val) === '[object Array]'){
+          // 若为Array，则递归调用flatMap
+          result =  Demo.flatMap(val, callback, ctx); 
+        }else {
+          result = callback.call(ctx, val);
+        }
+        return acc.concat(result);
+      }, [])
+    }else {
+      return callback.call(ctx, data);
+    }
+  }
   static test() { // 测试用例函数
     let test = [1,2,3,[4,5],[2,'a',['w', 'g']]];
     console.log(Solution.flatten(test));
+
+    // const testData = [1,2,3,[4,5, [0, 1]], 6];
+    // console.log(Solution.flatMap(testData, x => x + 1, this));
   }
 }
 Solution.test()

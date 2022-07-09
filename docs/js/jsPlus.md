@@ -254,7 +254,34 @@ TODO：
 + 手写防抖节流实现:
 
 ```js
-function debounce(fn, delay) {
+/**
+ * @description: 防抖wrap函数
+ * @param {Function} func 传入要包装的函数
+ * @param {number} wait 防抖间隔
+ * @param {boolean} immediate 可选项是否立即执行
+ * @return {undefined}
+ */
+function debounce(func, wait, immediate=false){
+  let timer = null;
+  return function(){
+    let _self = this;
+    let args = arguments;
+    if(timer) clearTimeout(timer);
+    if(immediate){ // 用于首次/立即执行
+      let callNow = !timer;
+      timer = setTimeout(()=>timer = null, wait);
+      if(callNow) func.apply(_self, args);
+    } else { // 延时执行
+      timer = setTimeout(()=>func.apply(_self, args), wait);
+    }
+  }
+}
+/**
+ * @description: 防抖wrap异步支持版本，也支持同步任务
+ * @param {} 参数与同步版本类似
+ * @return {() => Promise} 返回的执行函数将返回包装好的promise对象，调用then将传入异步函数执行结果
+ */
+function debounceAsync(fn, delay) {
   let timer = null;
   return function() {
     let _self = this;
@@ -271,7 +298,11 @@ function debounce(fn, delay) {
     })
   }
 }
-function throttle(fn, interval) {
+/**
+ * @description: 节流wrap函数异步版本，返回值与防抖类似,节流也可使用时间戳与间隔时间对比实现
+ * 节流也有立即执行和非立即执行的版本，实现思路与防抖类似
+ */
+function throttleAsync(fn, interval) {
   let timer = null;
   let result;
   return function() {
@@ -279,6 +310,7 @@ function throttle(fn, interval) {
     let args = arguments;
     if(!timer){
       result = new Promise((res, rej) => {
+        // 单独拎出executor即为同步执行的版本
         timer = setTimeout(() => {
           res(fn.apply(_self, args));
           timer = null;
@@ -288,38 +320,6 @@ function throttle(fn, interval) {
     return result;
   }
 }
-```
-
-### flatMap手写实现
-<!-- TODO:迁移到手写系列中 -->
-flatMap用于将数组展开，并map映射，但官方支持中，实际上是先map后flat，因此会造成如下问题:
-
-```js
-[1,2,3,[4,5],6].flatMap(x => x + 1, this); // [2, 3, 4, '4,51', 7]
-// 为解决此问题手写实现flatMap如下
-class Demo {
-  static flatMap(data, callback , ctx) {
-    if(Object.prototype.toString.call(data) === '[object Array]'){
-      return data.reduce((acc ,val) => {
-        let result = null;
-        if(Object.prototype.toString.call(val) === '[object Array]'){
-          // 若为Array，则递归调用flatMap
-          result =  Demo.flatMap(val, callback, ctx); 
-        }else {
-          result = callback.call(ctx, val);
-        }
-        return acc.concat(result);
-      }, [])
-    }else {
-      return callback.call(ctx, data);
-    }
-  }
-  static test() { // 测试用例函数
-    const testData = [1,2,3,[4,5, [0, 1]], 6];
-    console.log(Demo.flatMap(testData, x => x + 1, this));
-  }
-}
-Demo.test()
 ```
 
 ## js运行机制  
@@ -491,7 +491,7 @@ v8中js的基本数据类型被保存在栈内存中，而引用数据类型在�
 + 原型对象中有一个属性constructor, 它指向函数对象；  
 + 实例对象(工厂照设计图生产的产品)和函数(函数本身也是对象)都有__proto__属性和constructor属性，分别指向其构造函数的原型和构造函数  
   
-![avatar](./resource/prototype.svg)  
+![prototype.svg](./resource/prototype.svg)  
 如图为Foo函数、实例、Function、Object的原型对应关系：  
 矩形表示实例对象/原型对象，椭圆表示函数对象  
 红色箭头即为原型链，Function函数对象的constructor指向自己，prototype和__proto__属性指向相同的原型对象  
@@ -525,7 +525,12 @@ function Person(name, age){
 const person1 = myNew(Person, 'Tom', 20)
 console.log(person1)  // Person {name: "Tom", age: 20}
 ```
-  
+
+### 继承
+
+es6中多使用寄生组合式继承模式  
+详细[参见](./jsBase.html#继承)
+
 ## 前端性能与优化
 
 前端性能优化主要分为两方面：
@@ -546,7 +551,7 @@ console.log(person1)  // Person {name: "Tom", age: 20}
 ### 性能指标
 
 文档加载相关指标
-![avatar](https://www.w3.org/TR/navigation-timing-2/timestamp-diagram.svg)  
+![timestamp-diagram](./resource/timestamp-diagram.svg)  
 
 + Time to First Byte（TTFB）:浏览器从请求页面开始到接收第一字节的时间，这个时间段内包括 DNS 查找、TCP 连接和 SSL 连接。
 + DomContentLoaded(DCL): DOMContentLoaded 事件触发的时间, html 文档完全加载解析后(无需等待样式表、图像、iframe等)
