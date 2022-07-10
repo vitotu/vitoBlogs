@@ -322,6 +322,8 @@ function throttleAsync(fn, interval) {
 }
 ```
 
+[参考文档](https://blog.csdn.net/Polaris_tl/article/details/99300458)
+
 ## js运行机制  
 <!-- TODO：迁移到浏览器原理中 -->
 js执行是会将对象放在堆(heap)中，将基础变量以及对象的引用(指针)放在栈(stack)中;  
