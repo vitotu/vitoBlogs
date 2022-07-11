@@ -76,3 +76,32 @@ class Solution {
   }
 }
 ```
+
+leetcode 543题：二叉树的直径  
+直径即节点间的距离，即两个节点之间相距一个单位，由此可得：每一条二叉树的「直径」长度，就是一个节点的左右子树的最大深度之和
+
+```ts
+class Solution {
+  private MaxPath = 0;
+  diameterOfBinaryTree(root:TreeNode | null):number{
+    this.deepMax(root);
+    return this.MaxPath;
+  }
+  deepMax(root:TreeNode | null):number{
+    if(!root || root.val === undefined) return 0;
+    let leftMax = this.deepMax(root.left);
+    let rightMax = this.deepMax(root.right);
+    this.MaxPath = Math.max(this.MaxPath, leftMax + rightMax); // 在后续位置计算最大直径
+    return 1 + Math.max(leftMax, rightMax); // 函数返回作为子树时的最大深度
+  }
+  static test(root: TreeNode | null): number {
+    if(!root || root.val === undefined) return 0;
+    let demo = new Solution();
+    return demo.diameterOfBinaryTree(root);
+  }
+}
+```
+
+## 动态规划
+
+
