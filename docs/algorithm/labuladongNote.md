@@ -104,4 +104,50 @@ class Solution {
 
 ## 动态规划
 
+动态规划三要素：重叠子问题、最优子结构、状态转移方程  
+动态规划离不开递归算法(自顶向下分解问题)/递推算法(自底向上递推结果)  
+ps:递归算法的时间复杂度怎么计算？就是用子问题个数乘以解决一个子问题需要的时间。
 
+- 重叠子问题:通常使用备忘录(即打表)的方式避免重复的计算
+- 状态转移方程：递推，确定状态转移方程的基本模式是：`明确 base case -> 明确「状态」-> 明确「选择」 -> 定义 dp 数组/函数的含义。`
+- 最优子结构：子问题间相互独立，不相互影响
+
+关联题：
+
+leetcode 322 零钱兑换  
+如对于目标金额 amount=11 ，coins=[1, 2, 5], 分解问题可由 10+1, 9+2, 5+6的方式凑成，因此记`dp[i]`为凑成金额i的最少硬币数，仅此`dp[11] = min(dp[10], dp[9], dp[6]) + 1`, 初始base `dp[0] = 0`, 部分不能凑成的数额则记为-1，因此上述例子即可抽象出状态转移方程
+
+```ts
+function coinChange(coins: number[], amount: number): number {
+  // 初始化dp为amount+1，就因为凑成amount最多使用amount个硬币
+  let dp:number[] = new Array(amount+1).fill(amount+1);
+  dp[0] = 0; // 初始话起始值
+  for(let i = 0; i < dp.length; i++){ // 循环计算每个金额所需要的最少硬币数
+    for(let coin of coins){ // 遍历尝试每个硬币组合
+      if(i - coin < 0) continue; // 若遇到无法达成的组合则直接跳过
+      dp[i] = Math.min(dp[i], 1 + dp[i - coin]); // 比较与更新硬币组合数
+    }
+  }
+  // 若目标金额扔等于初始值，则返回无法凑成的结果
+  return (dp[amount] === amount + 1) ? -1 : dp[amount]; 
+};
+```
+
+leetcode 509 斐波那契数
+取初始值`dp[1] = 1`, `dp[2] = 1`,则从第3个数开始循环,计算`dp[n] = dp[n-1] + dp[n-2]`，并更新响应的两个缓存值，直到`i=n`则，返回此时的最新缓存值即可
+
+```ts
+function fib(n: number): number {
+  let dp:[number, number] = [1, 1];
+  if(n <= 0) return 0;
+  if(n === 1 || n === 2) return dp[0];
+  for(let i = 3; i <= n; i++) {
+    let tmp = dp[0] + dp[1];
+    dp[0] = dp[1];
+    dp[1] = tmp;
+  }
+  return dp[1];
+};
+```
+
+## 回溯法
