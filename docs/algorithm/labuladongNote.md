@@ -151,3 +151,50 @@ function fib(n: number): number {
 ```
 
 ## 回溯法
+
+回溯法需要考虑三个要素：路径、选择列表、结束条件;其本质是多叉树的遍历，在前序位置操作记录，在后续位置操作删除
+
+leetcode 46 全排列
+
+```ts
+interface Visited {[key:number]: boolean};
+
+function permute(nums: number[]): number[][] {
+  if(nums.length === 0) return [[]];
+  if(nums.length === 1) return [nums];
+  let demo = new Solution();
+  return demo.permute(nums);
+};
+
+class Solution {
+  res:number[][] = [];
+  permute(nums: number[]): number[][] {
+    // 主函数中初始化visited记录访问过的数字，track记录访问路径，即排列
+    let visited:Visited = {};
+    let track:number[] = [];
+    this.backtrack(nums, track, visited);
+    return this.res;
+  }
+  backtrack(nums:number[], track:number[], visited:Visited){
+    if(track.length === nums.length){ // 终止条件，存储一种排列并返回
+      this.res.push([...track]);
+      return
+    }
+    for(let i = 0; i < nums.length; i++) {
+      const val = nums[i];
+      if(visited[val]) continue; // 跳过已访问的数字
+      visited[val] = true; // 递归前标记访问，并记录节点
+      track.push(val)
+      this.backtrack(nums, track, visited);
+      visited[val] = false; // 递归返回后，删除标记，并删除节点
+      track.pop();
+    }
+  }
+}
+```
+
+leetcode 51 N皇后问题
+
+```ts
+
+```
