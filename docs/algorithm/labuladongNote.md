@@ -266,3 +266,49 @@ function minDepth(root: TreeNode | null): number {
 
 leetcode 752 打开转盘锁  
 每次只能转动一个轮盘且轮盘只能转动一个数组，即当前状态下一步可能有8种转法(4个数字，上下2中转法)，使用最少的步骤转动轮盘到target组合，且过程中须避开deadends
+
+```ts
+// TODO:need  to debug
+function openLock(deadends: string[], target: string): number {
+  let visited:Set<string> = new Set();
+  for(let key of deadends) visited.add(key);
+  let queue:string[] = ['0000'];
+  let step = 0;
+  while(queue.length > 0) {
+    let len = queue.length;
+    for(let i = 0; i < len; i++) {
+      let cur = queue.shift();
+      if(visited.has(cur)) continue;
+      if(cur == target) return step;
+      for(let j = 0; j < 4; j++){
+        let tmp = plusOne(cur, j);
+        if(!visited.has[tmp]){
+          queue.push(tmp);
+          visited.add(tmp);
+        }
+        tmp = minusOne(cur, j);
+        if(!visited.has[tmp]){
+          queue.push(tmp);
+          visited.add(tmp);
+        }
+      }
+    }
+    step++;
+  }
+  return -1;
+};
+
+function plusOne(s:string, j:number):string{
+  let tmp = Array.from(s);
+  if(tmp[j] == '9') tmp[j] = '0'
+  else tmp[j] = String(Number(tmp[j]) + 1)
+  return tmp.join('');
+}
+
+function minusOne(s:string, j:number):string{
+  let tmp = Array.from(s);
+  if(tmp[j] == '0') tmp[j] = '9'
+  else tmp[j] = String(Number(tmp[j]) - 1);
+  return tmp.join('');
+}
+```
