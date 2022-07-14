@@ -196,5 +196,73 @@ class Solution {
 leetcode 51 N皇后问题
 
 ```ts
+function solveNQueens(n: number): string[][] {
+  let demo = new Solution();
+  return demo.solveNQueens(n);
+};
 
+class Solution {
+  res:string[][] = [];
+  solveNQueens(n: number): string[][] {
+    let solve:string[][] = new Array(n).fill(0).map(item => new Array(n).fill('.'))
+    solve[0][0] = 'Q';
+    this.backtrack(solve, 0)
+    return this.res;
+  }
+  backtrack(track:string[][], row:number){
+    if(row === track.length){ // 本轮递归超过最后一行，因此收集结果结束递归
+      this.res.push(track.map(item => item.join('')));
+      return;
+    }
+    for(let col = 0; col < track.length; col++){ // 遍历当前列
+      if(!this.isValid(col, row, track)) continue;
+      track[row][col] = 'Q'; // 递归前标记
+      this.backtrack(track, row+1); // 递归新的行
+      track[row][col] = '.'; // 递归后回溯
+    }
+
+  }
+  isValid(col:number, row:number, track:string[][]):boolean {
+    let n = track.length; // 判断该位置是否能放置一个皇后
+    for(let i = 0; i < row; i++){
+      if(track[i][col] === 'Q') return false;
+    }
+    for(let i = row - 1, j = col - 1; i >=0 && j >= 0; i--, j--){
+      if(track[i][j] === 'Q') return false;
+    }
+    for(let i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++){
+      if(track[i][j] === 'Q') return false
+    }
+     return true;
+  }
+}
 ```
+
+## BFS算法框架
+
+其核心思想是，把问题抽象成图，从一个点向四周扩散，使用队列暂存扩散点，方便进行下一轮迭代
+
+leetcode 111题 二叉树的最小深度
+
+```ts
+function minDepth(root: TreeNode | null): number {
+  if(root == null) return 0;
+  let queue:TreeNode[] = [];
+  queue.push(root);
+  let deep = 1; // 初始化层数
+  while(queue.length > 0){
+    let length = queue.length;
+    for(let i = 0; i < length; i++) { // 仅对长度进行循环，不使用索引
+      let cur:TreeNode = queue.shift(); // 每次从队头推出一个节点
+      if(cur.left === null && cur.right === null) return deep; // 找到叶子节点则直接返回
+      if(cur.left !== null) queue.push(cur.left); // 依次推入左右节点
+      if(cur.right !== null) queue.push(cur.right);
+    }
+    deep++; // 遍历完一层更新层数
+  }
+  return deep;
+};
+```
+
+leetcode 752 打开转盘锁  
+每次只能转动一个轮盘且轮盘只能转动一个数组，即当前状态下一步可能有8种转法(4个数字，上下2中转法)，使用最少的步骤转动轮盘到target组合，且过程中须避开deadends
