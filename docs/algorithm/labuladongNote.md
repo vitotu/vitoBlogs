@@ -268,47 +268,89 @@ leetcode 752 打开转盘锁
 每次只能转动一个轮盘且轮盘只能转动一个数组，即当前状态下一步可能有8种转法(4个数字，上下2中转法)，使用最少的步骤转动轮盘到target组合，且过程中须避开deadends
 
 ```ts
-// TODO:need  to debug
 function openLock(deadends: string[], target: string): number {
-  let visited:Set<string> = new Set();
-  for(let key of deadends) visited.add(key);
-  let queue:string[] = ['0000'];
+  let visited:Set<string> = new Set(); // 使用set记录访问记录，在visited中的组合不会被分析
+  for(let key of deadends) visited.add(key); // 将deadends加入到visited中便于跳过
+  let queue:string[] = ['0000']; // 初始化队列
   let step = 0;
-  while(queue.length > 0) {
+  while(queue.length > 0) { // 队列不为空时进行遍历
     let len = queue.length;
-    for(let i = 0; i < len; i++) {
-      let cur = queue.shift();
-      if(visited.has(cur)) continue;
-      if(cur == target) return step;
-      for(let j = 0; j < 4; j++){
-        let tmp = plusOne(cur, j);
-        if(!visited.has[tmp]){
+    for(let i = 0; i < len; i++) { // 取当前层剩余的节点数作为遍历次数，而不用做索引
+      let cur = queue.shift(); // 从队头中推出当前组合(节点)
+      if(visited.has(cur)) continue // 当前节点已访问过或在deadends中则跳过该组合分析
+      else visited.add(cur); // 将当前节点加入到visited中，避免后续重复分析
+      if(cur == target) return step; // 若当前节点刚好等于目标密码，则直接返回步数
+      for(let j = 0; j < 4; j++){ // 收集该组合(节点)的下一步可能状态，8种
+        let tmp = plusOne(cur, j); // j position add number
+        if(!visited.has(tmp)){ // node  visited then add to queue
           queue.push(tmp);
-          visited.add(tmp);
         }
-        tmp = minusOne(cur, j);
-        if(!visited.has[tmp]){
+        tmp = minusOne(cur, j); // j position minus number
+        if(!visited.has(tmp)){
           queue.push(tmp);
-          visited.add(tmp);
         }
       }
     }
-    step++;
+    step++; // analyze one node then add step
   }
-  return -1;
+  return -1; // not found solution then return -1
 };
-
+// circular add one
 function plusOne(s:string, j:number):string{
   let tmp = Array.from(s);
   if(tmp[j] == '9') tmp[j] = '0'
   else tmp[j] = String(Number(tmp[j]) + 1)
   return tmp.join('');
 }
-
+// circular minus one
 function minusOne(s:string, j:number):string{
   let tmp = Array.from(s);
   if(tmp[j] == '0') tmp[j] = '9'
   else tmp[j] = String(Number(tmp[j]) - 1);
   return tmp.join('');
 }
+```
+
+## 回溯法解排列/组合/子集问题
+
+排列/组合/子集问题可以归结为从nums数组中取出若干元素，对应情形有a：无重复不可复选，b：有重复不可复选，c:无重复可复选，按排列/组合/子集进行划分，则总共有9种情况
+
+TODO:补充labudadong中的两种递归树
+
+### 子集(元素无重复不可复选)
+
+LeetCode 78 子集:返回nums中能组合出的所有子集  
+子集与顺序无关，因此遵循递归树1
+
+```ts
+function subsets(nums: number[]): number[][] {
+  let demo = new Solution();
+  return demo.subsets(nums);
+};
+
+class Solution {
+  res:number[][] = [];
+  subsets(nums: number[]): number[][] {
+    let trace:number[] = [];
+    this.backtracks(nums, trace, 0);
+    return this.res;
+  }
+  backtracks(nums: number[], trace:number[] , start:number) {
+    this.res.push([...trace]); // every iteration collect the trace(every node)
+    for(let i = start; i < nums.length; i++) { 
+      // use start control end of recursion
+      trace.push(nums[i]); // pre-order push to trace
+      // next recursion start from i+1 to avoid duplicates subsets
+      this.backtracks(nums, trace, i+1); 
+      // when i+1 equals nums.length,the recursion will stopped
+      trace.pop(); // backtracking
+    }
+  }
+}
+```
+
+### 组合(元素无重复不可复选)
+
+```ts
+
 ```
