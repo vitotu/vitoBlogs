@@ -300,6 +300,7 @@ TODO：详细展开
 - vuex
 - provide & inject
 - $parent & $children ref属性和refs引用的方式
+- $attrs & $listeners
 - 发布订阅模式
 
 ## 脚手架
