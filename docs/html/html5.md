@@ -171,3 +171,18 @@ CSP (Content Security Policy) 网页安全政策，浏览器端的白名单制�
 而inline的img标签下方空白即为baseline和bottom之间的空白，因此可以通过line-height设置为0，或font-size设置为0消除空白  
 [参考文档](https://www.zhihu.com/question/21558138)  
 相关话题:字体度量、line-height 和 vertical-align[IFC](https://panelcf1.stgchannelxyzroute.xyz/auth/login)  
+
+## 长列表优化问题
+
+长列表优化的主要方向还是减少渲染节点数量，仅渲染用户能看到的节点。  
+可以使用：分页处理(后端或前端均可做分页)、虚拟列表等方法来优化  
+
+虚拟列表的一种实现方案：使用小容器存放长列表中需要展示给用户的数据(滑动窗口)，每次仅渲染视口中的元素
+
+虚拟列表demo实现：
+
+::: tip 长列表原生demo实现
+<iframe id="longList" height=500 width=100% frameborder=0 src="/demo/longList.html"></iframe>
+
+[代码](./longList.md)
+:::

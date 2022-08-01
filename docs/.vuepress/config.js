@@ -26,7 +26,7 @@ module.exports = {
         ]},
       ]},  
       {text: 'Vue', items:[
-        { text:'vue2基础', link:'/vue/vue2base/'},
+        { text:'vue2基础', link:'/vue/vue2base'},
         { text:'vue2进阶', link:'/vue/vue2plus/'},
         { text:'vue3基础', link:'/vue/vue3base/'},
         { text:'vuex', link:'/vue/vuex/'},
