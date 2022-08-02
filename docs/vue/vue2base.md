@@ -228,7 +228,37 @@ this.$bus.$emit('hello',this.name)
   这点在echarts这类需要持有DOM实例进行渲染的库中，由于持有的旧DOM实例与新节点的DOM实例不同，会出现不能渲染的情况，解决方案是在此类场景中使用`v-show`或重新获取新节点DOM并初始化echarts实例  
   `v-if`与`v-else-if`等条件语句之间还存在着直接子节点复用的情况，添加key值可避免复用的情况发生  
   总结下来高频切换用`v-show`，否则用`v-if`  
-  
+
+- v-model和v-bind.sync
+
+两个指令均可实现双向绑定，即子组件改变prop时变化能同步到父组件中  
+其中v-bind.sync 通过自定义事件事件，在子组件中使用`this.$emit('update:prop名称', newVal)`的方式触发反向更新  
+v-bind.sync本质是语法糖  
+
+```html
+<custom-component :value.sync="value"></custom-component>
+相当于
+<custom-component :value="value" @update:value="value = $event"></custom-component>
+```
+
+v-model：v-model实际是v-bind.sync的语法糖，且每个组件仅能绑定一个v-model指令，对应text, textarea 的value属性反向更新绑定为input事件，而checkbox, select等为change事件,且仅能绑定到这些标签对应的固定值上  
+在自定义组件中使用是需要通过model选项定制其prop和event，否则默认事件为input  
+
+```js
+export default {
+  model:{
+    prop: 'props name',
+    event: 'change' // set default input event to change event
+  },
+  props:{
+    'props name': String
+  }
+}
+```
+
+ps:在vue3中v-model的使用范围已和v-bind.sync相同，并且移除了v-bind的sync修饰符  
+[参考文档](https://v3.cn.vuejs.org/guide/migration/v-model.html#%E6%A6%82%E8%A7%88)  
+
 ## 生命周期  
   
 ![lifecycle](https://cn.vuejs.org/images/lifecycle.png)  
@@ -302,6 +332,8 @@ TODO：详细展开
 - $parent & $children ref属性和refs引用的方式
 - $attrs & $listeners
 - 发布订阅模式
+
+v-model和v-bind.sync 也可以算作组件间通信的方式之一，其本质还是props & emit
 
 ## 脚手架
   
