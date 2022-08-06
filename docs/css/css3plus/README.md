@@ -22,7 +22,7 @@
 元素选择器:标签名 { }; 类选择器: .className { }; id选择器: #id { };  
 复合选择器: 选择器1选择器2{},如div.box1会选中class=box1的div标签  
 群组选择器: 选择器1,选择器2,选择器3 { }  
-后代选择器: 祖先元素 后代元素 后代元素 { }  
+后代选择器: 祖先元素 后代元素 后代元素 { } 后代选择器的结合方式是从右到左的(相当于从先查找目标节点，再根据其父级节点来排除不符合条件的节点，相比于从左到右的方式查找效率更高)  
 直接子元素选择器: 父元素 > 子元素{}  
 兄弟选择器: 兄弟元素 + 兄弟元素{},查找后一个兄弟元素; 兄弟元素 ~ 兄弟元素{} 查找后面的所有兄弟元素  
   
@@ -40,7 +40,9 @@ a:link 正常链接; a:visited 访问过的链接; a:hover 鼠标悬浮的链接
 `!important`修饰属性值，能够覆盖上述所有优先级计算，想要覆盖`!important`只能在优先级更高的规则中加入`!important`,应尽量避免使用该属性修饰符  
   
 `p :first-child`选择p的一个后代元素,`p:first-child`选取某元素的第一个p元素，为避免混淆可引入全局选择器，将前者改写为`p *:first-child`  
-  
+
+
+
 ## 默认样式  
   
 ## 盒模型  
@@ -123,8 +125,8 @@ flex-item上的属性：
 
 + order属性定义项目的排列顺序。数值越小，排列越靠前，默认为0  
 + flex-basis属性定义了item在主轴的空间大小(空间不足时可能缩小)，默认值为auto，若同时设置了width/height则flex-basis不为auto时拥有更高的优先级  
-+ flex-grow属性定义了沿主轴方向放大比例，按比例分配剩余空间，默认为0  
-+ flex-shrink属性定义了收缩比例，同时兼顾了item的最小大小  
++ flex-grow属性定义了沿主轴方向放大比例，默认为0，设置为非0数字时，所有item按数字比例分配剩余空间，若item总宽度大于容器则此属性失效，item按flex-shrink规则缩小  
++ flex-shrink属性定义了收缩比例，默认值为1，其值为压缩剩余空间(负剩余空间)的比例，同时兼顾了达到item的min-width属性值时不再缩小  
 + flex由flex-grow、flex-shrink、flex-basis组成，特殊缩写值{initial:0 1 auto, auto:1 1 auto, none:0 0 auto, 1:1 1 0}  
 + align-self属性指定对应item的交叉轴方向的对齐方式，可覆盖align-items属性，取值auto(默认值) | flex-start | flex-end | center | baseline | stretch
 

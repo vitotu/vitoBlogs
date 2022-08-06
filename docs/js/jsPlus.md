@@ -853,6 +853,77 @@ class Demo {
 Demo.test();
 ```
 
+### 错误处理
+
++ 回调函数错误捕获
+
+因为事件循环机制，异步任务执行时，发布该异步任务的执行栈fun1已经退出，因此在外部无法捕获异步任务中的抛出的错误；  
+
+```js
+fun1(){
+  try {
+    setTimeout(() => {
+      throw new Error("error");
+    })
+  } catch (e){
+    console.log(e); // 无法捕获错误
+  }
+}
+```
+
++ promise错误捕获
+
+异步任务抛出的错误需要在异步任务内部catch，对于promise来说，由于then/catch/finally已经捕获了错误并将返回的promise状态翻转为rejected,因此其错误捕获使用then/catch，若抛出错误后续没有catch，则对应错误会冒泡到主执行栈
+
+```js
+var a = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    throw new Error('error') // 同样无法捕获
+    // 仍然要在异步任务中进行捕获，并且通过将 promise 状态翻转的将错误传递给返回的promise对象
+    // try {
+    //   throw new Error('error')
+    // } catch (e){
+    //   reject(e)
+    // }
+  })
+}) // a is rejected promise
+var b = a.then(res => console.log(res), err => {
+  console.log(err);
+  throw new Error('b throw a new error');
+  // throw a error in callback will be wrapped and return rejected promise
+  // after throw error blow code will not being run
+}) 
+// a's error catch by onrejected callback function, but throw new error so b is rejected promise
+// promise b must being catch, otherwise the error will throw in global scope
+var c = b.catch(e=> console.log(e)); // c is fulfilled promise
+```
+
+PS: promise chain 无法被真正意义上的打破，即使是finally仍然会返回一个promise对象，若之前的对象处于pending状态则调用then方法后的promise对象也处于pending状态，因此无法阻止返回promise对象，无法阻断promise chain  
+
++ async/await 错误捕获
+
+async/await 实际上是generator/yield结合promise的语法糖，其修饰的函数返回值为promise
+
+```js
+async function() {
+  console.log('1');
+  try {
+    let a = await fun1(); // return value of success or undefined
+    console.log(a); // code on here like in then onResolved
+    // when fun1 return/is rejected promise code on here will not execute
+  } catch (e) {
+    console.log(e); // code on here like in catch onRejected
+  }
+}
+// recommend catch error code style like go syntax
+async function(){
+  let [err, res] await fun1().then(v=>[null, v], e=>[e, null])
+  if(err){
+    // handle error
+  }
+}
+```
+
 ## 补充说明  
 
 import模块加载时，传入目录，则优先加载目录下package.json文件中main属性指定的入口，其次是index.js文件；若都没找到则报错  
