@@ -4,18 +4,32 @@
 视频教程[地址](https://www.bilibili.com/video/BV1Zy4y1K7SH?p=1)  
 
 ## 模板语法
-  
-在html中书写`{{表达式}}`,`v-指令:属性='表达式'`等语法样式，这些语法样式由Vue实例来解析。这种方式被成为模板语法  
-  
-## 响应式  
 
-- 响应式基础特性
-  1. Vue2在组件实例上设置属性,代理访问data配置项中的数据(vm.key与vm._data.key同源).  
-  2. data配置项中数组对象的响应式是通过数组包装Array类型的原生`push()`、`pop()`、`shift()`、`unshift()`、`splice()`、`sort()`、`reverse()`等函数来实现的，因此在修改数组类型的数据时，想要响应式的更新都各调用处，需要使用数组方法来修改数组而不是直接使用索引。  
-  3. data配置项中的对象都设置的了数据代理，新加的属性想要获得响应式，需要通过`Vue.set(target，propertyName/index，value)`方法或方法内`vm.$set(target，propertyName/index，value)`进行设置  
-  4. 特别注意：`Vue.set()`和`vm.$set()`不能给vm 或 vm的根数据对象 添加属性！！！  
+vue的`.vue`文件是SFC(Single File Components 单文件组件)风格的编码，即一个文件中包含了`<template>`，`<script>`，`<style>`，详细如下：  
 
-## data配置项  
+```vue
+<template>
+<!-- 在这里书写html及模板语法
+此部分将通过@vue/complier-dom的处理，预编译为js的渲染函数render
+template本身最终将不会被渲染为DOM结构，并且内部可以多层嵌套template -->
+</template>
+
+<script>
+// 在这里书写js
+</script>
+
+<style>
+/* 在这里书写css */
+</style>
+```
+
+与之对应的`.jsx`风格即是在js中书写xml格式语法用于表示html结构，vue想要使用jsx风格需要自己书写render函数  
+vue在`<template>`中书写`{ {js表达式}}`,`v-指令:参数='表达式'`等语法样式，这些语法样式由Vue实例来解析。这种方式统称为模板语法  
+
+- `{ { js表达式 }}`:插值语法，其中可以引用组件上的属性，js表达式运行于沙盒中，只能访问[白名单](https://github.com/vuejs/vue/blob/v2.6.10/src/core/instance/proxy.js#L9)中的全局变量  
+- 标签/自定义组件上的attribute需要使用[指令](#指令)来进行绑定，2.6.0版本后参数支持以`[参数js表达式]`的形式通过js表达式指定动态参数  
+
+## data配置项与响应式
   
 在vm实例中data的配置项可以写成对象形式,但在组件中由于组件的复用特性,data对象必须写成回调函数的形式  
   
@@ -30,47 +44,70 @@ const vm = new Vue({
 console.log(vm._data === a) // true  
 console.log(vm._data === b) // false  
 // 原有的对象引用a被覆盖了,因此不等于b对象  
-```  
-  
+```
+
+从data配置向中返回的对象将都具有响应式，即当该数据被修改后所有引用到的地方都会被同步修改
+
+- 响应式基础特性
+  1. Vue2在组件实例上设置属性,代理访问data配置项中的数据(vm.key与vm._data.key同源).  
+  2. data配置项中数组对象的响应式是通过数组包装Array类型的原生`push()`、`pop()`、`shift()`、`unshift()`、`splice()`、`sort()`、`reverse()`等函数来实现的，因此在修改数组类型的数据时，想要响应式的更新都各调用处，需要使用数组方法来修改数组而不是直接使用索引。  
+  3. data配置项中的对象都设置的了数据代理，新加的属性想要获得响应式，需要通过`Vue.set(target，propertyName/index，value)`方法或方法内`vm.$set(target，propertyName/index，value)`进行设置  
+  4. 特别注意：`Vue.set()`和`vm.$set()`不能给vm 或 vm的根数据对象 添加属性！！！
+
+更深层次的响应式原理参见[响应式原理](./vue2plus/README.md#双向绑定与响应式)  
+
+## 计算属性computed与监听属性watch
+
+直接在模板语法中无法使用过于复杂的js表达式，computed属性可以用于解决此问题  
+类似于属性的getter/setter，仅配置一个函数时默认为getter  
+与methods中的方法相比，computed有基于响应式依赖进行缓存，只有依赖发生变化时才会重新求值，相对而言适用于计算量较大的场景  
+与watch属性相比，watch属性是更通用的监听数据变化的方法，适用于当数据变化时需要执行异步或开销较大的操作时  
+更多参见[computed和watch原理](./vue2plus/README.md#computed原理)  
+
 ## 根实例vm  
   
 vm取名字'mvvm'模型中的最后两个字符vm;model(数据),view(视图html),view-model(视图模型之间的映射)  
   
 ## 事件处理  
   
-- Vue中的事件修饰符：  
+- Vue中的事件修饰符：`v-on:事件名.修饰符=""`  
   
-1. prevent：阻止默认事件（常用）；  
-2. stop：阻止事件冒泡（常用）；  
-3. once：事件只触发一次（常用）；  
-4. capture：使用事件的捕获模式；  
-5. self：只有event.target是当前操作的元素时才触发事件；  
-6. passive：事件的默认行为立即执行，无需等待事件回调执行完毕；  
-7. native: 使用浏览器原生事件  
-  
-- 按键  
-  
-1. Vue中常用的按键别名：  
- 回车 => enter  
- 删除 => delete (捕获“删除”和“退格”键)  
- 退出 => esc  
- 空格 => space  
- 换行 => tab (特殊，必须配合keydown去使用)  
- 上 => up  
- 下 => down  
- 左 => left  
- 右 => right  
-  
-2. Vue未提供别名的按键，可以使用按键原始的key值去绑定，但注意要转为kebab-case（短横线命名）  
-  
-3. 系统修饰键（用法特殊）：ctrl、alt、shift、meta  
- (1).配合keyup使用：按下修饰键的同时，再按下其他键，随后释放其他键，事件才被触发。  
- (2).配合keydown使用：正常触发事件。  
-  
-4. 也可以使用keyCode去指定具体的按键（不推荐）  
-  
-5. Vue.config.keyCodes.自定义键名 = 键码，可以去定制按键别名  
-  
+  1. .prevent：阻止默认事件（常用）；  
+  2. .stop：阻止事件冒泡（常用）；  
+  3. .once：事件只触发一次（常用）；  
+  4. .capture：使用事件的捕获模式；  
+  5. .self：只有event.target是当前操作的元素时才触发事件；  
+  6. .passive：事件的默认行为立即执行，无需等待事件回调执行完毕；与.prevent同时使用时.prevent会被忽略  
+  7. .native: 使用浏览器原生事件  
+
+事件修饰符可以叠加，但会以从左到右顺序生效
+
+- 按键`v-on:[keyup/keydown等].[按键名]=""`
+
+  1. Vue中常用的按键别名：  
+    回车 => enter  
+    删除 => delete (捕获“删除”和“退格”键)  
+    退出 => esc  
+    空格 => space  
+    换行 => tab (特殊，必须配合keydown去使用)  
+    上 => up  
+    下 => down  
+    左 => left  
+    右 => right  
+
+  2. Vue未提供别名的按键，可以使用按键原始的key值去绑定，但注意要转为kebab-case（短横线命名）  
+  3. 系统修饰键（用法特殊）：ctrl、alt、shift、meta  
+    1).配合keyup使用：按下修饰键的同时，再按下其他键，随后释放其他键，事件才被触发。  
+    2).配合keydown使用：正常触发事件。  
+  4. 也可以使用keyCode去指定具体的按键（已被废弃）  
+  5. Vue.config.keyCodes.自定义键名 = 键码，可以去定制按键别名  
+  6. .exact用于精确控制系统修饰符组合触发的事件(有且仅有该键被按下时触发)
+
+- 鼠标修饰符  
+  .left  
+  .right  
+  .middle  
+
 - 自定义事件  
   
 自定义事件也可用于父子组件通信  
@@ -114,7 +151,7 @@ this.$bus.$emit('hello',this.name)
 
 与事件总线相类似的还有使用第三方库pubsub-js的消息发布订阅方式，用法与事件总线类似  
   
-## 绑定样式  
+## 绑定样式与class  
   
 1. class样式  
 写法`:class="xxx"` xxx可以是字符串、对象、数组。  
@@ -151,20 +188,19 @@ this.$bus.$emit('hello',this.name)
   使用index作为key是没有问题的。  
   
 ## 表单  
-  
-收集表单数据：  
-若：`<input type="text"/>`，则v-model收集的是value值，用户输入的就是value值。  
-若：`<input type="radio"/>`，则v-model收集的是value值，且要给标签配置value值。  
-若：`<input type="checkbox"/>`  
-  1.没有配置input的value属性，那么收集的就是checked（勾选 or 未勾选，是布尔值）  
-  2.配置input的value属性:  
-    (1)v-model的初始值是非数组，那么收集的就是checked（勾选 or 未勾选，是布尔值）  
-    (2)v-model的初始值是数组，那么收集的的就是value组成的数组  
-备注：v-model的三个修饰符：  
+
+使用v-model绑定收集表单数据，对于不同的输入元素将绑定不同的property和事件：  
+
+- `<input type="text"/>` 和 `<textarea/>` 元素使用 `value` property 和 `input` 事件；  
+- `<input type="checkbox"/>` 和 `<input type="radio"/>` 使用 `checked` property 和 `change` 事件；多个checkbox可绑定到同一数组上  
+- `<select>` 字段将 `value` 作为 prop 并将 `change` 作为事件。  
+
+PS：v-model的三个修饰符：  
   lazy：失去焦点再收集数据  
   number：输入字符串转为有效的数字  
   trim：输入首尾空格过滤  
-  
+关于v-model本质是语法糖，更多详细参见[指令](#指令)中v-model和v-bind.sync对比
+
 ## 过滤器  
 
 过滤器：  
@@ -181,7 +217,7 @@ this.$bus.$emit('hello',this.name)
 - 常用的指令：  
     v-bind : 单向绑定解析表达式, 可简写为 `:xxx`  
     v-model : 双向数据绑定  
-    v-for   : 遍历数组/对象/字符串  
+    v-for   : 遍历数组/对象/字符串(`item in items`和`item of items`在Vue中没有区别)  
     v-on    : 绑定事件监听, 可简写为@  
     v-if    : 条件渲染（动态控制节点是否存存在）  
     v-else  : 条件渲染（动态控制节点是否存存在）  
@@ -222,12 +258,14 @@ this.$bus.$emit('hello',this.name)
    3. 备注：  
       1.指令定义时不加v-，但使用时要加v-；  
       2.指令名如果是多个单词，要使用kebab-case命名方式，不要用camelCase命名。  
-  
->`v-if`指令应该注意的地方
->>`v-if`指定修饰的节点在条件变为不满足时，将摧毁该节点及其子节点；当条件再变为满足时，新创建的节点及子节点与原有节点不同；  
-  这点在echarts这类需要持有DOM实例进行渲染的库中，由于持有的旧DOM实例与新节点的DOM实例不同，会出现不能渲染的情况，解决方案是在此类场景中使用`v-show`或重新获取新节点DOM并初始化echarts实例  
-  `v-if`与`v-else-if`等条件语句之间还存在着直接子节点复用的情况，添加key值可避免复用的情况发生  
-  总结下来高频切换用`v-show`，否则用`v-if`  
+
+::: tip v-if指令应该注意的地方
+`v-if`指定修饰的节点在条件变为不满足时，将摧毁该节点及其子节点；当条件再变为满足时，新创建的节点及子节点与原有节点不同；  
+这点在echarts这类需要持有DOM实例进行渲染的库中，由于持有的旧DOM实例与新节点的DOM实例不同，会出现不能渲染的情况，解决方案是在此类场景中使用`v-show`或重新获取新节点DOM并初始化echarts实例  
+`v-if`与`v-else-if`等条件语句之间还存在着直接子节点复用的情况，添加key值可避免复用的情况发生  
+总结下来高频切换用`v-show`，否则用`v-if`  
+另外`v-if`不推荐与`v-for`一起使用，当处于同一节点时`v-for`优先级更高，`v-if`会作用于循环中的每一个item  
+:::
 
 - v-model和v-bind.sync
 
@@ -242,7 +280,7 @@ v-bind.sync本质是语法糖
 ```
 
 v-model：v-model实际是v-bind.sync的语法糖，且每个组件仅能绑定一个v-model指令，对应text, textarea 的value属性反向更新绑定为input事件，而checkbox, select等为change事件,且仅能绑定到这些标签对应的固定值上  
-在自定义组件中使用是需要通过model选项定制其prop和event，否则默认事件为input  
+在自定义组件中使用需要通过model选项定制其prop和event，否则默认事件为input  
 
 ```js
 export default {
