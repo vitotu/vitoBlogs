@@ -270,7 +270,8 @@ PS：v-model的三个修饰符：
 - v-model和v-bind.sync
 
 两个指令均可实现双向绑定，即子组件改变prop时变化能同步到父组件中  
-其中v-bind.sync 通过自定义事件事件，在子组件中使用`this.$emit('update:prop名称', newVal)`的方式触发反向更新  
+其中`v-bind.sync` 通过自定义事件事件，在子组件中使用`this.$emit('update:prop名称', newVal)`的方式触发反向更新  
+`v-bind.sync`不能与表达式一起使用，仅能提供property名  
 v-bind.sync本质是语法糖  
 
 ```html
@@ -281,6 +282,7 @@ v-bind.sync本质是语法糖
 
 v-model：v-model实际是v-bind.sync的语法糖，且每个组件仅能绑定一个v-model指令，对应text, textarea 的value属性反向更新绑定为input事件，而checkbox, select等为change事件,且仅能绑定到这些标签对应的固定值上  
 在自定义组件中使用需要通过model选项定制其prop和event，否则默认事件为input  
+在自定义组件中使用需要通过model选项定制其prop和event，否则默认事件为input，默认绑定prop为value  
 
 ```js
 export default {
@@ -359,11 +361,33 @@ ps：构造函数的prototype显式原型属性与其实例化后的实例的__p
   export {createMessage}  // 暴露函数，调用方引入该函数并调用即可使用MyMessage组件
   ```
 
+- 动态组件`<component>`
+
+vue内置元素`<component v-bind:is="switchComponentName">`通过`is`prop绑定已注册的组件名或组件的选项对象switchComponentName上，组件名也可用于普通的html标签，但普通标签的value等property需要使用`.prop`修饰器修饰，否则功能异常  
+TODO：完善动态组件的更详细的使用方法
+
+- 递归组件
+
+即组件在自己的模板中引用自身，此时要求组件有name选项或在全局注册  
+编写递归组件时需要保证递归终止条件，否则会导致栈溢出max stack size exceeded错误  
+
+- 组件间循环引用
+
+组件间的循环引用在打包时就会形成引用悖论，引发编译错误，解决此问题有如下方式：
+
+1. 全都进行全局注册  
+2. 在首先引用的那个组件A中通过beforeCreate生命周期钩子进行引入注册`beforeCreate(){ this.$options.components.yourComponent = require('url'); }`  
+3. 注册组件时使用异步`() => import('url')`的方式注册
+
+- 函数式组件
+
+TODO：函数式组件的用法与组件的函数式调用的区别，及其与jsx风格的关联关系
+
 ## 组件间通信的方式
 
 - props & emit
 
-props/emit仅适用于父子组件间通信，props属性只能从父组件单向流向子组件。  
+props/emit仅适用于父子组件间通信，[props属性](#组件属性及配置)只能从父组件单向流向子组件。  
 要实现双向通信需配合自定义事件emit, 在父组件使用v-on绑定监听事件回调函数，在子组件中使用this.$emit触发对应事件，并回传相应参数即可实现子组件到父组件的数据流动。  
 监听事件的回调函数上下文最终还是父组件。  
 
@@ -375,8 +399,10 @@ props/emit仅适用于父子组件间通信，props属性只能从父组件单�
 - EventBus 事件总线(发布订阅模式)
 
 基于自定义事件,普通自定义事件父组件通过v-on在子组件上订阅事件，并绑定回调函数，子组件中通过this.$emit触发对应事件并回传参数  
-事件总线需要在全局注册发布者bus，一个组件中通过bus.$emit('消息名', 传递参数)发布消息，其他需要通信的组件通过bus.$on('消息名', 回调函数(传递的参数))订阅此消息。  
+事件总线需要在全局注册发布者bus，一个组件中通过`bus.$emit('消息名', 传递参数)`发布消息，其他需要通信的组件通过`bus.$on('消息名', 回调函数(传递的参数))`订阅此消息。  
 由于是全局对象，可以存在多个订阅者，组件间通信也不仅限于父子组件，任意组件间均可进行通信  
+在组件销毁时需要通过`bus.$off('消息名', 回调函数)`的方式移除该事件的回调  
+另外还有`$once`的方式监听事件对应回到函数仅执行一次  
 
 - provide & inject
 
@@ -387,6 +413,7 @@ provide/inject可以实现祖到孙组件间的通信,没有层级深度限制�
 
 利用`$parent`和`$children`属性获取父组件或子组件的实例，通过读取或操作对应的值即可实现父子组件间通信  
 这种组件间通信方式仅应急状况下使用，不推荐大规模应用
+PS: 与之相类似的还可通过`$root`访问到根实例
 
 - `$attrs` & `$listeners`
 
@@ -417,25 +444,33 @@ this.$refs.sch 可获取到真实的DOM元素或School组件实例对象
 
 - props属性  
   
-父传子直接在props中传递数据即可，子传父需父组件先传递回调函数，子组件通过调用回调函数的方式向父组件传递数据，在子组件中不推荐直接修改父组件传过来的props数据  
-  
-props用于父子组件通信,常用写法如下:  
+props类似于函数的参数，数据由父传子单向传递，若要进行子传父，需父组件先传递回调函数，子组件通过调用回调函数的方式向父组件传递数据，在子组件中不推荐直接修改父组件传过来的props数据  
+若在子组件中尝试修改传入的props，vue会在控制台抛出错误，但由于js的对象或数组等传递方式是传引用，因此若props属性是一个对象或数组，直接修改其内部属性则可以修改成功并影响父组件  
+常用写法如下:  
 
-```JavaScript  
-//简单声明接收  
-props:['name','age','sex']  
-// 类型限制  
-props:{name:String}  
-// 类型限制+默认值的指定+必要性的限制  
-props:{  
-  name:{  
-    type:String,  
-    required:true, // 与default属性二选一  
-    // default:'张三'  
-  }  
-}  
-```  
-  
+```jsx
+// 在父组件中，使用v-bind传入name属性值data
+<child-component v-bind:name="data"/>
+<child-component v-bind="data"/> // 传入整个data对象，data对象的key-value将对应props中定义的属性名，类似于函数的参数解构
+
+var childComponent = {
+  //简单声明接收  
+  props:['name','age','sex']  
+  // 类型限制  
+  props:{name:String}  
+  // 类型限制+默认值的指定+必要性的限制  
+  props:{  
+    name:{  
+      type:String,  
+      required:true, // 与default属性二选一  
+      // default:'张三'  
+    }
+  }
+}
+```
+
+关联话题[组件间通信](#组件间通信的方式)  
+
 - mixin混入  
   
 将vue配置项的一部分提取出去,给各组件复用的方式称为混入;  
@@ -485,24 +520,40 @@ vue通过插槽向子组件中传递html结构
 ```html  
 <!-- 父组件中 -->  
 <子组件>  
-  <html结构1 slot='占位1'></html结构1>  
-  <html结构2 slot='占位2'></html结构2>  
+  <template v-slot:占位1>
+    <!-- 要插入占位1中的结构，v-slot指令仅可用于template标签上(被提供的内容仅有默认插槽时除外) -->
+  </template>  
+  <template v-slot:占位2>
+    <!-- 要插入占位2中的结构 -->
+  </template>  
 </子组件>  
 <!-- 子组件中 -->  
 <slot name='占位1'>默认值/结构</slot>  
 <slot name='占位2'>默认值/结构</slot>  
 ```  
   
-- 作用域插槽  
+- 作用域插槽
+
+父级模板中的所有内容都是在父级作用域中编译的；子组件的模板则时在子级作用域的中编译，因此要插入的html结构想要访问子组件中的变量，需要用到作用域插槽  
 
 ```html  
 <!-- 父组件中 -->  
-<template scope='childrenParams'> <!-- 可接收子组件传来的参数childrenParams(可自命令) -->  
-  <html结构>{{childrenParams}}</html结构>  
+<template v-slot:default='childrenParams'>
+  <!-- 将接收自子组件的变量重命名为了childrenParams -->  
+  <html结构>{{childrenParams.params1}}</html结构>  
 </template>  
 <!-- 子组件中 -->  
-<slot :params1="data1" params2='string2'></slot> <!-- 可传递多个参数，将被包裹在一个对象中 -->  
+<slot :params1="data1" params2='js表达式'></slot> <!-- 可传递多个参数，将被包裹在一个对象中 -->  
 ```  
+
+另外可以通过`<template v-slot:[动态插槽名]></template>`的方式定义动态的插槽名  
+具名插槽中`v-slot:`在`:`后有参数时`v-slot:`部分可缩写为`#`
+
+## 动态组件和异步组件
+
+动态切换的组件上，想要保持组件的状态可以使用`<keep-alive></keep-alive>`包裹，能够避免创建组件，能够在频繁切换的场景下提升性能  
+异步组件即以工厂函数的方式定义组件，工厂函数会异步的解析组件定义，vue仅在需要渲染时才会触发工厂函数，并且会缓存结果供未来重新渲染  
+异步组件最常见的使用形式是与webpack的code split功能相结合，通过类似`() => import('./my-async-component')`的方式进行注册或导入，从而增强code split的效果，将应用切分成更小的代码块  
 
 ***  
 
