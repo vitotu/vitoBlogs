@@ -555,6 +555,61 @@ vue通过插槽向子组件中传递html结构
 异步组件即以工厂函数的方式定义组件，工厂函数会异步的解析组件定义，vue仅在需要渲染时才会触发工厂函数，并且会缓存结果供未来重新渲染  
 异步组件最常见的使用形式是与webpack的code split功能相结合，通过类似`() => import('./my-async-component')`的方式进行注册或导入，从而增强code split的效果，将应用切分成更小的代码块  
 
+## 过渡
+
+vue在插入、更新、移除DOM或组件时提供不同的方式应用过渡效果，主要方式有：
+
+- 在 CSS 过渡和动画中自动应用 class，配合使用第三方 CSS 动画库，如 Animate.css
+- 在过渡钩子函数中使用 JavaScript 直接操作 DOM，配合使用第三方 JavaScript 动画库，如 Velocity.js
+
+通过在`<transition>`上绑定hook可直接操作DOM自定义过渡效果，hook绑定支持8种:  
+
+```vue
+<transition
+  v-on:before-enter="(el) => {}"
+  v-on:enter="(el, done) => {done()}"
+  v-on:after-enter="(el) => {}"
+  v-on:enter-cancelled="(el) => {}"
+
+  v-on:before-leave="(el) => {}"
+  v-on:leave="(el, done) => {done()}"
+  v-on:after-leave="(el) => {}"
+  v-on:leave-cancelled="(el) => {}"
+>实际使用过程中推荐使用function的形式绑定
+</transition>
+```
+
+- 使用vue封装的`<transition></transition>`组件包裹需要动画的标签或组件，这些标签或组件通常需要设置动态状态如:v-if、v-show、动态组件或组件根节点等
+
+当插入或删除包含在 transition 组件中的元素时，Vue 将会做以下处理：
+
+自动嗅探目标元素是否应用了 CSS 过渡或动画，如果是，在恰当的时机添加/删除 CSS 类名。  
+主要包含6个类名:
+v-enter, v-enter-active, v-enter-to;v-leave, v-leave-active, v-leave-to;
+各类名对应的状态及顺序详见[官方文档](https://v2.cn.vuejs.org/v2/guide/transitions.html#%E8%BF%87%E6%B8%A1%E7%9A%84%E7%B1%BB%E5%90%8D)  
+若`<transition>`中设置了name属性，则类名前缀`v`会被替换为name属性值,设置`类名-class`的属性则可自定义过渡的类名，设置duration属性则可定制持续时间  
+
+如果没有找到 JavaScript 钩子并且也没有检测到 CSS 过渡/动画，DOM 操作 (插入/删除) 在下一帧中立即执行。(注意：此指浏览器逐帧动画机制，和 Vue 的 nextTick 概念不同)
+
+- 初始渲染的过渡
+
+通过appear属性设置节点在初始渲染的过渡，与默认的进入离开过渡一样也可以自定义类名与绑定hook
+
+- 多个元素过渡(元素切换)
+
+当元素切换时(通过v-if/v-else或`<component>`等方式)，一个离开过渡的时候另一个开始进入过渡，同时生效的过渡不能满足所有要求，vue的过渡模式提供了in-out属性：新元素先进行过渡，完成之后当前元素过渡离开;out-in：当前元素先进行过渡，完成之后新元素过渡进入;两种模式  
+
+- 列表过渡
+
+列表过渡适用于使用了v-for指令的元素组，需要使用`<transition-group>`组件包裹，组件会转换为真实DOM，默认为`<span>`标签，且过渡模式不可用，内部元素需要指定唯一的key，css过渡的类会应用于内部元素中而不是组或容易本身  
+列表过渡的类名在普通过渡的基础上增加了move用于改变定位时使用  
+
+PS：将`<transition-group>`或`<transition>`作为根组件进行封装能够对过渡效果进行复用，更推荐使用函数式组件的方式进行复用  
+
+- 状态过渡
+
+组件中的状态，如节点位置，颜色显示，大小位置等其他属性发生变化可以利用响应式特性和组件结合一些css/js动效库，实现状态切换的过渡
+
 ***  
 
 ## Cookbook  

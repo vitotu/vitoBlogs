@@ -127,6 +127,7 @@ abstract class 抽象类 { // 抽象类只能用于extends继承，不能用来�
 class a extends 抽象类 {
   抽象方法(){console.log('')}
 }
+// 抽象类中可以有实现细节
 // 接口类似于抽象类，但所有属性和方法都没有实际值，主要用于定义类的结构
 // 接口也与类型别名相似，在一定条件下可以相互替换
 interface Person extends 接口1 { // 接口可继承其他接口或类
