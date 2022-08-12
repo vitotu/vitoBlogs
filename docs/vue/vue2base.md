@@ -478,7 +478,11 @@ var childComponent = {
 全局混入:全局混入将混入每一个vue实例中,导入后,通过`Vue.mixin(mixinObj1)`逐个混入  
 混入的配置项若有重复,不会覆盖原配置,  
 混入的对象型选项会进行合并，若key值冲突，则组件的属性值将覆盖该选项，hook函数则将合并调用，混入的hook优先被调用
-  
+
+Vue.extend()也采用了同样的策略进行合并  
+
+通过Vue.config.optionMergeStrategies.myOption可以自定义选项合并逻辑
+
 - 插件  
   
 在实例化vm之前,调用`Vue.use(plugins,params)`的方式挂载插件,传入plugins对象中必须包含install方法,install可以接收到Vue构造函数和params参数,在此阶段全局过滤器,全局混入,第三方库等功能挂载到原型对象上,增加vue的功能  
