@@ -203,7 +203,7 @@ PS：v-model的三个修饰符：
 
 ## 过滤器  
 
-过滤器：  
+过滤器：(在vue3中被移除)  
  定义：对要显示的数据进行特定格式化后再显示（适用于一些简单逻辑的处理）。  
  语法：  
     1.注册过滤器：Vue.filter(name,callback) 或 new Vue{filters:{}}  
@@ -243,21 +243,40 @@ PS：v-model的三个修饰符：
     1.跳过其所在节点的编译过程。  
     2.可利用它跳过：没有使用指令语法、没有使用插值语法的节点，会加快编译。  
 - 自定义指令总结：  
-   1. 定义语法：  
-      (1).局部指令：  
-        `new Vue({directive:{指令名:配置对象}})`或  
-        `new Vue({directive{指令名:回调函数}})`  // 简写模式回调函数默认是指bind和update  
-      (2).全局指令：  
-        `Vue.directive(指令名,配置对象/回调函数)`  
-  
-   2. 配置对象中常用的3个回调：  
-      (1)`.bind(element, binding)`：指令与元素成功绑定时调用。  
-      (2)`.inserted(element, binding)`：指令所在元素被插入页面时调用。  
-      (3)`.update(element, binding)`：指令所在模板结构被重新解析时调用。  
-  
-   3. 备注：  
-      1.指令定义时不加v-，但使用时要加v-；  
-      2.指令名如果是多个单词，要使用kebab-case命名方式，不要用camelCase命名。  
+  1. 定义语法：  
+    1).局部指令：  
+      `new Vue({directive:{指令名:配置对象}})`或  
+      `new Vue({directive{指令名:回调函数}})` 简写模式回调函数默认是指bind和update  
+    2).全局指令：  
+      `Vue.directive(指令名,配置对象/回调函数)`  
+
+  2. 配置对象中常用的3个回调：  
+    1)`bind(element, binding)`：指令与元素成功绑定时调用。  
+    2)`inserted(element, binding)`：指令所在元素被插入页面时调用。  
+    3)`update(element, binding)`：指令所在模板结构被重新解析时调用。  
+    4)`componentUpdated`指令所在组件的VNode及其子VNode全部更新后调用
+    5)`unbind`只调用一次，指令与元素解绑时调用
+
+  3. 回调函数的参数：
+
+        ```js
+          element // 指令所绑定的元素，可直接操作DOM
+          binding:{
+            name // 指令名，不含v-前缀
+            value // 绑定的值
+            oldValue // 绑定的旧值
+            expression // 字符串形式的指令表达式
+            arg // 传给指令的参数, 如v-bind:arg=""中的arg
+            modifiers // 修饰符对象, 如v-bind.sync => {sync:true}
+          }
+          vnode // 生成的虚拟节点
+          oldVnode // 上一个虚拟节点
+        ```
+
+  4. 备注：  
+    1.指令定义时不加v-，但使用时要加v-；  
+    2.指令名如果是多个单词，要使用kebab-case命名方式，不要用camelCase命名。  
+    3.指令绑定参数可以动态绑定
 
 ::: tip v-if指令应该注意的地方
 `v-if`指定修饰的节点在条件变为不满足时，将摧毁该节点及其子节点；当条件再变为满足时，新创建的节点及子节点与原有节点不同；  
@@ -379,9 +398,15 @@ TODO：完善动态组件的更详细的使用方法
 2. 在首先引用的那个组件A中通过beforeCreate生命周期钩子进行引入注册`beforeCreate(){ this.$options.components.yourComponent = require('url'); }`  
 3. 注册组件时使用异步`() => import('url')`的方式注册
 
-- 函数式组件
+- 函数式组件(无状态无实例)
 
-TODO：函数式组件的用法与组件的函数式调用的区别，及其与jsx风格的关联关系
+组件内部没有管理任何状态，没有生命周期，也没有实例(没有this上下文), 仅接收一些props，类似于函数，因此可以设置functional属性`<template functional>`或`Vue.component('myComponent', {functional:true})`，将该组件变为一个函数式组件  
+
+函数式组件若是写成渲染函数的形式，则其render 函数接收第二个参数context作为上下文，context对象包含props, children, slots, scopedSlots, data(传递给组件的整个数据对象区别与普通组件的data选项，此处还包含data.no, data.attrs等), parent, listeners(data.on的别名), injections  
+
+前面有介绍组件的函数式调用，其本质仍然是普通组件，这是其与函数式组件最大的区别  
+
+函数式组件本质是一个函数，与之对应的是普通的类组件，其渲染开销低于类组件。通常用于包装子组件，在将children，props，data传递给子组件前操作这些属性  
 
 ## 组件间通信的方式
 
@@ -413,7 +438,7 @@ provide/inject可以实现祖到孙组件间的通信,没有层级深度限制�
 
 利用`$parent`和`$children`属性获取父组件或子组件的实例，通过读取或操作对应的值即可实现父子组件间通信  
 这种组件间通信方式仅应急状况下使用，不推荐大规模应用
-PS: 与之相类似的还可通过`$root`访问到根实例
+PS: 与之相类似的还可通过`$root`访问到根实例  
 
 - `$attrs` & `$listeners`
 
@@ -489,7 +514,7 @@ Vue.extend()也采用了同样的策略进行合并
   
 - scoped  
   
-在vue文件中`<style scoped></style>`中使用该属性,标签中的属性将只在本组件中生效.  
+在vue文件中`<styl scoped></style>`中使用该属性,标签中的属性将只在本组件中生效.  
 vue是通过将模板中的标签加入`data-生成数字`属性来约束样式的  
   
 - `$nextTick`  
@@ -613,6 +638,67 @@ PS：将`<transition-group>`或`<transition>`作为根组件进行封装能够�
 - 状态过渡
 
 组件中的状态，如节点位置，颜色显示，大小位置等其他属性发生变化可以利用响应式特性和组件结合一些css/js动效库，实现状态切换的过渡
+
+## 渲染函数与jsx
+
+`.vue`文件中的`<template>`经过模板编译阶段会生成render渲染函数，调用render会得到对应的虚拟DOM。  
+通过编写render函数跳过模板编译阶段，从而获得更大的模板灵活性，但同时也要求对底层api较为熟悉  
+在vue的options配置项中加入render选项:
+
+```js
+Vue.component('myComponent', {
+  render: function(createElement){
+    return createElement(
+      // 添加render属性，使用createElement函数生成并返回虚拟DOM 
+    )
+  },
+  props: {} // ...
+})
+```
+
+- createElement函数的入参
+
+```js
+tagName: string| object | Function // 必填项，标签名或组件选项对象
+attributeObject:{ // 可选，与模板中attribute对应的数据对象
+  'class':{foo:true, bar:false}, // 与v-bind:class api相同
+  'style':{color:'red'}, // 与v-bind:style api相同
+  attrs:{}, // 普通attribute
+  props:{}, // 组件props属性
+  domProps:{innerHTML:'baz'}, // DOM properties
+  on:{ click:this.clickHandler}, // v-on绑定的事件监听器
+  nativeOn:{ click:this.nativeClickHandler}, // 仅用于组件，监听原生事件
+  directives:[{}], // 自定义的指令
+  scopedSlots:{default:props => {} }, // 作用于插槽
+  slot: 'name-of-slot', // 作为子组件时，指定的插槽名称
+  key: '',
+  ref: string|[], // 若给多个元素都应用了相同的ref名，则会变成一个数组
+  refInFot: true
+
+}
+childNode: string | Array // 文本节点或子级虚拟节点需要由createElement函数生成
+```
+
+PS:VNode必须唯一，因此多个相同的VNode需要用工行函数实现  
+渲染函数中v-if/v-for可以用条件判断或map等方式实现，而v-model语法糖则需要自行实现相关逻辑  
+对于部分事件修饰符，提供了对应的修饰前缀，如`click.passive => &click; click.capture => !click; click.once => ~click`,而其他修饰符基本可以从event参数中读取到并操作，因此没有对应的修饰符  
+通过this.$slots可以访问静态插槽的内容, 通过this.$scopedSlots访问作用于插槽
+
+- jsx
+
+jsx风格的语法允许在js文件中直接书写xml风格的template语法，因此可以借助构建loader，用于代替上述createElement的函数式调用风格，如:  
+
+```jsx
+{ // 省略了其他配置项
+  render:function(h){
+    return (
+      <AnchoredHeading level={1}>
+        <span>Hello</span> world!
+      </AnchoredHeading>
+    )
+  }
+}
+```
 
 ***  
 
