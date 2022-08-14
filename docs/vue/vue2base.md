@@ -320,7 +320,7 @@ ps:在vue3中v-model的使用范围已和v-bind.sync相同，并且移除了v-bi
 
 ## 生命周期  
   
-![lifecycle](https://cn.vuejs.org/images/lifecycle.png)  
+![lifecycle](./resource/lifecycle.png)  
 
 - 常用的生命周期钩子：  
     1.mounted: 发送ajax请求、启动定时器、绑定自定义事件、订阅消息等【初始化操作】。  
@@ -716,7 +716,9 @@ jsx风格的语法允许在js文件中直接书写xml风格的template语法，�
 
 ## vue-cli
 
-## vue lib模式打包生成umd文件笔记
+vue-cli是基于webpack等打包工具的
+
+### vue lib模式打包生成umd文件笔记
 
 通过使用vue[打包命令](https://cli.vuejs.org/zh/guide/build-targets.html#%E5%BA%93)中的target参数 指定构建模式为lib，可打包生产umd文件。  
 lib模式下默认不会打包vue，若要打包vue可使用命令```vue-cli-service build --target lib --inline-vue```
