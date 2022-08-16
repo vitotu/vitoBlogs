@@ -52,6 +52,7 @@ module.exports = {
         { text:'常见算法', link:'/algorithm/common'},
         { text:'排序算法python', link:'/algorithm/10sortedAlgorithm'},
         { text:'剑指offer-python', link:'/algorithm/python_sword_for_offer'},
+        { text:'labuladong算法', link:'/algorithm/labuladongNote'},
       ]},
       {text: 'github主页', link: 'https://github.com/vitotu'}      
     ],

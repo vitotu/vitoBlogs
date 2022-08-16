@@ -81,6 +81,8 @@ let 变量: 类型 = 值; // 声明类型并赋值
   |  tuple  |       [4,5]       | 元素，TS新增类型，固定长度数组   |
   |  enum   |    enum{A, B}     |       枚举，TS中新增类型       |
   |  bigint |    100n           |       es6中引入的大数字       |
+  |  null   |    null           | null与undefined不同是两种类型，但都是所有类型的子类型 |
+  | undefined |    undefined   |       同null       |
 
 * 字面量指定类型
 
@@ -96,14 +98,16 @@ let unionType: string | number; // unionType可取string或number类型
   * unknown 安全版本的any，unknown类型变量能够接收任何类型的值，但不能将unknown赋给any、unknown之外的变量，unknown类型不可执行方法，但any可以
   * never永远不存在的值的类型，如函数中报错未运行完成，也就不存在返回值；死循环函数也不存在返回值，因此函数声明时返回类型可声明为never，另外never,null,undefined可以赋给任何类型
 * array/tuple/enum
-  * array数组中只能存储同一类型的值，`类型[]`或`Array<类型>`
-  * tuple元组是类似于指定长度的数组，但可以存储指定的不同类型，越界添加元素时不会报错，但新元素的类型被限定为指定不同类型的一种
+  * array数组中只能存储同一类型的值，类型声明：`类型[]`或`Array<类型>`
+  * tuple元组是类似于指定长度的数组，但可以存储指定的不同类型，越界添加元素时不会报错，但新元素的类型被限定为指定不同类型中的一种(联合类型)
   * enum枚举类型,定义枚举类：`enum Weeks {Sun, Mon, Tue, Wen, Thu, Fri, Sat}`枚举成员会的被赋值为从0开始的数字，使用时`let day: Weeks = Weeks.Sun;`
 
 * 类型断言：告诉编译器变量的类型，语法形式:`(值 as 类型)`或`<类型>值`
   * TODO：完善断言详细规则
 
 * 类型别名可以给类型取一个新名字：`type 新别名 = 类型`，
+
+PS:所有类型表示均以小写开头，区别于以大写开头的
 
 ## 对象类型
 
