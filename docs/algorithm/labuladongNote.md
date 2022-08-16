@@ -128,7 +128,7 @@ function coinChange(coins: number[], amount: number): number {
       dp[i] = Math.min(dp[i], 1 + dp[i - coin]); // 比较与更新硬币组合数
     }
   }
-  // 若目标金额扔等于初始值，则返回无法凑成的结果
+  // 若目标金额仍等于初始值，则返回无法凑成的结果
   return (dp[amount] === amount + 1) ? -1 : dp[amount]; 
 };
 ```
@@ -351,6 +351,32 @@ class Solution {
 
 ### 组合(元素无重复不可复选)
 
-```ts
+leetcode 77 组合:给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。  
 
+解题思路接上题，大小为k的组合就是大小为k的子集，因此仅需在上题算法中取大小为k的结果进行输出即可  
+
+```ts
+function combine(n: number, k: number): number[][] {
+  let demo = new Solution();
+  return demo.subCombine(n, k);
+};
+class Solution {
+  res:number[][] = [];
+  subCombine(n: number, k: number): number[][] {
+    let trace:number[] = [];
+    this.backtrack(n, trace, 1, k);
+    return this.res;
+  }
+  backtrack(n:number, trace:number[], start:number, k:number){
+    if(k === trace.length){
+      this.res.push([...trace]);
+      return;
+    }
+    for(let i = start; i <= n; i++) {
+      trace.push(i);
+      this.backtrack(n, trace, i+1, k);
+      trace.pop();
+    }
+  }
+}
 ```
