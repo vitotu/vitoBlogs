@@ -38,8 +38,8 @@ module.exports = {
         { text:'css进阶', link: '/css/css3plus/'},
         { text:'scss', link: '/css/scss/'},
       ]},
-      {text: '浏览器', link: '/browser/'},
-      {text: '网络通信', link: '/network/'},
+      {text: '浏览器', link: '/browser/browser'},
+      {text: '网络通信', link: '/network/webNetwork'},
       {text: 'Linux', link: '/linuxNote/'},
       {text: '开发构建工具', items:[
         { text:'npm', link:'/devToolsNote/npm-note'},
