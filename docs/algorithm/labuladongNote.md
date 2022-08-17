@@ -1,6 +1,6 @@
 # labuladong算法学习笔记
 
-[labuladong](https://labuladong.github.io/algo/)
+labuladong文档中代码没有使用js，故这篇学习笔记主要用于记录使用js/ts实现对应部分的代码，详细算法解析等推荐配合原著阅读[labuladong的github站](https://labuladong.github.io/algo/)|[labuladong的gitee站](https://labuladong.gitee.io/algo/)
 
 ## 二叉树
 
@@ -315,7 +315,7 @@ function minusOne(s:string, j:number):string{
 
 排列/组合/子集问题可以归结为从nums数组中取出若干元素，对应情形有a：无重复不可复选，b：有重复不可复选，c:无重复可复选，按排列/组合/子集进行划分，则总共有9种情况
 
-TODO:补充labudadong中的两种递归树
+算法框架使用两种回溯递归树即可，子集/组合可归为一类递归树，而排列则单独一类，所有情况均在这两种树上进行剪枝/扩增
 
 ### 子集(元素无重复不可复选)
 
@@ -380,3 +380,214 @@ class Solution {
   }
 }
 ```
+
+### 排列(元素无重复不可复选)
+
+leetcode 46 全排列 给定不重复的数组nums输出其元素的全排列，不可复选  
+
+由于是全排列，则不可类似上述算法一样使用start限制后续的元素选择，因此采用used辅助数组用于记录已访问的元素，用于避免重复选择， 算法主体与上述类似  
+
+```ts
+function permute(nums: number[]): number[][] {
+  let demo = new Solution();
+  return demo.permuteUnique(nums);
+};
+class Solution {
+  res:number[][] = [];
+  permuteUnique(nums:number[]):number[][]{
+    let used:boolean[] = new Array(nums.length).fill(false);
+    let trace:number[] = [];
+    this.traceback(nums, trace, used);
+    return this.res;
+  }
+  traceback(nums:number[], trace:number[], used:boolean[]){
+    if(trace.length === nums.length){
+      this.res.push([...trace]);
+      return;
+    }
+    for(let i = 0; i < nums.length; i++){
+      if(used[i]) continue;
+      used[i] = true;
+      trace.push(nums[i]);
+      this.traceback(nums, trace, used);
+      used[i] = false;
+      trace.pop();
+    }
+  }
+}
+```
+
+### 子集(元素重复不可复选)
+
+leetcode 90 子集(二) 整数数组 nums ，其中可能包含重复元素，请你返回该数组所有可能的子集（幂集）。  
+解集 不能 包含重复的子集。返回的解集中，子集可以按 任意顺序 排列。
+
+```ts
+function subsetsWithDup(nums: number[]): number[][] {
+  let demo = new Solution();
+  return demo.subsetsWithDup(nums);
+};
+class Solution {
+  res:number[][] = [];
+  subsetsWithDup(nums:number[]):number[][]{
+    nums.sort(); // 先排序，保证相同的元素在相邻的位置
+    let trace:number[] = [];
+    this.traceback(nums, trace, 0);
+    return this.res;
+  }
+  traceback(nums:number[], trace:number[], start:number){
+    this.res.push([...trace]);
+    for(let i = start; i < nums.length; i++){
+      // 遍历时跳过相同的元素，避免产生重复的组合
+      if(i > start && nums[i] === nums[i-1]) continue;
+      trace.push(nums[i]);
+      this.traceback(nums, trace, i +1);
+      trace.pop();
+    }
+  }
+}
+```
+
+### 组合(元素重复不可复选)
+
+leetcode 40 组合总数(二) 给定一个候选人编号的集合 candidates(有重复编号) 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的无重复组合。  
+candidates 中的每个数字在每个组合中只能使用 一次 。
+
+```ts
+function combinationSum2(candidates: number[], target: number): number[][] {
+  let demo = new Solution();
+  return demo.combinationSum2(candidates, target);
+};
+class Solution {
+  res:number[][] = [];
+  curSum = 0;
+  target:undefined|number = undefined;
+  combinationSum2(cand:number[], target:number):number[][]{
+    cand.sort();
+    this.target = target;
+    let trace:number[] = [];
+    this.traceback(cand, trace, 0);
+    return this.res;
+  }
+  traceback(cand:number[], trace:number[], start:number){
+    if(this.curSum === this.target) {
+      this.res.push([...trace]);
+      return;
+    }
+    if(this.curSum > this.target) return;
+    for(let i = start; i < cand.length; i++){
+      if(i > start && cand[i] === cand[i-1]) continue;
+      this.curSum += cand[i];
+      trace.push(cand[i]);
+      this.traceback(cand, trace, i+1);
+      this.curSum -= cand[i];
+      trace.pop();
+    }
+  }
+}
+```
+
+### 排列(元素重复不可复选)
+
+leetcode 47 全排列 给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。  
+
+```ts
+function permuteUnique(nums: number[]): number[][] {
+  let demo = new Solution();
+  return demo.permuteUnique(nums);
+};
+class Solution {
+  res:number[][] = [];
+  permuteUnique(nums:number[]):number[][]{
+    nums.sort(); // 同样需要先进行排序
+    let used:boolean[] = new Array(nums.length).fill(false);
+    let trace:number[] = [];
+    this.traceback(nums, trace, used);
+    return this.res;
+  }
+  traceback(nums:number[], trace:number[], used:boolean[]){
+    if(trace.length === nums.length){
+      this.res.push([...trace]);
+      return;
+    }
+    for(let i = 0; i < nums.length; i++){
+      if(used[i]) continue;
+      // 新增去重条件，跳过重复的元素，!used[i-1]保证了相同的元素位置相对固定
+      // 元素相同时，当前一个元素未被选中，则当前元素不可越过前一个元素进行排列
+      if(i > 0 && nums[i] === nums[i-1] && !used[i-1]) continue;
+      used[i] = true;
+      trace.push(nums[i]);
+      this.traceback(nums, trace, used);
+      used[i] = false;
+      trace.pop();
+    }
+  }
+}
+```
+
+### 子集/组合(元素无重复可复选)
+
+leetcode 39 组合总数 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回  
+candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。  
+
+```ts
+function combinationSum(candidates: number[], target: number): number[][] {
+  let demo = new Solution();
+  return demo.combinationSum(candidates, target);
+};
+class Solution {
+  res:number[][] = [];
+  curSum = 0;
+  target:undefined|number = undefined;
+  combinationSum(cand:number[], target:number):number[][]{
+    let trace:number[] = [];
+    this.target = target;
+    this.traceback(cand, trace, 0);
+    return this.res;
+  }
+  traceback(cand:number[], trace:number[], start:number){
+    if(this.curSum === this.target) {
+      this.res.push([...trace]);
+      return;
+    }
+    // 增加跳出条件，当前和大于目标时结束本次递归
+    if(this.curSum > this.target) return;
+    for(let i = start; i < cand.length; i++){
+      this.curSum += cand[i];
+      trace.push(cand[i]);
+      // 递归传入起点i 而不是i+1 可重复使用i位置的元素
+      this.traceback(cand, trace, i);
+      this.curSum -= cand[i];
+      trace.pop();
+    }
+  }
+}
+```
+
+### 排列(元素无重复可复选)
+
+leetcode上没有对应的题目，长度为3的数组全排列为3^3=27种，之前的算法使用了used数组进行剪枝，现在可重复选在元素，去掉used数组即可  
+
+```ts
+class Solution {
+  res:number[][] = [];
+  permuteUnique(nums:number[]):number[][]{
+    let trace:number[] = [];
+    this.traceback(nums, trace);
+    return this.res;
+  }
+  traceback(nums:number[], trace:number[]){
+    if(trace.length === nums.length){
+      this.res.push([...trace]);
+      return;
+    }
+    for(let i = 0; i < nums.length; i++){
+      trace.push(nums[i]);
+      this.traceback(nums, trace);
+      trace.pop();
+    }
+  }
+}
+```
+
+子集与组合问题本质相同，仅递归终止条件不同
