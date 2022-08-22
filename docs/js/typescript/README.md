@@ -4,7 +4,9 @@
 
 typescript是js的超集，最终将被转换为js代码执行，与js一样都是弱类型的(允许隐式类型转换)。ts有静态类型(编译阶段类型检查)，更严格的语法检查，并完全兼容js语法。
 
-TODO:本笔记知识简略的了解ts，具体使用还需详细学习[参考文档](https://ts.xcatliu.com/introduction/index.html)
+PS: 本文基于es6+的语法基础上简单记录ts的独特之处，阅读需要掌握一定的es6+的知识  
+官方文档[ts中文文档](https://www.tslang.cn/docs/handbook/basic-types.html)|[ts英文文档handbook](https://www.typescriptlang.org/docs/handbook/intro.html)  
+一些不错的第三方教程[参考文档](https://ts.xcatliu.com/introduction/index.html)  
 
 ## 开发环境搭建
 
@@ -114,16 +116,22 @@ PS:所有类型表示均以小写开头，区别于以大写开头的
 ### class类|抽象类|接口
 
 ```ts
-class 类型名1 {
+class 类型名1 extends 基础类型 { // 从基础类型进行继承(可选)
   属性名: 类型;
-  public 公共属性: 类型; // 默认值，可在类、子类、实例中修改
+  public 公共属性: 类型; // 默认值，可在类、子类、实例中修改(外部读写)
   protected 保留属性: 类型; // 仅可以在类、子类中修改
   private 私有属性: 类型; // 仅可以在类中修改
-  constructor(参数:类型){this.属性名 = 参数;}
+  constructor(参数:类型){
+    super(参数); // 执行父类构造函数，可传入参数，构造器中的super代表父类构造函数，与方法中的super不同。继承时必须调用super()执行基类构造函数
+    this.属性名 = 参数;
+  }
   static 方法名() {}
   static 静态属性: 类型;
   get 私有属性(){return 私有属性;}
   set 私有属性(value: 类型){this.私有属性 = value;}
+  sayHi(){ // 方法，可复写父类中的方法
+    super.sayHi(); // 在方法中使用super代表父类
+  }
 }
 abstract class 抽象类 { // 抽象类只能用于extends继承，不能用来实例化对象
   abstract 抽象方法():void; // 抽象类中定义的抽象方法，子类必须实现该方法
@@ -136,17 +144,30 @@ class a extends 抽象类 {
 // 接口也与类型别名相似，在一定条件下可以相互替换
 interface Person extends 接口1 { // 接口可继承其他接口或类
   name: string;
-  readonly weight: number; // 只读属性
+  readonly weight: number; // 只读属性, 当做属性使用时使用readonly, 当使用变量时使用const。只读属性必须在声明或构造函数中初始化
   sayHello():void;
   age?:number; // 使用?修饰，可选属性
   [propName: string]: any; // 允许增加任意属性，确定属性和可选属性的类型必须是任意属性类型的子集，接口中只能定义一个任意属性
+  
+  (source:string):boolean; // 接口的方式表示函数类型，参数名可以不同，但类型必须相同
+
+  // ts支持两种索引签名：字符串和数字
+  [index:number]:null; // 数字索引的返回值类型必须时字符串索引值返回类型的子类
+  [index:string]:string // 此例中null是string的子类，同时这样定义后声明的其他字面量属性必须时string的子类，如：
+  name:number // error
 }
 class guy extends 抽象类 implements Person, 接口2 { // 继承抽象类并实现多个接口
+// 此处接口实现仅针对实例部分进行了类型检查
   constructor(public name: string){ // 属性声明也可放在构造函数参数上
   }
   sayHello(){console.log(this.name)}
 }
+
+// 接口也可以继承一个类类型，此时它仅继承类的成员，不包括其实现
+interface BadGuy extends guy {}
 ```
+
+声明了一个类，也相当于定于了一个类的实例类型
 
 ### 泛型
 
