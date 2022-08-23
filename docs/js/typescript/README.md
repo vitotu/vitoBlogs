@@ -197,6 +197,7 @@ class MyClass<T extends MyInter>{ // 限制T的类型范围,必须为MyInter的�
 
 ```ts
 // 使用？定义了可选参数去后不可出现确定参数，默认参数将被视为可选参数，但不受前一条件约束，rest参数为一数组类型
+// 可选参数与默认参数共享参数类型
 function fn(确定参数: 类型, 可选参数?: 类型, 默认参数: string = 'name', ...rest: any[]): 返回类型{
 }
 // 函数表达式, 其中=>符号表示函数定义与es6中的箭头函数不同
@@ -208,8 +209,18 @@ interface func {
 }
 ```
 
-重载允许一个函数接受不同数量或类型的参数时，作出不同的处理。
-TODO：详细完善重载
+重载允许一个函数接受不同数量或类型的参数时，作出不同的处理。  
+根据传入参数类型的不同做不同的处理，如:
+
+```ts
+function pickCard(x:object):number; // 重载1
+function pickCard(x:number):object; // 重载2
+function pickCard(x):any { // 函数具体实现逻辑
+  if(typeof x === 'object') console.log('handle object');
+  if(typeof x === 'number') console.log('handle number');
+}
+// pickCard调用时，查找重载列表，从上到下匹配，所以最精确的定义放在前面
+```
 
 ## 类型别名
 
