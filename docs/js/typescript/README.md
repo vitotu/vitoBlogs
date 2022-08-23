@@ -207,6 +207,8 @@ let mySum: (x: number, y: number) => number = function (x: number, y: number): n
 interface func {
   (arg1: string, arg2: number): boolean; // 接口的方式定义函数形状
 }
+function foo(this:void) {}; // 可以为this显式指定一个参数，此时this必须出现在参数列表的最前方
+// 在回调函数中也可以指定其他类型便于ts进行类型检查
 ```
 
 重载允许一个函数接受不同数量或类型的参数时，作出不同的处理。  
