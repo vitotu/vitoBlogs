@@ -111,6 +111,39 @@ let unionType: string | number; // unionType可取string或number类型
 
 PS:所有类型表示均以小写开头，区别于以大写开头的
 
+### 枚举enum
+
+枚举通常被用来限定该枚举的取值范围，如星期，固定的颜色等，最为类型名限定变量仅能取其成员，常见的枚举类型有：
+
+* 数字枚举
+
+```ts
+// 若未初始化，则从0开始初始化，即相应的枚举成员值对应数字
+enum Direction {
+  Up = 1, // Up被初始化为1,其余成员在其前方成员基础上+1
+  Down,
+  Left,
+  Right
+}
+// 数字枚举有反向映射，字符串枚举没有
+console.log(Direction[1]); // 输出: 'Up'
+```
+
+* 字符串枚举
+
+```ts
+enum Direction { // 字符串枚举每个成员必须被初始化
+  Up = "UP",
+  Down = "DOWN",
+  Left = "LEFT",
+  Right = "RIGHT",
+}
+```
+
+异构枚举：混合了数字和字符串的成员(不推荐)  
+除了使用字符串、数字对成员进行初始化外，还可使用对之前的常量枚举成员的引用，常量表达式(返回常量的表达式，求值后为NaN或/Infinity除外)进行初始化  
+枚举在运行时是真正存在的对应，即可以按照其字面量值的类型进行运算  
+
 ## 对象类型
 
 ### class类|抽象类|接口
@@ -181,15 +214,17 @@ function test<T, K>(arg1: T, arg2: K): T {
 test(10, 'a'); // 自动推断
 test<number, string>(10, 'a'); // 手动指定
 
-interface MyInter {
+interface MyInter<T> {
   length : number;
+  (arg: T):T; // 泛型方法
 }
 
-class MyClass<T extends MyInter>{ // 限制T的类型范围,必须为MyInter的子类
+class MyClass<T extends MyInter>{ // 限制T的类型范围,必须为MyInter的子类,此例中T具有了length属性
   private key: T;
   constructor(prop: T){
     this.key = prop;
   }
+  keyAdd:(x:T) => T;
 }
 ```
 
