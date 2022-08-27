@@ -106,7 +106,6 @@ let unionType: string | number; // unionType可取string或number类型
   * enum枚举类型,定义枚举类：`enum Weeks {Sun, Mon, Tue, Wen, Thu, Fri, Sat}`枚举成员会的被赋值为从0开始的数字，使用时`let day: Weeks = Weeks.Sun;`
 
 * 类型断言：告诉编译器变量的类型，语法形式:`(值 as 类型)`或`<类型>值`
-  * TODO：完善断言详细规则
 
 * 类型别名可以给类型取一个新名字：`type 新别名 = 类型`，
 
@@ -162,6 +161,28 @@ enum Direction { // 字符串枚举每个成员必须被初始化
 在使用联合类型是，如果确切知道变量所属类型，可使用断言、函数返回`var is typename`类型谓词、`typeof var === typename`、`var instanceof typename`的方式进行类型保护，明确变量类型  
 
 null和undefined是所有类型的子类，因此可以赋值给任何类型，可以使用上述类型保护排除，也可以使用后缀`!`，如`var!`方式排除null和undefined
+
+* 类型别名
+
+与接口相同类型别名也可以是泛型，类型别名不能出现在声明的右侧；类型别名并不创建新名字；  
+类型别名结合字面量联合类型能够达到枚举类的效果`type week = 1 | 2 | 3 | 4 | 5 | 6 | 7`  
+索引查询操作符`keyof T`将返回T类型上公共属性名的联合`Tkey1 | Tkey2`，索引查询操作符的一个应用：
+
+```ts
+// 从旧的类型中创建新类型的一种方式：类型映射
+type Readonly<T> = {
+  readonly [P in keyof T]: T[P]; // 此类型遍历T的每个key赋值给P类型变量，并将对应属性设置为只读，下同
+  // 'keyof T'也可以是一种单独的联合类型
+}
+type Partial<T> = {
+  [P in keyof T]?: T[P];
+}
+type PersonPartial = Partial<Person>;
+type ReadonlyPerson = Readonly<Person>;
+// Readonly<T>、 Partial<T>、Pick<T>、 Record<T>等被包含在ts标准库中
+```
+
+[ts内置标准库文档](https://www.typescriptlang.org/docs/handbook/utility-types.html)  
 
 ## 对象类型
 
@@ -283,3 +304,7 @@ function pickCard(x):any { // 函数具体实现逻辑
 前面简单提到了类型别名type和类型断言
 
 ## 声明文件
+
+ts中引入非ts类库，需要用到声明文件`.d.ts`,类似于C++中的`.h`文件
+
+TODO: 继续完善模块化与声明文件  
