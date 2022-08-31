@@ -591,3 +591,61 @@ class Solution {
 ```
 
 子集与组合问题本质相同，仅递归终止条件不同
+
+## 二分搜索算法
+
+二分搜索算法适用于有序的数组查找，选择中间点，确定目标所在区间，再次缩小范围，直到找到目标或触发边界条件。  
+通常有三种场景1、找到目标；2、确定目标出现左边界；3、确定目标出现右边界。  
+而算法的左右指针边界选择又可分为全闭区间、左闭右开区间两种，不同的开闭方法，对应了不同的边界条件，但本质是相同的，为了便于理解，推荐使用全闭区间  
+
+leetcode 34题 给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
+
+```ts
+function searchRange(nums: number[], target: number): number[] {
+  let demo = new Solution();
+  return [demo.left_bound(nums, target), demo.right_bound(nums, target)];
+};
+class Solution {
+  // 二分查找左边界
+  left_bound(nums:number[], target: number): number {
+    let left = 0, right = nums.length - 1; // 确定左右闭区间
+    while(left <= right) { // 当区间长度为0时退出循环，即此时left > right
+      let mid = left + Math.floor((right - left) / 2); // 确定中间点
+      if(nums[mid] < target) left = mid + 1; // 目标在右区间，收缩左边界
+      else if(nums[mid] > target) right = mid - 1; // 目标在左区间，收缩右边界
+      // 发现目标固定左边界，收缩右边界，结合循环退出条件；将刚好位于第一个不为target的数上
+      else if(nums[mid] === target) right = mid - 1;
+    }
+    if(left === nums.length) return -1; // left若溢出索引则直接返回
+    return nums[left] === target ? left : -1; // left位置即首次出现的位置
+  }
+  // 二分查找右边界，原理与left_bound类似
+  right_bound(nums:number[], target:number): number {
+    let left = 0, right = nums.length - 1;
+    while(left <= right) {
+      let mid = left + Math.floor((right - left))
+      if(nums[mid] < target) left = mid + 1;
+      else if(nums[mid] > target) right = mid - 1;
+      else if(nums[mid] === target) left = mid + 1;
+    }
+    if(left - 1 < 0) return -1;
+    return nums[left - 1] === target ? left - 1 : -1;
+  }
+}
+```
+
+leetcode 704题 二分查找 给定一个 n 个元素有序的（升序）整型数组 nums 和一个目标值 target  ，写一个函数搜索 nums 中的 target，如果目标值存在返回下标，否则返回 -1。
+
+```ts
+// 二分搜索
+function search(nums: number[], target: number): number {
+  let left = 0, right = nums.length - 1;
+  while(left <= right) {
+    let mid = left + Math.floor((right - left) / 2);
+    if(nums[mid] == target) return mid;
+    else if(nums[mid] < target) left = mid + 1;
+    else if(nums[mid] > target) right = mid - 1;
+  }
+  return -1;
+};
+```
