@@ -649,3 +649,56 @@ function search(nums: number[], target: number): number {
   return -1;
 };
 ```
+
+## 双指针之链表
+
+leetcode 21 合并两个有序链表
+
+```ts
+function mergeTwoLists(list1: ListNode | null, list2: ListNode | null): ListNode | null {
+  // tempHead设置tempHead来简化逻辑
+  let tempHead = new ListNode(-1), p = tempHead;
+  let p1 = list1, p2 = list2;
+  while (p1 !== null && p2 !== null) {
+    if(p1.val > p2.val) { // 将较小的节点合并到结果中
+      p.next = p2;
+      p2 = p2.next;
+    } else {
+      p.next = p1;
+      p1 = p1.next;
+    }
+    p = p.next;
+  }
+  if(p1 !== null) p.next = p1;
+  if(p2 !== null) p.next = p2;
+  return tempHead.next;
+}
+```
+
+leetcode 86 分隔链表 给你一个链表的头节点 head 和一个特定值 x ，请你对链表进行分隔，使得所有 小于 x 的节点都出现在 大于或等于 x 的节点之前。
+
+与leetcode 21 相反，相当于分链表
+
+```ts
+function partition(head: ListNode | null, x: number): ListNode | null {
+  let tempHead1 = new ListNode(-1);
+  let tempHead2 = new ListNode(-1);
+  let p1 = tempHead1;
+  let p2 = tempHead2;
+  let p = head;
+  while (p !== null) {
+    if(p.val >= x) {
+      p2.next = p;
+      p2 = p2.next;
+    } else {
+      p1.next = p;
+      p1 = p1.next;
+    }
+    let temp = p.next;
+    p.next = null;
+    p = temp;
+  }
+  p1.next = tempHead2.next;
+  return tempHead1.next;
+};
+```
