@@ -702,3 +702,54 @@ function partition(head: ListNode | null, x: number): ListNode | null {
   return tempHead1.next;
 };
 ```
+
+leetcode 23 合并K个升序链表：给你一个链表数组，每个链表都已经按升序排列。
+请你将所有链表合并到一个升序链表中，返回合并后的链表。
+
+考虑各链表为升序，此题仅需迭代比较各链表头部，取出较小的节点  
+利用[最小堆Heap](./TODO), 存储每个链表头部，每次弹出最小的节点，放入结果链表中  
+同时将弹出节点的下一个非空节点推入数组，最小堆每次都能保证弹出堆中的最小节点  
+
+```ts
+function mergeKLists(lists: Array<ListNode | null>): ListNode | null {
+  if(lists.length === 0) return null;
+  let tmpNode:ListNode = new ListNode(-1); // 虚拟头节点
+  let p = tmpNode; // 操作指针
+  // 传入比较函数，实例化最小堆，最小堆取自公共方法中的最小堆类，详细代码点击上方链接  
+  let minHeap = new Heap<ListNode>((a,b) => a.val > b.val ? true : false);
+  for(let i = 0; i < lists.length; i++) { // 初始化头节点
+    if(lists[i] !== null) minHeap.push(lists[i]);
+  }
+  // 迭代的比较，取出最小节点
+  while(minHeap.size > 0) {
+    let swapNode = minHeap.pop();
+    p.next = swapNode;
+    // 推入弹出节点的下一个非空节点
+    if(swapNode.next) minHeap.push(swapNode.next);
+    p = p.next; // 移动操作指针
+  }
+  return tmpNode.next;
+};
+```
+
+leetcode 19 删除链表的倒数第N个节点
+
+此题与找到倒数第N个节点类似，使用快慢双指针，先找到倒数第N+1个节点，然后删除节点即可
+
+```ts
+function removeNthFromEnd(head: ListNode | null, n: number): ListNode | null {
+  let tmpNode = new ListNode(-1); // 使用虚拟头节点，在n大于等于链表长度时默认删除head节点
+  tmpNode.next = head;
+  let p1 = tmpNode;
+  for(let i = 0; i <= n; i++) { // p1先走n+1步
+    p1 = p1.next;
+  }
+  let p2 = tmpNode;
+  while(p1 !== null) {
+    p2 = p2.next;
+    p1 = p1.next;
+  }
+  p2.next = p2.next.next;
+  return tmpNode.next;
+};
+```
