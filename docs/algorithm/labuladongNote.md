@@ -753,3 +753,41 @@ function removeNthFromEnd(head: ListNode | null, n: number): ListNode | null {
   return tmpNode.next;
 };
 ```
+
+leetcode 876 链表的中间节点
+
+使用快慢双指针，当快指针走到末尾时，慢指针正好指向中间节点，若节点数为偶数时，则指向中间节点中靠后的一个
+
+```ts
+function middleNode(head: ListNode | null): ListNode | null {
+  let fast = head, slow = head;
+  // fast快指针不可走出链表，即fast本身不可为null
+  while(fast !==null && fast.next !==null){
+    fast = fast.next.next;
+    slow = slow.next;
+  }
+  return slow;
+};
+```
+
+链表中是否包含环问题：
+同样可以使用快慢指针，当两指针相遇时即说明链表中包含环  
+衍生问题：查找环的起点  
+首先需要判断链表中是否存在环，当相遇时，重置slow指针指向头部，同步移动fast和slow，当两指针相遇时，即为环起点  
+
+leetcode 160 判断两条链表是否相交
+
+设两链表长度为m, n则让两指针在遍历完一侧链表后再遍历另一侧链表，则两指针一定能指向同一节点，即为两条链表的交点；若不存在交点，即p1, p2指向null时退出
+
+```ts
+function getIntersectionNode(headA: ListNode | null, headB: ListNode | null): ListNode | null {
+  let p1 = headA, p2 = headB;
+  while(p1 !==p2) {
+    if(p1 === null) p1 = headB;
+    else p1 = p1.next;
+    if(p2 === null) p2 = headA;
+    else p2 = p2.next;
+  }
+  return p1;
+};
+```
