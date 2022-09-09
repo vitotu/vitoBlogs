@@ -770,10 +770,46 @@ function middleNode(head: ListNode | null): ListNode | null {
 };
 ```
 
+::: tip 环形链表问题
 链表中是否包含环问题：
 同样可以使用快慢指针，当两指针相遇时即说明链表中包含环  
 衍生问题：查找环的起点  
 首先需要判断链表中是否存在环，当相遇时，重置slow指针指向头部，同步移动fast和slow，当两指针相遇时，即为环起点  
+:::
+
+leetcode 141 环形链表 判断链表中是否包含环
+
+```ts
+function hasCycle(head: ListNode | null): boolean {
+  let fast = head, slow = head;
+  while(fast !== null && fast.next !== null){
+    fast = fast.next.next;
+    slow = slow.next;
+    if(fast === slow) return true;
+  }
+  return false;
+};
+```
+
+leetcode 142 环形链表2 查找环形链表的起点
+
+```ts
+function detectCycle(head: ListNode | null): ListNode | null {
+  let fast = head, slow = head;
+  while(fast !== null && fast.next !== null){
+    fast = fast.next.next;
+    slow = slow.next;
+    if(fast === slow) break;
+  }
+  if(fast === null || fast.next === null) return null;
+  slow = head;
+  while(slow !== fast){
+    fast = fast.next;
+    slow = slow.next;
+  }
+  return slow;
+};
+```
 
 leetcode 160 判断两条链表是否相交
 
@@ -891,4 +927,56 @@ function twoSum(numbers: number[], target: number): number[] {
   }
   return [-1, -1]
 };
+```
+
+leetcode 344 反转字符串  
+思路：同样利用left和right指针对撞，每次交换left和right对应位置字符，随后右移left左移right即可  
+
+```ts
+function reverseString(s: string[]): void {
+  let left = 0, right = s.length - 1;
+  while(left < right){
+    let temp = s[right];
+    s[right] = s[left];
+    s[left] = temp;
+    left++;
+    right--;
+  }
+  return;
+};
+```
+
+leetcode 5 最长回文子串
+
+回文串左右对称，为偶数时中心对应两个相同的元素，为奇数时中心对应一个元素  
+先实现一个函数使用双指针从中心向外部扩散，返回指针能够遍历到的最长回文串  
+依次遍历每个字符，尝试以该字符为中心进行扩散，并把得到的回文串与前序结果result比较，保持result始终为最长的回文串  
+
+```ts
+function longestPalindrome(s: string): string {
+  let demo = new Solution();
+  return demo.longestPalindrome(s);
+};
+class Solution {
+  // 输入左右指针，扩散获取最长回文串
+  palindrome(s:string, left:number, right:number):string{
+    // 保证不越界，同时传入left === right时表示为奇数的情况
+    while(left >= 0 && right < s.length && s[left] === s[right]){
+      left--;
+      right++;
+    }
+    // 遍历退出时，left和right刚好指向不满足的一对字符，因此返回子串范围为[left+1, right)
+    return s.substring(left+1, right);
+  }
+  longestPalindrome(s:string):string{
+    let result = '';
+    for(let i = 0; i < s.length; i++){ // 遍历s中的每个元素，获取该元素为中心的最长子串
+      let s1 = this.palindrome(s, i, i); // 尝试奇数子串
+      let s2 = this.palindrome(s, i, i+1); // 尝试偶数子串
+      result = s1.length > result.length ? s1 : result; // 更新result，保持其最长
+      result = s2.length > result.length ? s2 : result;
+    }
+    return result;
+  }
+}
 ```
