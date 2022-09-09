@@ -707,7 +707,7 @@ leetcode 23 合并K个升序链表：给你一个链表数组，每个链表都�
 请你将所有链表合并到一个升序链表中，返回合并后的链表。
 
 考虑各链表为升序，此题仅需迭代比较各链表头部，取出较小的节点  
-利用[最小堆Heap](./TODO), 存储每个链表头部，每次弹出最小的节点，放入结果链表中  
+利用[最小堆Heap](./common/#最小大堆), 存储每个链表头部，每次弹出最小的节点，放入结果链表中  
 同时将弹出节点的下一个非空节点推入数组，最小堆每次都能保证弹出堆中的最小节点  
 
 ```ts
@@ -789,5 +789,106 @@ function getIntersectionNode(headA: ListNode | null, headB: ListNode | null): Li
     else p2 = p2.next;
   }
   return p1;
+};
+```
+
+## 双指针之数组
+
+将数组索引视为指针，则数组问题与链表类似
+
+leetcode 26 删除有序数组中的重复项，原地删除，并保持元素顺序不变  
+思路：使用快慢指针fast和slow，slow始终指向不重复的最后一项，用fast遍历数组  
+当slow和fast不同时，则发现一个新的不重复项，slow向后移一位，fast的不重复项复制到slow位置  
+保持slow始终指向不重复的最后一项  
+
+```ts
+function removeDuplicates(nums: number[]): number {
+  if(nums.length === 0) return 0;
+  let fast = 0, slow = 0;
+  while(fast < nums.length){ // fast 遍历数组
+    if(nums[fast] !== nums[slow]) { // 发现不重复项
+      slow++; // 移动slow指针，复制到slow移动后的位置
+      nums[slow] = nums[fast];
+    };
+    fast++;
+  }
+  return slow+1; // slow从0开始，因此返回长度需要+1
+};
+```
+
+leetcode 83 删除排序链表中的重复元素  
+思路： 此题与上题思路相同，依然是快慢指针
+
+```ts
+function deleteDuplicates(head: ListNode | null): ListNode | null {
+  if(head === null) return null;
+  let fast = head, slow = head;
+  while(fast !== null){
+    if(fast.val !== slow.val) {
+      slow.next = fast;
+      slow = slow.next;
+    }
+    fast = fast.next;
+  }
+  slow.next = null; // 与上题不同，链表遍历完成后需要断开slow后续的所有节点
+  return head;
+};
+```
+
+leetcode 27 原地移除数组nums中指定的值val，并返回移除后数组的新长度  
+思路：与上题类似，依然时快慢指针，但在细节上fast要与val比较，当发现不同的元素时需要先赋值，然后移动slow  
+保证数组的val出现在0位置时也能被删除，此时slow保持指向无val子数组末尾一位，遍历完成后slow即为长度  
+
+```ts
+function removeElement(nums: number[], val: number): number {
+  let fast = 0, slow = 0;
+  while (fast < nums.length) {
+    if(nums[fast] !== val) {
+      nums[slow] = nums[fast];
+      slow++;
+    }
+    fast++;
+  }
+  return slow;
+};
+```
+
+leetcode 283 移动零 原地移动数组nums中的0到nums末尾，同时其他元素相对位置保持不变  
+思路：与上题类似，可以先删除，然后将剩余元素赋值为0  
+发现非0元素，交换fast和slow也可实现  
+
+```ts
+function moveZeroes(nums: number[]): void {
+  if(nums.length <= 1) return;
+  let fast = 0, slow = 0;
+  while(fast < nums.length){
+    if(nums[fast] !== 0){
+      nums[slow] = nums[fast];
+      slow++;
+    }
+    fast++;
+  }
+  while(slow < nums.length){
+    nums[slow] = 0;
+    slow++;
+  }
+  return;
+};
+```
+
+leetcode 167 两数之和2，非递减数组numbers中找到两个数，其和为target  
+思路：两数之和通用解法可以使用map映射辅助存储与target的差值，数字匹配对应差值从而找到满足条件的两个数  
+由于数组有序，因此可以使用left和right指针对撞的方式进行查找的算法效率更高  
+
+```ts
+function twoSum(numbers: number[], target: number): number[] {
+  let left = 0, right = numbers.length - 1;
+  while(left < right) { // TODO: 注意终止条件与初始化区间的关系
+    let sum = numbers[left] + numbers[right];
+    if(sum > target) right--;
+    else if(sum < target) left++;
+    else return [left+1, right+1]; // 题目返回要求从1开始的索引
+  }
+  return [-1, -1]
 };
 ```
