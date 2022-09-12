@@ -161,4 +161,36 @@ wx.createInterSectionObserver api则与浏览器的IntersectionObserver api 类�
 
 ### 逻辑层
 
+小程序js代码会在启动时运行，直到小程序销毁，类似于ServiceWorker, 逻辑层也称为App Service
+
+在app.js文件中，调用`App()`方法注册小程序实例，与vue类似，整个小程序只有一个app实例，全页面共享，`可通过getApp`方法获取到这个唯一的实例  
+在各页面的js文件中，使用`Page()`方法注册页面，与vue的mixin类似，小程序通过引入behaviors选项可实现，多个页面有相同的数据字段和方法  
+对于复杂页面可以使用`Component`方法来构造页面，语法上与`Page()`的主要区别是方法要放在`methods()`选项中  
+
+- 页面路由
+
+小程序页面路由全部由框架管理，维护有页面栈，可通过wx.navigate*等api进行手动跳转，也可使用`<navigator open-type="navigate*"></navigator>`等组件  
+
+- 模块化
+
+小程序仅支持module.exports和require的方式进行模块导出和导入  
+TODO：npm包管理器的使用
+
+- API
+
+小程序通过API开放微信的能力，主要分为同步API和异步API； 异步api支持回调和promise两种方式，若结构参数Object中不含`success/fail/complete`时，默认返回promise对象，但部分结构`downloadFile, request, createCamera`等还需要自行promisify封装  
+wx.onUnhandledRejection可以监听未处理的Promise拒绝事件  
+
+## 生命周期
+
+[生命周期](https://res.wx.qq.com/wxdoc/dist/assets/img/page-lifecycle.2e646c86.png)  
 TODO:
+
+冷启动：用户首次打开或小程序销毁后用户再次打开，再次打开时，若带有path则进入对应path页面，若无path则进入首页或遵循重新启动策略`restartStrategy`  
+热启动：已打开过小程序，小程序未被销毁，从后台切换到前台为热启动，热启动可利用场景值和path再次回到小程序或对应的页面  
+
+前台：界面被展示给用户，称为前台状态  
+后台：关闭小程序时，小程序并没有真正关闭，而是进入后台状态，此时小程序还可短暂运行一小段时间，但部分api受限(常规切后台方式外，前台运行时锁屏或直接将微信切后台均可进入后台方式)  
+小程序进入后台后5秒，会停止小程序js线程执行，随后进入挂起状态，此时会保存小程序内存状态，但代码会停止执行，事件及接口回调会在再次进入前台时触发  
+当使用了后台音乐播放、后台地理位置等能力时小程序可以在后台持续运行  
+当小程序可能将要被销毁前`onSaveExitState`函数会被调用，在回调中可以通过返回数据对象的方式缓存一些数据，返回对象格式：`{data:Object, expireTimeStamp: time}`  
