@@ -980,3 +980,125 @@ class Solution {
   }
 }
 ```
+
+## 双指针之滑动窗口
+
+双指针还常用来表示滑动窗口，通常取left, right为0，表示区间`[left, right)`, 这样依赖初始状态下区间内元素个数为0  
+当right向右边滑动时扩大窗口，区间长度为`right - left = 1`，随后做相应的数据更新，  
+再进行窗口缩小条件判断，对称的右滑left，更新数据；最后根据不同的需要在不同的阶段返回或记录结果  
+
+leetcode 3 无重复字符的最长子串
+
+```ts
+function lengthOfLongestSubstring(s: string): number {
+  // 初始化滑动窗口
+  let left = 0, right = 0;
+  let window = {}; // 初始化窗口map
+  let len = 0; // 用于记录符合条件的长度
+  while(right < s.length){
+    let c = s[right]; // 取出进入窗口的元素
+    right++;
+    window[c] = (window[c] || 1) + 1; // 若没有c元素则赋值为1，否则对应计数+1
+    while(window[c] > 1){ // 发现重复元素, 反复判断并缩小窗口,刚进入窗口的元素不重复
+      let c = s[left]; // 块内变量，与while条件判断的c值不同
+      left++;
+      if(window[c]) window[c]--; // 将对应离开窗口的元素的计数-1
+    }
+    len = right - left > len ? right - left : len; // 一轮循环完成保证了无重复子串，比较记录长度中的较大者
+  }
+  return len;
+};
+```
+
+leetcode 76 最小覆盖子串 给定字符串s, t 返回s中涵盖t所有字符的最小子串  
+
+```ts
+function minWindow(s: string, t: string): string {
+  let left = 0, right = 0;
+  let need = {}, window = {}; // 初始化目标字符串map及窗口map
+  for(let i = 0; i < t.length; i++) need[t[i]] = (need[t[i]] || 0) + 1;
+  // 初始化记录长度和起点的索引，初始化符合条件的字符数
+  let len = Number.MAX_SAFE_INTEGER, count = 0, start = 0;
+  while(right < s.length){ // 扩大窗口
+    let c = s[right];
+    right++;
+    if(need[c]){ // 进入窗口元素命中目标元素
+      window[c] = (window[c]||0) + 1; // 统计窗口中命中的元素
+      if(window[c] === need[c]) count++; // 若该字符命中数和窗口中命中数相同则，符合条件的字符数+1
+    }
+    while(count === Object.keys(need).length){ // 符合条件的字符数与目标need字符数相等则缩小窗口
+      // 在缩小窗口前更新结果
+      if(right - left < len){
+        len = right - left;
+        start = left;
+      }
+      let c = s[left]; // 执行窗口缩小堆成逻辑
+      left++;
+      if(need[c]){
+        if(window[c] === need[c]) count--;
+        window[c]--;
+      }
+    }
+  }
+  // 与初始长度比较并返回对应状态的子串
+  return len < Number.MAX_SAFE_INTEGER ? s.substring(start, start + len) : '';
+};
+```
+
+leetcode 567 字符串的排列 判断 s2 是否包含 s1 的排列  
+
+```ts
+function checkInclusion(s1: string, s2: string): boolean {
+  let left = 0, right = 0, count = 0;
+  let window = {}, need = {}; // 初始化窗口和目标字符串map
+  for(let i of s1) need[i] = (need[i] || 0) + 1;
+  while(right < s2.length){
+    let c = s2[right];
+    right++;
+    if(need[c]){ // 当前字符在目标内，更新数据
+      window[c] = (window[c] || 0) + 1;
+      if(need[c] === window[c]) count++; // 统计有效的字符种类
+    }
+    while(right - left >= s1.length){ // 窗口大小达到目标长度则开始缩小窗口
+      if(count === Object.keys(need).length) return true; // 有效种类等于目标种类则可以返回
+      let c = s2[left]; // 缩小窗口
+      left++;
+      if(need[c]){
+        if(need[c] === window[c]) count--;
+        window[c]--;
+      }
+    }
+  }
+  return false;
+};
+```
+
+leetcode 438 找到字符串中所有字母异位词 找到 s 中所有 p 的 异位词(全排列) 的子串，返回所有结果的起始索引  
+
+代码与上题类似，尽在发现结果时，收集结果
+
+```ts
+function findAnagrams(s: string, p: string): number[] {
+  let left = 0, right = 0, count = 0;
+  let window = {}, need = {}, res:number[] = [];
+  for(let i of p) need[i] = (need[i] || 0) + 1;
+  while(right < s.length){
+    let c = s[right];
+    right++;
+    if(need[c]){
+      window[c] = (window[c] || 0) + 1;
+      if(window[c] === need[c]) count++;
+    }
+    while(right - left >= p.length){
+      if(count === Object.keys(need).length) res.push(left);
+      let c = s[left];
+      left++;
+      if(need[c]){
+        if(window[c] === need[c]) count--;
+        window[c]--;
+      }
+    }
+  }
+  return res;
+};
+```
