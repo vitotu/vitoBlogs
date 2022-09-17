@@ -194,3 +194,46 @@ TODO:
 小程序进入后台后5秒，会停止小程序js线程执行，随后进入挂起状态，此时会保存小程序内存状态，但代码会停止执行，事件及接口回调会在再次进入前台时触发  
 当使用了后台音乐播放、后台地理位置等能力时小程序可以在后台持续运行  
 当小程序可能将要被销毁前`onSaveExitState`函数会被调用，在回调中可以通过返回数据对象的方式缓存一些数据，返回对象格式：`{data:Object, expireTimeStamp: time}`  
+
+## 组件化开发
+
+创建自定义组件：在js中通过`Component()`来注册组件，在json文件中声明`"component":true`字段  
+使用组件: 在json文件使用声明`"usingComponents":{"component-tag-name":"自定义组件的路径"}"`
+
+组件wxml模板中支持`<slot></slot>`标签，与vue中插槽类似，默认情况只能有一个slot，多个slot需要在js中声明启用  
+多个slot用不同的name区别，使用时通过`<view slot="name"/>`方式指定要插入的slot，与具名插槽类似  
+
+```js
+Component({
+  options:{multipleSlots:true}
+})
+```
+
+小程序中也支持类似vue的prop的方式传参
+
+- 组件样式
+
+组件对应wxss仅对组件内节点生效，组件定义与使用时仅能使用class选择器，避免使用后代选择器，继承样式会影响到组件内，其他样式则不会影响  
+与vue的scoped类似，组件的样式也存在隔离，可以通过js的的方式来指定隔离选项  
+
+```js
+Component({
+  options:{
+    styleIsolation:'isolated', // 默认值，自定义组件内外，使用 class 指定的样式将不会相互影响
+    // apply-shared // 页面wxss样式将影响到自定义组件，组件不会影响页面
+    // shared // 页面影响组件，组件会影响其他设置了apply-shared或shared的组件
+    // page-isolated // 组件作为页面时，页面禁用app.wxss，同时页面不会影响其他组件
+    // page-apply-shared // 同上，但设为shared的组件会影响页面
+    // page-shared // 禁用app.wxss，其他与shared相同
+    addGlobalClass:true, // 等价与 styleIsolation:apply-shared,但styleIsolation会屏蔽此选项
+  },
+  externalClasses:['my-class'], // 支持外部传入 className
+  virtualHost:true, // 将组件节点虚拟化，类似于vue中template节点
+})
+```
+
+2.10.1版本后也支持在json文件中配置styleIsolation字段  
+另外使用标签选择器或其他特殊选择器，则对应样式会全局生效  
+通过`class="~class-name"`的方式组件可以引用页面中对应的样式, 通过`^`前缀的方式可以引用父组件中对应的样式，该系列前缀可连续使用  
+
+- 生命周期
