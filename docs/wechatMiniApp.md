@@ -211,7 +211,9 @@ Component({
 
 小程序中也支持类似vue的prop的方式传参
 
-- 组件样式
+使用Component构造页面时，组件的properties属性可用于接收页面query参数，页面的生命周期方法应该写在methods中
+
+### 组件样式
 
 组件对应wxss仅对组件内节点生效，组件定义与使用时仅能使用class选择器，避免使用后代选择器，继承样式会影响到组件内，其他样式则不会影响  
 与vue的scoped类似，组件的样式也存在隔离，可以通过js的的方式来指定隔离选项  
@@ -236,4 +238,91 @@ Component({
 另外使用标签选择器或其他特殊选择器，则对应样式会全局生效  
 通过`class="~class-name"`的方式组件可以引用页面中对应的样式, 通过`^`前缀的方式可以引用父组件中对应的样式，该系列前缀可连续使用  
 
-- 生命周期
+### 组件生命周期
+
+与vue类似，小程序组件也有其生命周期函数，可以直接定义在Component一级参数中，也可以使用lifetimes字段声明(推荐方式，优先级最高)  
+
+组件可用的生命周期函数
+
+- create 组件实例刚创建号，setData还不能调用
+- attached 组件初始化完成，进入页面节点树后，
+- ready 组件在视图层布局完成后执行
+- moved 组件实例被移动到节点树的另一位置时执行
+- detached 组件离开页面节点树后
+- error 组件方法抛出错误时执行
+
+组件所在页面的生命周期函数
+
+- show 组件所在页面被展示时执行
+- hide 组件所在页面被隐藏时执行
+- resize 组件所在页面尺寸变化时执行
+
+behavior中也可声明同名的生命周期函数，并且不会与其他behavior中的同名相互覆盖
+
+### 组件间通信
+
+- wxml数据绑定：定义properties选项用于接收绑定的数据，与vue中props类似，可用于父传子通信
+- 事件： 自定义事件，父组件`bind:myevent="callback"`， 子组件`this.triggerEvent('myevent', detailObject, eventOption)`与vue中emit类似 子传父
+
+另外还可通过父组件还可通过`this.selectComponent('.children-component')`方法获取子组件实例对象  
+默认情况下，小程序与插件，插件之间的不同组件无法通过该方法获取组件实例，可通过子组件中`behaviors:wx://component-export`配置及`export(){return customObject}`方法指定`this.selectComponent('.children-component')`的返回值  
+
+### behaviors
+
+类似于vue中的mixin混入, 组件中引入时，对应的属性、数据和方法会被合并到组件中，生命周期函数会在对应的时机调用  
+behavior中也可以引入其他behavior  
+
+- 合并规则
+
+同名生命周期函数和observers，behavior中先于组件中执行，嵌套式被引用者先于引用者，靠前先于靠后；  
+同名属性或方法组件中生效，behavior引用其他behavior时，引用者生效；  
+同名数据字段，对象类型进行合并，其他情况引用者覆盖被引用者，靠后的behavior覆盖靠前的behavior；  
+
+- 内置behavior
+
+wx://form-field 为自定义组件添加表单控件行为，使form组件识别自定义组件  
+wx://form-field-group 添加表单空间组行为，与上类似  
+wx://form-field-button 使form识别表单内部button  
+wx://component-export 使组件支持export定义，可用于执行组件被`selectComponent`调用时的返回值  
+
+- relations组件间关系
+
+relations字段可用于指定组件间关系，并绑定对应的生命周期函数，如：
+
+```html
+<custom-ul>
+  <custom-li>item1</custom-li>
+  <custom-li>item2</custom-li>
+</custom-ul>
+```
+
+```js
+// custom-ul.js
+Component({
+  relations:{
+    'custom-li':{
+      type:'child',
+      linked:function(target){}, // custom-li被插入时执行，target为该节点的实例对象，在attached之后触发
+      linkChanged:function(target){}, // custom-li被移动后执行，在触发该节点的moved之后
+      unlinked:function(target){}, // custom-li被移除时执行，detached之后触发
+    }
+  },
+  ready:function(){
+    var nodes = this.getRelationNodes('path to custom-li') // 获取nodes数组，包含所有已关联的custom-li，有序
+  }
+})
+// custom-li.js
+Component({
+  relations:{
+    './custom-ul':{
+      type:'parent',
+      linked:function(target){}, // 被插入到custom-ul中时执行，触发在attached之后，target时custom-ul的实例对象
+      linkChanged:function(target){}, // 与上类比对应
+      unlinked:function(target){}, // 与上类比对应
+    }
+  }
+})
+// 两组件定义中需要都加入relations定义才能生效
+```
+
+另外子组件使用了共同的behaviors选项后，path key可以用对用behaviors来代替并在父组件中设置target为对应behaviors，type可分别设置为ancestor, descendant  
