@@ -45,7 +45,7 @@ class Solution {
 }
 ```
 
-leetcode 144题：二叉树的前序遍历
+- leetcode 144题：二叉树的前序遍历
 
 ```ts
 // 由于分解问题的方式代码看起来简洁
@@ -77,7 +77,7 @@ class Solution {
 }
 ```
 
-leetcode 543题：二叉树的直径  
+- leetcode 543题：二叉树的直径  
 直径即节点间的距离，即两个节点之间相距一个单位，由此可得：每一条二叉树的「直径」长度，就是一个节点的左右子树的最大深度之和
 
 ```ts
@@ -114,7 +114,7 @@ ps:递归算法的时间复杂度怎么计算？就是用子问题个数乘以�
 
 关联题：
 
-leetcode 322 零钱兑换  
+- leetcode 322 零钱兑换  
 如对于目标金额 amount=11 ，coins=[1, 2, 5], 分解问题可由 10+1, 9+2, 5+6的方式凑成，因此记`dp[i]`为凑成金额i的最少硬币数，仅此`dp[11] = min(dp[10], dp[9], dp[6]) + 1`, 初始base `dp[0] = 0`, 部分不能凑成的数额则记为-1，因此上述例子即可抽象出状态转移方程
 
 ```ts
@@ -133,7 +133,7 @@ function coinChange(coins: number[], amount: number): number {
 };
 ```
 
-leetcode 509 斐波那契数
+- leetcode 509 斐波那契数
 取初始值`dp[1] = 1`, `dp[2] = 1`,则从第3个数开始循环,计算`dp[n] = dp[n-1] + dp[n-2]`，并更新响应的两个缓存值，直到`i=n`则，返回此时的最新缓存值即可
 
 ```ts
@@ -154,7 +154,7 @@ function fib(n: number): number {
 
 回溯法需要考虑三个要素：路径、选择列表、结束条件;其本质是多叉树的遍历，在前序位置操作记录，在后续位置操作删除
 
-leetcode 46 全排列
+- leetcode 46 全排列
 
 ```ts
 interface Visited {[key:number]: boolean};
@@ -193,7 +193,7 @@ class Solution {
 }
 ```
 
-leetcode 51 N皇后问题
+- leetcode 51 N皇后问题
 
 ```ts
 function solveNQueens(n: number): string[][] {
@@ -242,7 +242,7 @@ class Solution {
 
 其核心思想是，把问题抽象成图，从一个点向四周扩散，使用队列暂存扩散点，方便进行下一轮迭代
 
-leetcode 111题 二叉树的最小深度
+- leetcode 111题 二叉树的最小深度
 
 ```ts
 function minDepth(root: TreeNode | null): number {
@@ -264,7 +264,7 @@ function minDepth(root: TreeNode | null): number {
 };
 ```
 
-leetcode 752 打开转盘锁  
+- leetcode 752 打开转盘锁  
 每次只能转动一个轮盘且轮盘只能转动一个数组，即当前状态下一步可能有8种转法(4个数字，上下2中转法)，使用最少的步骤转动轮盘到target组合，且过程中须避开deadends
 
 ```ts
@@ -319,7 +319,7 @@ function minusOne(s:string, j:number):string{
 
 ### 子集(元素无重复不可复选)
 
-LeetCode 78 子集:返回nums中能组合出的所有子集  
+- leetcode 78 子集:返回nums中能组合出的所有子集  
 子集与顺序无关，因此遵循递归树1
 
 ```ts
@@ -351,7 +351,7 @@ class Solution {
 
 ### 组合(元素无重复不可复选)
 
-leetcode 77 组合:给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。  
+- leetcode 77 组合:给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。  
 
 解题思路接上题，大小为k的组合就是大小为k的子集，因此仅需在上题算法中取大小为k的结果进行输出即可  
 
@@ -383,7 +383,7 @@ class Solution {
 
 ### 排列(元素无重复不可复选)
 
-leetcode 46 全排列 给定不重复的数组nums输出其元素的全排列，不可复选  
+- leetcode 46 全排列 给定不重复的数组nums输出其元素的全排列，不可复选  
 
 由于是全排列，则不可类似上述算法一样使用start限制后续的元素选择，因此采用used辅助数组用于记录已访问的元素，用于避免重复选择， 算法主体与上述类似  
 
@@ -419,7 +419,7 @@ class Solution {
 
 ### 子集(元素重复不可复选)
 
-leetcode 90 子集(二) 整数数组 nums ，其中可能包含重复元素，请你返回该数组所有可能的子集（幂集）。  
+- leetcode 90 子集(二) 整数数组 nums ，其中可能包含重复元素，请你返回该数组所有可能的子集（幂集）。  
 解集 不能 包含重复的子集。返回的解集中，子集可以按 任意顺序 排列。
 
 ```ts
@@ -450,7 +450,7 @@ class Solution {
 
 ### 组合(元素重复不可复选)
 
-leetcode 40 组合总数(二) 给定一个候选人编号的集合 candidates(有重复编号) 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的无重复组合。  
+- leetcode 40 组合总数(二) 给定一个候选人编号的集合 candidates(有重复编号) 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的无重复组合。  
 candidates 中的每个数字在每个组合中只能使用 一次 。
 
 ```ts
@@ -489,7 +489,7 @@ class Solution {
 
 ### 排列(元素重复不可复选)
 
-leetcode 47 全排列 给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。  
+- leetcode 47 全排列 给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。  
 
 ```ts
 function permuteUnique(nums: number[]): number[][] {
@@ -527,7 +527,7 @@ class Solution {
 
 ### 子集/组合(元素无重复可复选)
 
-leetcode 39 组合总数 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回  
+- leetcode 39 组合总数 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回  
 candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。  
 
 ```ts
@@ -566,7 +566,7 @@ class Solution {
 
 ### 排列(元素无重复可复选)
 
-leetcode上没有对应的题目，长度为3的数组全排列为3^3=27种，之前的算法使用了used数组进行剪枝，现在可重复选在元素，去掉used数组即可  
+- leetcode上没有对应的题目，长度为3的数组全排列为3^3=27种，之前的算法使用了used数组进行剪枝，现在可重复选在元素，去掉used数组即可  
 
 ```ts
 class Solution {
@@ -598,7 +598,7 @@ class Solution {
 通常有三种场景1、找到目标；2、确定目标出现左边界；3、确定目标出现右边界。  
 而算法的左右指针边界选择又可分为全闭区间、左闭右开区间两种，不同的开闭方法，对应了不同的边界条件，但本质是相同的，为了便于理解，推荐使用全闭区间  
 
-leetcode 34题 给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
+- leetcode 34题 给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
 
 ```ts
 function searchRange(nums: number[], target: number): number[] {
@@ -634,7 +634,7 @@ class Solution {
 }
 ```
 
-leetcode 704题 二分查找 给定一个 n 个元素有序的（升序）整型数组 nums 和一个目标值 target  ，写一个函数搜索 nums 中的 target，如果目标值存在返回下标，否则返回 -1。
+- leetcode 704题 二分查找 给定一个 n 个元素有序的（升序）整型数组 nums 和一个目标值 target  ，写一个函数搜索 nums 中的 target，如果目标值存在返回下标，否则返回 -1。
 
 ```ts
 // 二分搜索
@@ -652,7 +652,7 @@ function search(nums: number[], target: number): number {
 
 ## 双指针之链表
 
-leetcode 21 合并两个有序链表
+- leetcode 21 合并两个有序链表
 
 ```ts
 function mergeTwoLists(list1: ListNode | null, list2: ListNode | null): ListNode | null {
@@ -675,7 +675,7 @@ function mergeTwoLists(list1: ListNode | null, list2: ListNode | null): ListNode
 }
 ```
 
-leetcode 86 分隔链表 给你一个链表的头节点 head 和一个特定值 x ，请你对链表进行分隔，使得所有 小于 x 的节点都出现在 大于或等于 x 的节点之前。
+- leetcode 86 分隔链表 给你一个链表的头节点 head 和一个特定值 x ，请你对链表进行分隔，使得所有 小于 x 的节点都出现在 大于或等于 x 的节点之前。
 
 与leetcode 21 相反，相当于分链表
 
@@ -703,7 +703,7 @@ function partition(head: ListNode | null, x: number): ListNode | null {
 };
 ```
 
-leetcode 23 合并K个升序链表：给你一个链表数组，每个链表都已经按升序排列。
+- leetcode 23 合并K个升序链表：给你一个链表数组，每个链表都已经按升序排列。
 请你将所有链表合并到一个升序链表中，返回合并后的链表。
 
 考虑各链表为升序，此题仅需迭代比较各链表头部，取出较小的节点  
@@ -732,7 +732,7 @@ function mergeKLists(lists: Array<ListNode | null>): ListNode | null {
 };
 ```
 
-leetcode 19 删除链表的倒数第N个节点
+- leetcode 19 删除链表的倒数第N个节点
 
 此题与找到倒数第N个节点类似，使用快慢双指针，先找到倒数第N+1个节点，然后删除节点即可
 
@@ -754,7 +754,7 @@ function removeNthFromEnd(head: ListNode | null, n: number): ListNode | null {
 };
 ```
 
-leetcode 876 链表的中间节点
+- leetcode 876 链表的中间节点
 
 使用快慢双指针，当快指针走到末尾时，慢指针正好指向中间节点，若节点数为偶数时，则指向中间节点中靠后的一个
 
@@ -777,7 +777,7 @@ function middleNode(head: ListNode | null): ListNode | null {
 首先需要判断链表中是否存在环，当相遇时，重置slow指针指向头部，同步移动fast和slow，当两指针相遇时，即为环起点  
 :::
 
-leetcode 141 环形链表 判断链表中是否包含环
+- leetcode 141 环形链表 判断链表中是否包含环
 
 ```ts
 function hasCycle(head: ListNode | null): boolean {
@@ -791,7 +791,7 @@ function hasCycle(head: ListNode | null): boolean {
 };
 ```
 
-leetcode 142 环形链表2 查找环形链表的起点
+- leetcode 142 环形链表2 查找环形链表的起点
 
 ```ts
 function detectCycle(head: ListNode | null): ListNode | null {
@@ -811,7 +811,7 @@ function detectCycle(head: ListNode | null): ListNode | null {
 };
 ```
 
-leetcode 160 判断两条链表是否相交
+- leetcode 160 判断两条链表是否相交
 
 设两链表长度为m, n则让两指针在遍历完一侧链表后再遍历另一侧链表，则两指针一定能指向同一节点，即为两条链表的交点；若不存在交点，即p1, p2指向null时退出
 
@@ -832,7 +832,7 @@ function getIntersectionNode(headA: ListNode | null, headB: ListNode | null): Li
 
 将数组索引视为指针，则数组问题与链表类似
 
-leetcode 26 删除有序数组中的重复项，原地删除，并保持元素顺序不变  
+- leetcode 26 删除有序数组中的重复项，原地删除，并保持元素顺序不变  
 思路：使用快慢指针fast和slow，slow始终指向不重复的最后一项，用fast遍历数组  
 当slow和fast不同时，则发现一个新的不重复项，slow向后移一位，fast的不重复项复制到slow位置  
 保持slow始终指向不重复的最后一项  
@@ -852,7 +852,7 @@ function removeDuplicates(nums: number[]): number {
 };
 ```
 
-leetcode 83 删除排序链表中的重复元素  
+- leetcode 83 删除排序链表中的重复元素  
 思路： 此题与上题思路相同，依然是快慢指针
 
 ```ts
@@ -871,7 +871,7 @@ function deleteDuplicates(head: ListNode | null): ListNode | null {
 };
 ```
 
-leetcode 27 原地移除数组nums中指定的值val，并返回移除后数组的新长度  
+- leetcode 27 原地移除数组nums中指定的值val，并返回移除后数组的新长度  
 思路：与上题类似，依然时快慢指针，但在细节上fast要与val比较，当发现不同的元素时需要先赋值，然后移动slow  
 保证数组的val出现在0位置时也能被删除，此时slow保持指向无val子数组末尾一位，遍历完成后slow即为长度  
 
@@ -889,7 +889,7 @@ function removeElement(nums: number[], val: number): number {
 };
 ```
 
-leetcode 283 移动零 原地移动数组nums中的0到nums末尾，同时其他元素相对位置保持不变  
+- leetcode 283 移动零 原地移动数组nums中的0到nums末尾，同时其他元素相对位置保持不变  
 思路：与上题类似，可以先删除，然后将剩余元素赋值为0  
 发现非0元素，交换fast和slow也可实现  
 
@@ -912,7 +912,7 @@ function moveZeroes(nums: number[]): void {
 };
 ```
 
-leetcode 167 两数之和2，非递减数组numbers中找到两个数，其和为target  
+- leetcode 167 两数之和2，非递减数组numbers中找到两个数，其和为target  
 思路：两数之和通用解法可以使用map映射辅助存储与target的差值，数字匹配对应差值从而找到满足条件的两个数  
 由于数组有序，因此可以使用left和right指针对撞的方式进行查找的算法效率更高  
 
@@ -929,7 +929,7 @@ function twoSum(numbers: number[], target: number): number[] {
 };
 ```
 
-leetcode 344 反转字符串  
+- leetcode 344 反转字符串  
 思路：同样利用left和right指针对撞，每次交换left和right对应位置字符，随后右移left左移right即可  
 
 ```ts
@@ -946,7 +946,7 @@ function reverseString(s: string[]): void {
 };
 ```
 
-leetcode 5 最长回文子串
+- leetcode 5 最长回文子串
 
 回文串左右对称，为偶数时中心对应两个相同的元素，为奇数时中心对应一个元素  
 先实现一个函数使用双指针从中心向外部扩散，返回指针能够遍历到的最长回文串  
@@ -987,7 +987,7 @@ class Solution {
 当right向右边滑动时扩大窗口，区间长度为`right - left = 1`，随后做相应的数据更新，  
 再进行窗口缩小条件判断，对称的右滑left，更新数据；最后根据不同的需要在不同的阶段返回或记录结果  
 
-leetcode 3 无重复字符的最长子串
+- leetcode 3 无重复字符的最长子串
 
 ```ts
 function lengthOfLongestSubstring(s: string): number {
@@ -1010,7 +1010,7 @@ function lengthOfLongestSubstring(s: string): number {
 };
 ```
 
-leetcode 76 最小覆盖子串 给定字符串s, t 返回s中涵盖t所有字符的最小子串  
+- leetcode 76 最小覆盖子串 给定字符串s, t 返回s中涵盖t所有字符的最小子串  
 
 ```ts
 function minWindow(s: string, t: string): string {
@@ -1045,7 +1045,7 @@ function minWindow(s: string, t: string): string {
 };
 ```
 
-leetcode 567 字符串的排列 判断 s2 是否包含 s1 的排列  
+- leetcode 567 字符串的排列 判断 s2 是否包含 s1 的排列  
 
 ```ts
 function checkInclusion(s1: string, s2: string): boolean {
@@ -1073,7 +1073,7 @@ function checkInclusion(s1: string, s2: string): boolean {
 };
 ```
 
-leetcode 438 找到字符串中所有字母异位词 找到 s 中所有 p 的 异位词(全排列) 的子串，返回所有结果的起始索引  
+- leetcode 438 找到字符串中所有字母异位词 找到 s 中所有 p 的 异位词(全排列) 的子串，返回所有结果的起始索引  
 
 代码与上题类似，尽在发现结果时，收集结果
 
@@ -1100,5 +1100,71 @@ function findAnagrams(s: string, p: string): number[] {
     }
   }
   return res;
+};
+```
+
+## 动态规划之股票买卖问题
+
+使用[动态规划三要素](#动态规划)来判断当前问题是否适合使用动态规划来解题  
+股票问题中每天都要需要选择买入、卖出、持有操作，而每次操作与前一天的持有和累计已执行操作次数有关，当天不考虑即操作买入又操作卖出的情况(即不考虑当日内价格波动，也无相关数据)  
+因此满足重叠子问题，存在状态转移方程，子问题间相互独立三要素，可以使用动态规划进行解题  
+
+动态规划本质是在穷举状态，对应状态有当天天数、允许交易的最大次数(一次交易包含买和卖)、当前持有情况；  
+因此使用三维数组表示这三种状态的组件`dp[i][k][s]`,如`dp[2][3][0]`表示第二天，至今最多进行3次交易，当前没有持有股票  
+其中i取`[0, n)`, k取`[1, K]`, s取0或1，表示没有股票或持有股票  
+要返回的状态是`dp[n-1][K][0]`,即最后一天，最多允许K次交易，且当前不持有股票(相同状态下不持有股票利润较高)  
+
+状态转义方程：  
+`dp[i][k][0] = max(dp[i-1][k][0], dp[i-1][k][1]+prices[i])`  
+今天不持有股票的状态下的利润是：昨天不持有，今天不选择买入的利润 与 昨天持有，但今天卖出的利润中的较大者；  
+ps：昨天不持有则今天无法卖出，若选择买入则利润不如不操作的情况，昨天持有的情况同理  
+`dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i])`  
+今天持有股票状态下的利润是：昨天持有，今天选择继续持有的利润 与 昨天不持有，今天选择买入的利润中的较大者；  
+与上类似：昨天持有选择卖出，则今天就无法持有股票，而继续买入的利润不如继续持有，昨天若无持有，则今天必须买入；  
+k为交易次数上限，为保证今天的次数上限为k，昨天无持有状态下的交易上限应为k-1(即截止昨天最多执行交易次数不得超过k-1)  
+
+初始状态  
+`dp[-1][*][0] = 0` i从0开始，因此-1意味着还没开始，利润为0；  
+`dp[-1][*][1] = -infinity` 未开始时不可能只有股票，由于求最大利润，因此初始值设置为最小值，表示从该状态出发的转移无效  
+`dp[*][0][0] = 0` k=0 意味着不可操作，所以利润为0  
+`dp[*][0][1] = -infinity` k=0 意味着不可操作，也不可能持有股票，因此设置为最小值
+
+- leetcode 121 买卖股票的最佳时机  
+给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。  
+选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票，返回能获取的最大利润  
+
+对于本题相当于k=1，状态转移方程：  
+`dp[i][1][0] = max(dp[i-1][1][0], dp[i-1][1][1]+prices[i])`  
+`dp[i][1][1] = max(dp[i-1][1][1], dp[i-1][0][0] - prices[i]) = max(dp[i-1][1][1], -prices[i])`, k=0时利润为0  
+因此可以简化取到k这一项，对于i = -1时需要进行额外处理
+
+```ts
+function maxProfit(prices: number[]): number {
+  let len = prices.length;
+  let dp = new Array(len).fill(new Array(2));
+  for(let i = 0; i < len; i++) {
+    if(i - 1 == -1){ // 对索引为-1的起始状态进行特殊处理，此时k取1，以下两值均需根据转移方程进行推导
+      dp[i][0] = 0; // dp[i][0] = max(dp[-1][0], dp[-1][1]+prices[i]) = max(0, -infinity + prices[i])
+      dp[i][1] = -prices[i]; // dp[i][1] = max(dp[-1][1], dp[-1][0] - prices[i]) = max(-infinity, 0 - prices[i])
+      continue;
+    }
+    // 根据转移方程更新当天的利润
+    dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1]+prices[i]);
+    dp[i][1] = Math.max(dp[i-1][1], -prices[i]);
+  }
+  return dp[len-1][0];
+};
+```
+
+```ts
+// 由于新状态只和相邻的一个状态有关，因此可以压缩dp，不需要用到数据
+function maxProfit(prices: number[]): number {
+  let len = prices.length;
+  let dp_i_0 = 0, dp_i_1 = Number.MIN_SAFE_INTEGER;
+  for(let i = 0; i < len; i++) {
+    dp_i_0 = Math.max(dp_i_0, dp_i_1 + prices[i]);
+    dp_i_1 = Math.max(dp_i_1, -prices[i])
+  }
+  return dp_i_0;
 };
 ```
