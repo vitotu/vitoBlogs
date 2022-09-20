@@ -335,4 +335,23 @@ $gutter-width: 10px;
 ### 输出格式  
 
 此部分实用性不强，参考[官方文档](https://www.sass.hk/docs/)  
-  
+
+## scss与js联动
+
+基于webpack、sass-loader在vue项目中，scss中的变量可以导入到js中使用  
+
+```scss
+// @/styles/variables.scss
+$--color-primary: skyblue;
+$--border-width: 2px;
+
+:export {
+  colorPrimary: $--color-primary;
+  borderWidth: $--border-width;
+}
+```
+
+```js
+import styleVariables from '@/styles/variables.scss'
+console.log(styleVariables) // { colorPrimary: 'skyblue', borderWidth: '2px'}
+```

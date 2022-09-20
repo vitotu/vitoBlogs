@@ -326,3 +326,17 @@ Component({
 ```
 
 另外子组件使用了共同的behaviors选项后，path key可以用对用behaviors来代替并在父组件中设置target为对应behaviors，type可分别设置为ancestor, descendant  
+
+- observers数据监听器
+
+与vue的watch选项类似，监听数据变化，并且可同时监听多个
+
+```js
+Component({
+  observers:{
+    'numberA, numberB':function(numberA, numberB){}, // 同时监听多个数据
+    'some.subfield.*':function(subfield){}, // 支持监听子属性，也支持使用通配符*
+    'arr[12]':function(arr12){} // 监听特定索引值
+  }
+})
+```
