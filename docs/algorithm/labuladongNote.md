@@ -1141,7 +1141,7 @@ k为交易次数上限，为保证今天的次数上限为k，昨天无持有状
 ```ts
 function maxProfit(prices: number[]): number {
   let len = prices.length;
-  let dp = new Array(len).fill(new Array(2));
+  let dp = new Array(len).fill('').map(item => [0, 0]);
   for(let i = 0; i < len; i++) {
     if(i - 1 == -1){ // 对索引为-1的起始状态进行特殊处理，此时k取1，以下两值均需根据转移方程进行推导
       dp[i][0] = 0; // dp[i][0] = max(dp[-1][0], dp[-1][1]+prices[i]) = max(0, -infinity + prices[i])
@@ -1166,5 +1166,102 @@ function maxProfit(prices: number[]): number {
     dp_i_1 = Math.max(dp_i_1, -prices[i])
   }
   return dp_i_0;
+};
+```
+
+- leetcode 122 买卖股票的最佳时机2  
+
+`prices[i]`表示某只股票的第i天的价格,每天可以决定否购买和/或出售股票，最多只能持有一只股票；  
+
+此题套用框架，相当于K无限大，即没有记录k的必要，转移方程可退化为二维,其他情况与121题类似，以下仅展示优化空间后的解法
+
+```ts
+function maxProfit(prices: number[]): number {
+  let len = prices.length;
+  let dp_i_0 = 0, dp_i_1 = Number.MIN_SAFE_INTEGER;
+  for(let i = 0; i < len; i++) {
+    dp_i_0 = Math.max(dp_i_0, dp_i_1 + prices[i]);
+    dp_i_1 = Math.max(dp_i_1, dp_i_0 - prices[i]);
+  }
+  return dp_i_0;
+};
+```
+
+- leetcode 309 最佳买卖股票时机含冷冻期
+
+对比上面的题型，本题多了限制条件：卖出股票后，无法在第二天买入股票 (即冷冻期为 1 天)。
+
+分析：同理，由于k无限制可以省略，同时多了冷冻期，在买入股票的状态转移方程需要做出调整  
+原有的：`dp[i][1] = Math.max(dp[i-1][1], dp[i-1][0] - prices[i])`  
+需要调整为：`dp[i][1] = Math.max(dp[i-1][1], dp[i-2][0] - prices[i])`  
+即i-1天不持有，i天买入的情况需要调整，买入需要考虑冷冻期  
+i-1天不持有的情况可以由i-2天不持有i-1天无操作和i-2天持有i-1天卖出状态转移过来  
+如果i-1天选择了卖出，i天则无法买入，因此要i天买入只能由i-2天不持有且i-1天无操作状态转移而来  
+
+```ts
+function maxProfit(prices: number[]): number {
+  let len = prices.length;
+  let dp = new Array(len).fill('').map(i => [0, 0]);
+  for(let i = 0; i < len; i++) {
+    if(i - 1 === -1){
+      dp[i][0] = 0;
+      dp[i][1] = -prices[i];
+      continue;
+    }
+    if(i - 2 === -1){ // 保证i-2在安全索引范围内
+      dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] + prices[i]);
+      dp[i][1] = Math.max(dp[i-1][1], - prices[i]);
+      continue;
+    }
+    dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] + prices[i]);
+    dp[i][1] = Math.max(dp[i-1][1], dp[i-2][0] - prices[i]);
+  }
+  return dp[len-1][0];
+};
+```
+
+- leetcode 714 买卖股票的最佳时机含手续费
+
+与122题类似，忽略k，每次的交易手续费fee，根据题目提供的案例得知，一买一卖为一次交易，仅收取一次手续费  
+由于最终状态处于卖出，因此可在买入或卖出时减去手续费，选用买入时扣除手续非改写状态转移方程如下  
+`dp[i][1] = Math.max(dp[i-1][1], dp[i-1][0] - prices[i] - fee)`  
+
+```ts
+function maxProfit(prices: number[], fee: number): number {
+  let len = prices.length;
+  let dp_i_0 = 0, dp_i_1 = Number.MIN_SAFE_INTEGER;
+  for (let i = 0; i < len; i++) {
+    if(i - 1 === -1){
+      dp_i_0 = 0;
+      dp_i_1 = -prices[i] - fee;
+      continue;
+    }
+    dp_i_0 = Math.max(dp_i_0, dp_i_1 + prices[i]);
+    dp_i_1 = Math.max(dp_i_1, dp_i_0 - prices[i] - fee);
+  }
+  return dp_i_0;
+};
+```
+
+- leetcode 123 买卖股票的最佳时机 III
+
+与122题类似，但交易限制K为2次，因此不可忽略K，根据状态转移方程，变量有i和k需要双重循环  
+
+```ts
+function maxProfit(prices: number[]): number {
+  let len = prices.length, K = 2;
+  let dp = new Array(len).fill('').map(i => new Array(K+1).fill('').map(k => [0,0]));
+  for(let i = 0; i < len; i++) {
+    for(let k = K; k >= 1; k--){
+      if(i - 1 === -1){
+        dp[i][k][0] = 0;
+        dp[i][k][1] = -prices[i];
+        continue;
+      }
+      dp[i][k][0] = Math.max(dp[i-1][k][0], dp[i-1][k][1] + prices[i]);
+      dp[i][k][1] = Math.max(dp[i-1][k][1], dp[i-1][k - 1][0] - prices[i]);
+    }
+  }
+  return dp[len-1][K][0];
 };
 ```
