@@ -285,7 +285,14 @@ wx://form-field-group 添加表单空间组行为，与上类似
 wx://form-field-button 使form识别表单内部button  
 wx://component-export 使组件支持export定义，可用于执行组件被`selectComponent`调用时的返回值  
 
-- relations组件间关系
+- 自定义组件扩展
+
+在behavior中可使用definitionFilter函数对自检进行扩展，函数接收两个参数:defFields为使用方对象(component/behaviors)  definitionFilterArr是该behavior所引入的behavior的definitionFilter函数列表  
+示例：A使用了B，A的声明就会调用B的definitionFilter函数，并传入A的定义对象  
+若B还使用了C和D则，B可以决定要不要通过definitionFilterArr调用C和D的definitionFilter函数  
+TODO：不确定时B决定还是A决定，此处待详细学习  
+
+### relations组件间关系
 
 relations字段可用于指定组件间关系，并绑定对应的生命周期函数，如：
 
@@ -327,7 +334,7 @@ Component({
 
 另外子组件使用了共同的behaviors选项后，path key可以用对用behaviors来代替并在父组件中设置target为对应behaviors，type可分别设置为ancestor, descendant  
 
-- observers数据监听器
+### observers数据监听器
 
 与vue的watch选项类似，监听数据变化，并且可同时监听多个
 
@@ -339,4 +346,62 @@ Component({
     'arr[12]':function(arr12){} // 监听特定索引值
   }
 })
+```
+
+### 纯数据字段
+
+纯数据字段类似于vue中无响应式的字段(但不完全)，仅用于组件内部，不可用于wxml中，也不可能传递给其他组件  
+纯数据字段可用于提升页面性能  
+通过`Component({options:{pureDatePattern:正则表达式}})`  
+或json中`{"pureDatePattern":"正则表达式"}`的pureDatePattern选项配置正则表达式  
+被正则匹配中的properties和data中的字段都将被执行为纯数据字段  
+但数据监听器observers仍然可以监听纯数据字段
+
+### 抽象节点
+
+类似于vue中的内置组件component, 具体组件使用的组件由传入参数决定  
+与vue中component不同的是，小程序中抽象节点可自定义，如：  
+
+```xml
+<!-- selectable-group.wxml -->
+<view wx:for="{{labels}}">
+  <label>
+    <selectable disabled="{{false}}"></selectable>
+    {{item}}
+  </label>
+</view>
+<!-- 父组件中， 其中custom-radio仅支持静态值 -->
+<selectable-group generic:selectable="custom-radio"/>
+```
+
+```json
+// 对应selectable-group.json
+{
+  "componentGenerics":{
+    "selectable":true,
+    // "selectable":{"default":"path to default component"} // 设定默认虚拟节点
+  }
+}
+// 对应父组件json中
+{
+  "usingComponent":{"custom-radio":"path to custom-radio"}
+}
+```
+
+### 占位组件
+
+使用分包异步化或用时注入等特性时，自定义组件所引用的其他组件处于暂时不可用状态，可使用其他可用的组件进行占位，称为占位组件  
+
+```json
+// 在页面json文件中
+{
+  "usingComponent":{
+    "comp-a":"path to comp-a",
+  },
+  "componentPlaceHolder":{
+    // comp-a 的占位组件为内置组件view,也可指定为其他注册过的自定义组件如comp-b
+    // 当comp-b被指定为占位组件后，为comp-b指定占位组件是无效的
+    "comp-a":"view",
+  }
+}
 ```
