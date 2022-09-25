@@ -1246,6 +1246,8 @@ function maxProfit(prices: number[], fee: number): number {
 - leetcode 123 买卖股票的最佳时机 III
 
 与122题类似，但交易限制K为2次，因此不可忽略K，根据状态转移方程，变量有i和k需要双重循环  
+k可以从最大值开始循环，也可从最小值开始循环；从最大值开始循环更符合日常逻辑  
+由于k仅有2中取值，也可全部列举出来对空间复杂度进行优化  
 
 ```ts
 function maxProfit(prices: number[]): number {
@@ -1264,4 +1266,34 @@ function maxProfit(prices: number[]): number {
   }
   return dp[len-1][K][0];
 };
+```
+
+- leetcode 188 买卖股票的最佳时机 IV
+
+相比于上题，此题的K为外部传入，因此需要考虑K的取值范围，由于一买一卖算做一次交易，且不能同时持有多只股票，所以当K大于prices长度的一半后失去了意义，可不考虑或进行特殊处理  
+
+```ts
+function maxProfit(k: number, prices: number[]): number {
+  let len = prices.length;
+  let limitK = k > len / 2 ? Math.floor(len / 2) : k; // 当超过一半时取一半向下取整作为限制后的k
+  let dp = new Array(len).fill("").map(i =>new Array(limitK+1).fill(0).map(k => [0, 0]));
+  for(let i = 0; i < len; i++){
+    for(let k = limitK; k >= 1; k--){
+      if(i - 1 === -1){
+        dp[i][k][0] = 0;
+        dp[i][k][1] = -prices[i];
+        continue;
+      }
+      if(k - 1 === 0){ // 为方便索引，dp初始化时使用了limitK + 1，因此当k-1===0时需要对k-1索引值根据初始状态特殊处理
+        dp[i][k][0] = Math.max(dp[i-1][k][0], dp[i-1][k][1] + prices[i]);
+        dp[i][k][1] = Math.max(dp[i-1][k][1], -prices[i]);
+        continue;
+      }
+      dp[i][k][0] = Math.max(dp[i-1][k][0], dp[i-1][k][1] + prices[i]);
+      dp[i][k][1] = Math.max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i]);
+    }
+  }
+  return dp[len-1][limitK][0];
+};
+// 由于K>len/2失去意义，则可在此处调用122题中的算法，以此简化复杂度
 ```
