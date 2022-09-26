@@ -1297,3 +1297,81 @@ function maxProfit(k: number, prices: number[]): number {
 };
 // 由于K>len/2失去意义，则可在此处调用122题中的算法，以此简化复杂度
 ```
+
+## 动态规划之打家劫舍
+
+- leetcode 198 打家劫舍 给定一个代表每个房屋存放金额的非负整数数组，在不可连续偷的情况下 ，能够偷窃到的最高金额  
+
+第i天状态`dp[i]`：可以选择不偷，总金额为`dp[i+1]`，即i+1天能偷的最高金额  
+或选择偷，总金额为`nums[i] + dp[i+2]`，即偷的金额加上i+2天能偷到的最高金额  
+因此i天能偷得的最高金额为`dp[i] = max(dp[i+1], nums[i] + dp[i+2])`，即为状态转移方程  
+
+偷与不偷的选择需要根据其后的天数中能偷得的最高金额来决定，因此想要递推只能从数组末尾开始循环  
+对于超出范围的n+1和n+2天不存在，对应初始状态，能偷得的金额为0，因此可以根据初始状态和状态转移方程写出如下代码：
+
+```ts
+function rob(nums: number[]): number {
+  let len = nums.length;
+  let dp_i_1 = 0, dp_i_2 = 0;
+  let dp_i = 0;
+  for(let i = len - 1; i >= 0; i--){
+    dp_i = Math.max(dp_i_1, nums[i] + dp_i_2);
+    dp_i_2 = dp_i_1;
+    dp_i_1 = dp_i;
+  }
+  return dp_i;
+};
+```
+
+- leetcode 213 打家劫舍II 与上题基本一致，但房屋围成一个圈，即首尾不能同时被偷
+
+首尾不能同时被偷，对应情况为a、首尾都没有被偷；b、不偷尾；c、不偷首；  
+而后应用上题算法取最大值即可  
+
+```ts
+function rob(nums: number[]): number {
+  let demo = new Solution();
+  return demo.rob(nums);
+};
+
+class Solution {
+  robRange(nums:number[], start:number, end:number):number{
+    let dp_i_1 = 0, dp_i_2 = 0, dp_i = 0;
+    for(let i = end; i >= start; i--){
+      dp_i = Math.max(dp_i_1, nums[i] + dp_i_2);
+      dp_i_2 = dp_i_1;
+      dp_i_1 = dp_i;
+    }
+    return dp_i;
+  }
+  rob(nums:number[]):number{
+    let len = nums.length;
+    if(len === 1) return nums[0]; // 取不偷首和不偷尾中的较大值，因为首尾这两种情况可以包含首尾都不偷
+    return Math.max(this.robRange(nums, 1, len - 1), this.robRange(nums, 0, len - 2));
+  }
+}
+```
+
+- leetcode 337 打家劫舍III 与198题基本一致但房子在二叉树上，输入为树的根节点
+
+这次该用自顶向下的思路，每个节点上可选择偷或不偷，对应的着不同的收益  
+同时递归计算其子节点对应的两种情况的收益，若选择偷，则左右节点均不可偷，选择左右节点不可偷的收益情况与当前节点相加即可  
+若选择不偷，则左右节点可选偷或不偷，选取收益的较大组合即可，返回当前节点偷与不偷的两种情况的收益  
+递归终止条件为当前节点为null，返回收益为0的数组即可  
+求取根节点的收益，返回收益较大的情况即可得最终结果  
+
+```ts
+function rob(root: TreeNode | null): number {
+  if(root === null) return 0;
+  let res = robCore(root);
+  return Math.max(res[0], res[1]);
+};
+function robCore(root:TreeNode | null):number[]{
+  if(root === null) return [0,0];
+  let left:number[] = robCore(root.left);
+  let right:number[] = robCore(root.right);
+  let doIt = root.val + left[0] + right[0]; // 偷root，则左右均不可偷
+  let notDo = Math.max(left[0], left[1]) + Math.max(right[0], right[1]);
+  return [notDo, doIt];
+}
+```
