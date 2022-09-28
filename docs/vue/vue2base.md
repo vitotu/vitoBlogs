@@ -382,8 +382,11 @@ ps：构造函数的prototype显式原型属性与其实例化后的实例的__p
 
 - 动态组件`<component>`
 
-vue内置元素`<component v-bind:is="switchComponentName">`通过`is`prop绑定已注册的组件名或组件的选项对象switchComponentName上，组件名也可用于普通的html标签，但普通标签的value等property需要使用`.prop`修饰器修饰，否则功能异常  
-TODO：完善动态组件的更详细的使用方法
+vue内置元素`<component v-bind:is="switchComponentName">`  
+通过`is`prop绑定已注册的组件名或组件的选项对象switchComponentName上，  
+组件名也可用于普通的html标签，但普通标签的value等property需要使用`.prop`修饰器修饰，否则功能异常  
+还可传入异步组件`defineAsyncComponent(()=>import('component path'))`实现按需加载  
+其上绑定的属性将被透传到动态指定的组件上  
 
 - 递归组件
 
