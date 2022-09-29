@@ -1,4 +1,6 @@
-module.exports = {
+import { defineUserConfig, defaultTheme } from 'vuepress';
+import { searchPlugin } from '@vuepress/plugin-search';
+export default defineUserConfig({
   title: 'Vito\'s blog',
   description: 'vito的个人网站',
   open:true,
@@ -12,20 +14,20 @@ module.exports = {
       includeLevel: [2, 3]
     }
   },
-  themeConfig: {
-    nav:[ // 导航栏配置
-      {text: 'JavaScript', items:[
+  theme: defaultTheme({
+    navbar:[ // 导航栏配置
+      {text: 'JavaScript', children:[
         { text:'js基础', link:'/js/jsBase'},
         { text:'es6+基础', link:'/js/es6+/'},
         { text:'js进阶', link:'/js/jsPlus'},
         { text:'js手写系列', link:'/js/jsHand'},
         { text:'typescript', link:'/js/typescript/'},
-        { text:'js读书笔记', items:[
+        { text:'js读书笔记', children:[
           { text:'js异步编程', link:'/js/jsAsync/'},
           { text:'你不知道的js系列', link:'/js/jsDeep/'},
         ]},
       ]},  
-      {text: 'Vue', items:[
+      {text: 'Vue', children:[
         { text:'vue2基础', link:'/vue/vue2base'},
         { text:'vue2进阶', link:'/vue/vue2plus/'},
         { text:'vue3基础', link:'/vue/vue3base/'},
@@ -33,24 +35,24 @@ module.exports = {
         { text:'vue router', link:'/vue/vueRouter/'},
       ]},
       {text: 'html', link: '/html/'},
-      {text: 'css', items:[
+      {text: 'css', children:[
         { text:'图解css3', link: '/css/css3/'},
         { text:'css进阶', link: '/css/css3plus/'},
         { text:'scss', link: '/css/scss/'},
       ]},
-      {text: 'hybridApp', items:[
+      {text: 'hybridApp', children:[
         {text:'概述', link:'/hybrid-app/abstract'},
         {text:'微信小程序基础', link:'/hybrid-app/wechat-miniAppBase'},
       ]},
       {text: '浏览器', link: '/browser/browser'},
       {text: '网络通信', link: '/network/webNetwork'},
       {text: 'Linux', link: '/linuxNote/'},
-      {text: '开发构建工具', items:[
+      {text: '开发构建工具', children:[
         { text:'npm', link:'/devToolsNote/npm-note'},
         { text:'webpack基础', link:'/webpack/webpackNote'},
         { text:'webpack5', link:'/webpack/webpack5Note'},
       ]},
-      {text: '算法', items:[
+      {text: '算法', children:[
         { text:'排序算法', link:'/algorithm/tsClassicTop10SortAlgorithm'},
         { text:'剑指offer', link:'/algorithm/tsSword4Offer'},
         { text:'常见算法', link:'/algorithm/common'},
@@ -65,5 +67,10 @@ module.exports = {
     lastUpdated: 'Last Updated',
     // nextLinks: true,
     // prevLinks: true
-  }
-};
+  }),
+  plugins:[
+    searchPlugin({
+
+    }),
+  ]
+});
