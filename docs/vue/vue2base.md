@@ -1,6 +1,6 @@
 # vue2基础使用
 
-参考尚硅谷的vue2教程
+参考尚硅谷的vue2教程  
 视频教程[地址](https://www.bilibili.com/video/BV1Zy4y1K7SH?p=1)  
 
 ## 模板语法
@@ -31,8 +31,21 @@ vue在`<template>`中书写`{ {js表达式}}`,`v-指令:参数='表达式'`等�
 
 ## data配置项与响应式
   
-在vm实例中data的配置项可以写成对象形式,但在组件中由于组件的复用特性,data对象必须写成回调函数的形式  
-  
+在vm实例中data的配置项可以写成对象形式,但在组件中由于组件的复用特性,data对象必须写成回调函数的形式，如  
+
+```js
+export default { // 到处vue options配置项对象用于创建组件或页面
+  data(){
+    return {
+      a:'value of a',
+    }
+  },
+  mounted(){
+    this.a // 可直接读写data中定义的属性
+  }
+}
+```
+
 Vue获取配置项中的data对象后,对data对象进行代理(深度遍历对象给属性添加getter,setter等),然后将改造后的data对象赋给vm实例的`_data`属性,同时覆盖原有的对象引用,伪代码表示如下:  
 
 ```JavaScript  

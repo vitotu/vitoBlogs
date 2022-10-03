@@ -200,6 +200,20 @@ TODO:
 创建自定义组件：在js中通过`Component()`来注册组件，在json文件中声明`"component":true`字段  
 使用组件: 在json文件使用声明`"usingComponents":{"component-tag-name":"自定义组件的路径"}"`
 
+### data数据定义与读写
+
+```js
+Component({ // Page() 页面构造器也相同
+  data:{
+    a:'value of a',
+  },
+  onLoad(){
+    this.data.a // 读取data中定义的属性
+    this.setData({a:'new value of a'}); // 设置data中对应属性
+  }
+})
+```
+
 组件wxml模板中支持`<slot></slot>`标签，与vue中插槽类似，默认情况只能有一个slot，多个slot需要在js中声明启用  
 多个slot用不同的name区别，使用时通过`<view slot="name"/>`方式指定要插入的slot，与具名插槽类似  
 
