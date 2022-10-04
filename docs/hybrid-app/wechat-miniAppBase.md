@@ -154,7 +154,7 @@ query.select('#app') // 返回NodesRef对象实例，类似于DOM节点
 wx.createInterSectionObserver api则与浏览器的IntersectionObserver api 类似  
 
 - 初始渲染缓存
-
+ 
 小程序初始化逻辑层时，先初始化页面this对象，然后发送相关数据到视图层，视图层等待逻辑层初始化完毕后，渲染页面  
 冷启动时，逻辑层初始化事件较长，启用初始渲染缓存可以让视图层直接使用缓存的数据而无需等待逻辑层初始化完毕，从而加速启动过程  
 通过json文件中增加`"initialRenderingCache":"static"`配置项开启渲染缓存，小程序首次打开后页面初始数据将被缓存，在第二次打开时检查缓存命中  
@@ -213,6 +213,12 @@ Component({ // Page() 页面构造器也相同
   }
 })
 ```
+
+`this.setData(Object, callback)`函数异步的将数据从逻辑层发送到视图层，同步的改变对应this.data的值。因此不推荐直接修改this.data，会导致数据与页面状态不一致  
+其中Object中的key对应data配置项中的key，支持数据路径形式给出`a[1].b.`，也不需要在data中预先定义  
+[详细规则参考](https://developers.weixin.qq.com/miniprogram/dev/reference/api/Page.html#Page-prototype-setData-Object-data-Function-callback)
+
+TODO
 
 组件wxml模板中支持`<slot></slot>`标签，与vue中插槽类似，默认情况只能有一个slot，多个slot需要在js中声明启用  
 多个slot用不同的name区别，使用时通过`<view slot="name"/>`方式指定要插入的slot，与具名插槽类似  
