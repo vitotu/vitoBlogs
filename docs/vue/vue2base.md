@@ -181,8 +181,20 @@ this.$bus.$emit('hello',this.name)
   
 ## 列表渲染  
 
-可遍历：数组、对象、字符串（用的很少）、指定次数（用的很少）  
-  
+可遍历：Array、Object、String、Number(指定次数)  
+若遍历对象类型则遍历顺序由`Object.keys()`决定  
+
+v-for与v-if不推荐在同一层级使用，若放在同一层级，则v-if优先级较高, 因此v-if无法使用v-for中的变量
+
+```vue
+<template>
+  <li v-for="(item, index) in items" :key="index">{{index + item.message}}</li>
+  <li v-for="(value, key, index) in customObject">{{index + value}}</li>
+</template>
+```
+
+列表渲染中推荐使用主键(每个item独一无二的值)绑定key，key辅助更新的原理：
+
 > react、vue中的key有什么作用？（key的内部原理）  
 
 1. 虚拟DOM中key的作用：  

@@ -1,100 +1,202 @@
 # Vue3快速上手
 
-<img src="https://user-images.githubusercontent.com/499550/93624428-53932780-f9ae-11ea-8d16-af949e16a09f.png" style="width:200px" />
+## 与vue2相比
 
-## 1.Vue3简介
+vue3相对于vue2进行了一次大的升级, 仓库地址[github](https://github.com/vuejs/core)|[官方文档](https://cn.vuejs.org/guide/introduction.html)(ps:搜索栏下方可切换vue3语法风格)  
+在语法上vue3目前同时支持选项式api和组合式api两种风格，选项api与vue2中的语法大同小异，但组合式api则是全新的写法，本文将以官方推荐的组合式api展开，浓缩、对比vue2学习vue3的基础用法。  
 
-- 2020年9月18日，Vue.js发布3.0版本，代号：One Piece（海贼王）
-- 耗时2年多、[2600+次提交](https://github.com/vuejs/vue-next/graphs/commit-activity)、[30+个RFC](https://github.com/vuejs/rfcs/tree/master/active-rfcs)、[600+次PR](https://github.com/vuejs/vue-next/pulls?q=is%3Apr+is%3Amerged+-author%3Aapp%2Fdependabot-preview+)、[99位贡献者](https://github.com/vuejs/vue-next/graphs/contributors)
-- github上的tags地址：<https://github.com/vuejs/vue-next/releases/tag/v3.0.0>
-
-## 2.Vue3带来了什么
-
-### 1.性能的提升
-
-- 打包大小减少41%
-
-- 初次渲染快55%, 更新渲染快133%
-
-- 内存减少54%
-
-  ......
-
-### 2.源码的升级
-
-- 使用Proxy代替defineProperty实现响应式
-
-- 重写虚拟DOM的实现和Tree-Shaking
-
-  ......
-
-### 3.拥抱TypeScript
-
-- Vue3可以更好的支持TypeScript
-
-### 4.新的特性
-
-1. Composition API（组合API）
-
-   - setup配置
-   - ref与reactive
-   - watch与watchEffect
-   - provide与inject
-   - ......
-2. 新的内置组件
-   - Fragment
-   - Teleport
-   - Suspense
-3. 其他改变
-
-   - 新的生命周期钩子
-   - data 选项应始终被声明为一个函数
-   - 移除keyCode支持作为 v-on 的修饰符
-   - ......
+- 1.性能的提升
+  - 打包大小减少41%
+  - 初次渲染快55%, 更新渲染快133%
+  - 内存减少54%
+- 2.源码的升级
+  - 使用Proxy代替defineProperty实现响应式
+  - 重写虚拟DOM的实现和Tree-Shaking
+- 3.拥抱TypeScript
+  - Vue3可以更好的支持TypeScript
+- 4.新的特性
+  - 1. Composition API（组合API）
+    - setup配置
+    - ref与reactive
+    - watch与watchEffect
+    - provide与inject
+  - 2. 新的内置组件
+    - Fragment
+    - Teleport
+    - Suspense
+  - 3. 其他改变
+    - 新的生命周期钩子
+    - data 选项应始终被声明为一个函数
+    - 移除keyCode支持作为 v-on 的修饰符
 
 ## 一、创建Vue3.0工程
 
-### 1.使用 vue-cli 创建
+确保已安装最新版nodejs
 
-官方文档：<https://cli.vuejs.org/zh/guide/creating-a-project.html#vue-create>
+### 1.使用 create-vue 创建(推荐方式)
 
-```bash
-# 查看@vue/cli版本，确保@vue/cli版本在4.5.0以上
-vue --version
-# 安装或者升级你的@vue/cli
-npm install -g @vue/cli
-# 创建
-vue create vue_test
-# 启动
-cd vue_test
-npm run serve
-```
+在命令行中运行命令`npm init vue@latest`  
+此过程会安装create-vue创建vue3项目，依照命令行提示即可创建项目  
+其中推荐启用typescript; Pinia 是用于替换vuex的下一代状态管理库  
+项目默认构建工具由webpack换成了基于Rollup的vite构建工具  
 
 ### 2.使用 vite 创建
 
-官方文档：<https://v3.cn.vuejs.org/guide/installation.html#vite>
+通过模板进行创建`npm create vite@latest <you-vue-app-name> --template vue`  
 
-vite官网：<https://vitejs.cn>
+vite官网：<https://cn.vitejs.dev/guide/>
 
 - 什么是vite？—— 新一代前端构建工具。
 - 优势如下：
   - 开发环境中，无需打包操作，可快速的冷启动。
   - 轻量快速的热重载（HMR）。
   - 真正的按需编译，不再等待整个应用编译完成。
-- 传统构建 与 vite构建对比图
 
-<img src="https://cn.vitejs.dev/assets/bundler.37740380.png" style="width:500px;height:280px;float:left" /><img src="https://cn.vitejs.dev/assets/esm.3070012d.png" style="width:480px;height:280px" />
+## 创建vue应用
 
-```bash
-# 创建工程
-npm init vite-app <project-name>
-# 进入工程目录
-cd <project-name>
-# 安装依赖
-npm install
-# 运行
-npm run dev
+在vue2中有个main.js入口文件中导入相关插件与依赖，`new Vue()`的方式创建应用实例，而vue3中需要通过createApp()的方式创建根实例
+
+- vue2的main.js中
+
+```js
+import Vue from 'vue';
+import App from './App.vue'; // 导入根组件
+// import router , store...
+// Vue.use() 使用插件
+new Vue({
+  // router, store
+  render:h=>h(App), // 基于根组件创建渲染函数
+}).mount('#app') // 挂载到id为app的dom上
 ```
+
+- vue3的main.(js|ts)中
+
+```js
+import { createApp } from 'vue'; // 导入函数用于创建应用实例
+import App from './App.vue'; // 导入根组件
+const app = createApp(App);
+// 通过app.config配置应用级选项，如增加模板语法作用域中能访问的变量
+// app.component() // 注册全局组件
+// app.use()
+app.mount('#app') // 挂载应该在应用配置和资源注册完成后调用
+```
+
+## 模板语法
+
+vue3中的模板语法风格与[vue2的](../vue2base.md#模板语法)基本一致;  
+模板中支持的表达式将被沙盒化, 只能访问[有限的全局对象](https://github.com/vuejs/core/blob/main/packages/shared/src/globalsWhitelist.ts#L3), 也可以通过`app.config.globalProperties`添加拓展的属性或方法  
+
+## 响应式
+
+此部分对应vue2的data配置项相对应，vue3中使用了es6中的 proxy 对象代替vue2中的 defineProperty 来实现响应式，克服了vue2中操作数组索引和添加新属性等场景响应式丢失等问题  
+vue3中的选项式api中的data和methods配置项与vue2中基本一致，但组合式api大有不同，且本质上选项式api是在组合式api基础上实现的  
+
+```vue
+<template>
+  <div @click="add">{{state.count}}</div>
+</template>
+<script>
+import { reactive } from 'vue'; // 导入reactive函数用于创建响应式对象
+export default {
+  setup(){
+    const state = reactive({count:0});
+    // reactive创建的响应式对象state != {count:0}原对象，state时es6中的proxy类型的对象
+    function add(){state.count++;} // 相当于method中定义的方法
+    return {state, add} // 返回的变量才能在模板中访问
+  }
+}
+</script>
+```
+
+在使用构建工具和单文本组件(SFC)的情况下上述js代码通常写作(强烈推荐的写法)  
+
+```vue
+<script setup>
+  import { reactive } from 'vue';
+  const state = reactive({count:0}); // 顶层的导入和声明都可以在同一组件的模板中使用
+  function add(){state.count++;}
+</script>
+```
+
+reactive默认创建深层的响应式，使用shallowReactive函数可以创建只有顶层响应式的对象  
+对一个proxy对象应用reactive返回的是proxy对象本身  
+
+响应式是通过对属性对象的访问进行追踪的，因此使用属性赋值`let count = state.count`或解构至本地变量`let {count} = state`, 又或者使用属性传参`fn(state.count)`都会让被赋值的变量不具有响应式，即`count++`不会响应式更新`state.count`  
+同样对state整体赋值 `state = {count:0}`, 会让state指向另一个对象,从而丢失对原先的proxy对象的引用, 后续对state操作将不具有响应式  
+
+另外reactive仅对对象类型有效，对string、number、boolean等原始类型无效  
+vue中引入了`ref`来解决原始类型响应式的问题, 使用方法同reactive, ref将入参包装为一个带有value属性的Ref对象, 如果入参为对象类型，则会调用reactive方法挂载到Ref对象的value属性上  
+ref和reactive生成的对象在解构、传参、赋值时的响应式丢失情况相同，即传递对象本身，被赋值的变量响应式被保留，但传递普通属性，则响应式丢失  
+
+```vue
+<script setup>
+  import { ref, reactive } 'vue';
+  const count = ref(0);
+  console.log(count.value); // setup作用域中count为{value:0}对象，访问其值需要用.value
+  let state = ref({count:0});
+  function add(){ // 操作对象时先使用value，再访问属性
+    state.value.count++;
+  };
+  function stop(){state = {count:0};}; // 同样改变state引用的对象会导致响应式丢失
+  state.value = {count:9} // 响应式替换
+  // let {count} = state // 这种方式解构 count 为 undefined
+  let {count} = state.value // 这种方式解构count无响应式
+
+  const data = reactive({count:ref(0)})
+  console.log(data.count) // 深层的reactive响应式对象中嵌套ref，则对应ref会自动解包，无须data.count.value访问
+  // 当ref作为响应式的数组、map等集合类型的元素访问时则不会自动解包
+  const dataArr = reactive([ref('list')]);
+  console.log(dataArr[0].value);
+</script>
+<template>
+  <!-- 模板中使用顶层属性count会自动解包，不需要.value
+   对于非顶层Ref对象，模板表达式仅为简单取值时才会进行自动解包，其他情况会被渲染为Object -->
+  <button @click="add">{{count}},state Count: {{state.count}}</button> 
+  <button @click="stop">阻断响应式</button>
+</template>
+```
+
+## 计算属性computed
+
+与vue2中基本一致，组合式api写法:
+
+```vue
+<script setup>
+import { ref, computed } from 'vue'
+const name = ref('Join');
+const id = ref(123456);
+const nameNumber = computed({ // 返回的将是一个Ref对象
+  get(){return name.value + '/' + id.value}, 
+  set(val) {[name.value, id.value] = val.split('/')}
+})
+console.log(nameNumber.value)
+</script>
+```
+
+## 类与样式的绑定
+
+vue2中`<template></template>`中仅支持一个根节点，但vue3中可以有多个根节点，即
+因此在自定义的组件中，单根节点时绑定的class与vue2相同，class会被编译到根节点上，多根节点时，需要手动通过`$attrs`指定到目标节点上  
+其他方面与vue2中基本一致  
+
+```vue
+<template>
+  <div></div>
+  <div></div>
+</template>
+```
+
+## 条件渲染
+
+与vue2基本一致
+
+## 列表渲染
+
+列表渲染与vue2中基本一致
+
+## 事件处理
+
+TODO:
 
 ## 二、常用 Composition API
 
