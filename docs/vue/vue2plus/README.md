@@ -56,7 +56,7 @@ Observer对象利用Object.defineProperty()方法对数据进行监听，并借�
 ![reactive.png](./resource/reactive.png)  
 
 ::: tip 简单手写实现演示如下
-<iframe id="reactive-demo" height=100 width=100% frameborder=0 src="/demo/reactive.html"></iframe>
+<iframe id="reactive-demo" height=100 width=100% frameborder=0 :src="$withBase('/demo/reactive.html')"></iframe>
 
 [代码](./reactive.md)  
 :::
@@ -352,7 +352,7 @@ h函数使用解析好的tokens来递归的生成虚拟节点VNode对象，便�
 9. 若旧序列中还有VNode剩余则循环删除剩余的VNode
 
 ::: tip 简单手写实现演示如下
-<iframe id="vDom-demo" height="100px" width="100%" frameborder=0 src="/demo/vDom.html"></iframe>
+<iframe id="vDom-demo" height="100px" width="100%" frameborder=0 :src="$withBase('/demo/vDom.html')"></iframe>
 
 [源码](./vDom.md)
 :::
