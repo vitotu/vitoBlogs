@@ -86,8 +86,15 @@ console.log(vm._data === b) // false
 vm取名字'mvvm'模型中的最后两个字符vm;model(数据),view(视图html),view-model(视图模型之间的映射)  
   
 ## 事件处理  
-  
-- Vue中的事件修饰符：`v-on:事件名.修饰符=""`  
+
+`v-on:事件名.修饰符="事件处理器"`，v-no也可以缩写为@符号；  
+事件名为html标签支持的事件click, input等或这自定义组件中触发的事件名  
+
+- 事件处理器
+  - 内联事件处理器：内联js表达式，js表达式内通过$event手动访问event参数
+  - 方法事件处理器：组件上定义的方法属性名或路径，默认会传入event参数和组件中触发的额外参数
+
+- Vue中的事件修饰符：  
   
   1. .prevent：阻止默认事件（常用）；  
   2. .stop：阻止事件冒泡（常用）；  
@@ -225,7 +232,7 @@ v-for与v-if不推荐在同一层级使用，若放在同一层级，则v-if优�
 - `<select>` 字段将 `value` 作为 prop 并将 `change` 作为事件。  
 
 PS：v-model的三个修饰符：  
-  lazy：失去焦点再收集数据  
+  lazy：失去焦点再收集数据, 即input事件后更新数据  
   number：输入字符串转为有效的数字  
   trim：输入首尾空格过滤  
 关于v-model本质是语法糖，更多详细参见[指令](#指令)中v-model和v-bind.sync对比

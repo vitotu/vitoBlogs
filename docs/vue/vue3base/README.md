@@ -196,26 +196,146 @@ vue2中`<template></template>`中仅支持一个根节点，但vue3中可以有�
 
 ## 事件处理
 
-TODO:
+与vue2基本一致
+
+## 表单
+
+与vue2基本一致
+
+## 生命周期
+
+![lifecycle](https://cn.vuejs.org/assets/lifecycle.16e4c08e.png)  
+vue3的生命周期函数与vue2中大同小异,对比表格如下：  
+
+|调用时机|vue3组合式api|vue3选项式api|vue2|
+|-|-|-|-|
+|最早调用|setup|无|无|
+|组件实例初始化(处理props，事件等)完成之后立即调用|被setup替代|beforeCreate|beforeCreate|
+|组件实例处理完所有与状态相关的选项后调用(data,methods等可用)|被setup替代|created|created|
+|组件被挂载之前被调用|onBeforeMount()|beforeMount|beforeMount|
+|组件挂载完成后执行|onMounted()|mounted|mounted|
+|响应式状态变更而更新其 DOM 树之前调用|onBeforeUpdate()|beforeUpdate|beforeUpdate|
+|响应式状态变更导致DOM树更新之后|onUpdated()|updated|updated|
+|组件实例被卸载/销毁之前调用|onBeforeUnmount()|beforeUnmount|beforeDestroy|
+|组件实例被卸载/销毁后调用|onUnmounted()|unmounted|destroyed|
+
+组合式api中的生命周期函数均需import后使用，并且写在setup词法作用域中  
+父子组件间的生命周期函数执行顺序参见[vue2生命周期](../vue2base.md#生命周期)
+
+- setup函数的返回值：
+  1. 若返回一个对象，则对象中的属性、方法, 在模板中均可以直接使用。
+  2. 若返回一个渲染函数：则可以自定义渲染内容。
+  3. 使用async setup()或`<script setup>await fun()</script>`的方式会让组件变为异步组件，并返回promise，需要配合内置组件`<Suspense>`使用
+
+## 侦听器watch
+
+```vue
+<script setup>
+import { reactive, watch, watchEffect } from 'vue'
+const obj = reactive({count:0});
+const unWatch = watch( // 第一个参数为要侦听的对象，可以取String|Function|Object|Array
+  () => obj.count, // 不可直接侦听一个响应式对象的属性值如obj.count，使用函数替换
+  async (newCount, oldCount) => {}, // 在vue2中使用箭头函数无法保留上下文
+  {
+    deep:true, // 绑定响应式对象时默认时深层侦听的，但也可以通过配置deep强制转换为深层侦听
+    flush:'post' // 状态变化时，回调调用默认在DOM更新之前，flush选项可指定在DOM更新之后调用
+  }, 
+)
+const url = ref('http://..');
+const data = ref(null);
+const unWatchEffect = watchEffect(async () => { // watch仅当数据源变化时才会执行
+  // watchEffect则可以在创建侦听器时立即执行
+  // 如果传入函数产生了副作用effect则，vue会自动分析以依赖，并当依赖发生变化时再次执行回调
+  const res = await fetch(url.value); // url.value会被自动加入侦听
+  data.value = await res.json();
+}, {flush:'post'}) // 同watch，指定了flush选项的watchEffect()别名watchPostEffect()
+// 同步的语句中创建的侦听器才会自定绑定到当前组件实例上
+unWatch() // 手动停止侦听器
+unWatchEffect()
+</script>
+```
+
+## 模板引用
+
+vue2中通过模板中指定ref="refName"在js中通过this.$refs['refName']的方式访问，在vue3中则不同
+
+```vue
+<template>
+  <input ref="customName"/>
+  <div v-for="n in 10" ref="itemRefs"></div>
+  <!-- 也可绑定函数，函数第一个参数el为该组件的引用
+  当元素卸载时函数也会被调用一次，此时el=null -->
+  <div :ref="(el)={}"></div>
+  <!-- 引用setup方式自定义的组件时，仅能访问到子组件通过defineExpose()暴露的属性方法 -->
+  <!-- 引用选项式api定义的子组件时则，能获取到子组件的this -->
+  <customComponent ref="customComponent"/>
+</template>
+<script setup>
+import {ref, onMounted } from 'vue';
+const customName = ref(null); // 定义同名的变量访问ref引用的组件
+const itemRefs = ref([]); // 绑定v-for的对应变量为数组，数组并不保证与源数据相同顺序
+onMounted(()=>{ // 仅在组件挂载后才能保证访问到模板引用
+  customName.value.focus();
+  console.log(itemRefs.value);
+})
+</script>
+```
+
+## 组件化开发
+
+组件可类比于html标签或片段，通过组件可将界面UI划分成独立可重用的部分，一个单页应用(包括但不限于VUE)通常是基于组件嵌套的树状结构，组件构成了单页应用的基本单位，并能与[原生web components](https://developer.mozilla.org/zh-CN/docs/Web/Web_Components)相互配合使用  
+
+SFC组件示例：
+
+```vue
+<!-- ButtonCounter.vue --> 
+<script setup>
+import { ref } from 'vue'
+const count = ref(0)
+</script>
+<template>
+  <button @click="count++">You clicked me {{ count }} times.</button>
+</template>
+<!-- 也可写作纯js文件(不推荐) -->
+<script>
+import { ref } from 'vue'
+export default {
+  setup() {
+    const count = ref(0)
+    return { count }
+  },
+  template: `
+    <button @click="count++">
+      You clicked me {{ count }} times.
+    </button>`
+  // 或者 `template: '#my-template-element'`
+}
+</script>
+```
+
+在父组件中引入并使用
+
+```vue
+<script setup> // 导入即可直接使用，使用setup()函数时则需要components选项注册
+import ButtonCounter from './ButtonCounter.vue' // 此处为局部注册
+</script>
+<template>
+  <h1>Here is a child component!</h1>
+  <ButtonCounter />
+</template>
+```
+
+全局注册方式参见[创建vue应用](#创建vue应用)中的代码注释部分  
+
+### 入参props
+
+### 监听事件
+
+### 插槽
+
+### 动态组件
 
 ## 二、常用 Composition API
-
-官方文档: <https://v3.cn.vuejs.org/guide/composition-api-introduction.html>
-
-### 1.拉开序幕的setup
-
-1. 理解：Vue3.0中一个新的配置项，值为一个函数。
-2. setup是所有<strong style="color:#DD5145">Composition API（组合API）</strong><i style="color:gray;font-weight:bold">“ 表演的舞台 ”</i>。
-3. 组件中所用到的：数据、方法等等，均要配置在setup中。
-4. setup函数的两种返回值：
-   1. 若返回一个对象，则对象中的属性、方法, 在模板中均可以直接使用。（重点关注！）
-   2. <span style="color:#aad">若返回一个渲染函数：则可以自定义渲染内容。（了解）</span>
-5. 注意点：
-   1. 尽量不要与Vue2.x配置混用
-      - Vue2.x配置（data、methos、computed...）中<strong style="color:#DD5145">可以访问到</strong>setup中的属性、方法。
-      - 但在setup中<strong style="color:#DD5145">不能访问到</strong>Vue2.x配置（data、methos、computed...）。
-      - 如果有重名, setup优先。
-   2. setup不能是一个async函数，因为返回值不再是return的对象, 而是promise, 模板看不到return对象中的属性。（后期也可以返回一个Promise实例，但需要Suspense和异步组件的配合）
 
 ### 2.ref函数
 
@@ -394,52 +514,6 @@ TODO：
       console.log('person的job变化了',newValue,oldValue)
   },{deep:true}) //此处由于监视的是reactive素定义的对象中的某个属性，所以deep配置有效
   ```
-
-### 3.watchEffect函数
-
-- watch的套路是：既要指明监视的属性，也要指明监视的回调。
-
-- watchEffect的套路是：不用指明监视哪个属性，监视的回调中用到哪个属性，那就监视哪个属性。
-
-- watchEffect有点像computed：
-
-  - 但computed注重的计算出来的值（回调函数的返回值），所以必须要写返回值。
-  - 而watchEffect更注重的是过程（回调函数的函数体），所以不用写返回值。
-
-  ```js
-  //watchEffect所指定的回调中用到的数据只要发生变化，则直接重新执行回调。
-  watchEffect(()=>{
-      const x1 = sum.value
-      const x2 = person.age
-      console.log('watchEffect配置的回调执行了')
-  })
-  ```
-
-### 8.生命周期
-<div style="display:flex;flex-direction:row;overflow:auto">
-<div style="flex:0 0 auto;border:1px solid black;width:380px;margin-right:20px;">
-<strong>vue2.x的生命周期</strong>
-<img src="https://cn.vuejs.org/images/lifecycle.png" alt="lifecycle_2" style="zoom:33%;width:1200px" />
-</div>
-<div style="flex:0 0 auto;border:1px solid black;width:510px;height:985px;">
-<strong>vue3.0的生命周期</strong>
-<img src="https://v3.cn.vuejs.org/images/lifecycle.svg" alt="lifecycle_2" style="zoom:33%;width:2500px" />
-</div>
-</div>
-1
-
-- Vue3.0中可以继续使用Vue2.x中的生命周期钩子，但有有两个被更名：
-  - ```beforeDestroy```改名为 ```beforeUnmount```
-  - ```destroyed```改名为 ```unmounted```
-- Vue3.0也提供了 Composition API 形式的生命周期钩子，与Vue2.x中钩子对应关系如下：
-  - `beforeCreate`===>`setup()`
-  - `created`=======>`setup()`
-  - `beforeMount` ===>`onBeforeMount`
-  - `mounted`=======>`onMounted`
-  - `beforeUpdate`===>`onBeforeUpdate`
-  - `updated` =======>`onUpdated`
-  - `beforeUnmount` ==>`onBeforeUnmount`
-  - `unmounted` =====>`onUnmounted`
 
 ### 9.自定义hook函数
 
