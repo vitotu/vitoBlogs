@@ -250,34 +250,40 @@ PS：v-model的三个修饰符：
   
 ## 指令  
 
-- 常用的指令：  
-    v-bind : 单向绑定解析表达式, 可简写为 `:xxx`  
-    v-model : 双向数据绑定  
-    v-for   : 遍历数组/对象/字符串(`item in items`和`item of items`在Vue中没有区别)  
-    v-on    : 绑定事件监听, 可简写为@  
-    v-if    : 条件渲染（动态控制节点是否存存在）  
-    v-else  : 条件渲染（动态控制节点是否存存在）  
-    v-show  : 条件渲染 (动态控制节点是否展示)  
+vue通过指令封装了有关DOM操作的逻辑模板中使用方法`<div v-example:[arg].modifiers="value"></div>`  
+`v-example`为指令名称  
+arg是指令参数，可以`[arg]`的形式表示动态参数，动态参数字符串类型，不支持js表达式，  
+modifiers为指令修饰符  
+value是传给指令的值  
+
+- 常用的内置指令：  
+  v-bind : 单向绑定解析表达式, 可简写为 `:xxx`  
+  v-model : 双向数据绑定  
+  v-for   : 遍历数组/对象/字符串(`item in items`和`item of items`在Vue中没有区别)  
+  v-on    : 绑定事件监听, 可简写为@  
+  v-if    : 条件渲染（动态控制节点是否存存在）  
+  v-else  : 条件渲染（动态控制节点是否存存在）  
+  v-show  : 条件渲染 (动态控制节点是否展示)  
 - v-text指令：  
-    1.作用：向其所在的节点中渲染文本内容。  
-    2.与插值语法的区别：v-text会替换掉节点中的内容，{{xx}}则不会。  
+  1.作用：向其所在的节点中渲染文本内容。  
+  2.与插值语法的区别：v-text会替换掉节点中的内容，{{xx}}则不会。  
 - v-html指令：  
-    1.作用：向指定节点中渲染包含html结构的内容。  
-    2.与插值语法的区别：  
-      (1).v-html会替换掉节点中所有的内容，{{xx}}则不会。  
-      (2).v-html可以识别html结构。  
-    3.严重注意：v-html有安全性问题！！！！  
-      (1).在网站上动态渲染任意HTML是非常危险的，容易导致XSS攻击(如：通过插入html向特定网站发送用户的cookie等数据)。  
-      (2).一定要在可信的内容上使用v-html，永不要用在用户提交的内容上！  
+  1.作用：向指定节点中渲染包含html结构的内容。  
+  2.与插值语法的区别：  
+    (1).v-html会替换掉节点中所有的内容，{{xx}}则不会。  
+    (2).v-html可以识别html结构。  
+  3.严重注意：v-html有安全性问题！！！！  
+    (1).在网站上动态渲染任意HTML是非常危险的，容易导致XSS攻击(如：通过插入html向特定网站发送用户的cookie等数据)。  
+    (2).一定要在可信的内容上使用v-html，永不要用在用户提交的内容上！  
 - v-cloak指令（没有值）：  
-    1.本质是一个特殊属性，Vue实例创建完毕并接管容器后，会删掉v-cloak属性。  
-    2.使用css `diaplay:none`配合v-cloak可以解决网速慢时页面展示出模板`{{xxx}}`的问题。  
+  1.本质是一个特殊属性，Vue实例创建完毕并接管容器后，会删掉v-cloak属性。  
+  2.使用css `diaplay:none`配合v-cloak可以解决网速慢时页面展示出模板`{{xxx}}`的问题。  
 - v-once指令：  
-    1.v-once所在节点在初次动态渲染后，就视为静态内容了。  
-    2.以后数据的改变不会引起v-once所在结构的更新，可以用于优化性能。  
+  1.v-once所在节点在初次动态渲染后，就视为静态内容了。  
+  2.以后数据的改变不会引起v-once所在结构的更新，可以用于优化性能。  
 - v-pre指令：  
-    1.跳过其所在节点的编译过程。  
-    2.可利用它跳过：没有使用指令语法、没有使用插值语法的节点，会加快编译。  
+  1.跳过其所在节点的编译过程。  
+  2.可利用它跳过：没有使用指令语法、没有使用插值语法的节点，会加快编译。  
 - 自定义指令总结：  
   1. 定义语法：  
     1).局部指令：  
@@ -286,7 +292,7 @@ PS：v-model的三个修饰符：
     2).全局指令：  
       `Vue.directive(指令名,配置对象/回调函数)`  
 
-  2. 配置对象中常用的3个回调：  
+  2. 配置对象中常用的回调：  
     1)`bind(element, binding)`：指令与元素成功绑定时调用。  
     2)`inserted(element, binding)`：指令所在元素被插入页面时调用。  
     3)`update(element, binding)`：指令所在模板结构被重新解析时调用。  
@@ -295,19 +301,19 @@ PS：v-model的三个修饰符：
 
   3. 回调函数的参数：
 
-        ```js
-          element // 指令所绑定的元素，可直接操作DOM
-          binding:{
-            name // 指令名，不含v-前缀
-            value // 绑定的值
-            oldValue // 绑定的旧值
-            expression // 字符串形式的指令表达式
-            arg // 传给指令的参数, 如v-bind:arg=""中的arg
-            modifiers // 修饰符对象, 如v-bind.sync => {sync:true}
-          }
-          vnode // 生成的虚拟节点
-          oldVnode // 上一个虚拟节点
-        ```
+     ```js
+      element // 指令所绑定的元素，可直接操作DOM
+      binding:{
+        name // 指令名，不含v-前缀
+        value // 绑定的值
+        oldValue // 绑定的旧值
+        expression // 字符串形式的指令表达式
+        arg // 传给指令的参数, 如v-bind:arg=""中的arg
+        modifiers // 修饰符对象, 如v-bind.sync => {sync:true}
+      }
+      vnode // 生成的虚拟节点
+      oldVnode // 上一个虚拟节点
+     ```
 
   4. 备注：  
     1.指令定义时不加v-，但使用时要加v-；  
@@ -473,6 +479,17 @@ props/emit仅适用于父子组件间通信，[props属性](#组件属性及配�
 provide/inject可以实现祖到孙组件间的通信,没有层级深度限制，且不会为数据增加额外的响应式(传入响应式数据则有响应式，没有则没有响应式)，  
 祖组件中设置provide属性，提供可供注入的对象或返回对象的函数，子孙组件中使用inject属性(string[]/object)从提供的注入对象中选择要注入的属性。  
 
+```vue
+<script>
+export default {
+  provide：function(){return { // 为后代组件提供数据
+    key:value , // key:string|symbol, value:any
+  }},
+  inject:[key] // key:string|symbol // 注入父级组件提供的数据
+}
+</script>
+```
+
 - `$parent` & `$children`或ref
 
 利用`$parent`和`$children`属性获取父组件或子组件的实例，通过读取或操作对应的值即可实现父子组件间通信  
@@ -607,12 +624,13 @@ vue通过插槽向子组件中传递html结构
 ```html  
 <!-- 父组件中 -->  
 <template v-slot:default='childrenParams'>
-  <!-- 将接收自子组件的变量重命名为了childrenParams -->  
-  <html结构>{{childrenParams.params1}}</html结构>  
-</template>  
-<!-- 子组件中 -->  
-<slot :params1="data1" params2='js表达式'></slot> <!-- 可传递多个参数，将被包裹在一个对象中 -->  
-```  
+  <!-- 将接收自子组件的变量重命名为了childrenParams -->
+  <html结构>{{childrenParams.params1}}</html结构>
+</template>
+<!-- 子组件中 -->
+<slot :params1="data1" params2='js表达式'></slot>
+<!-- 可传递多个参数，将被包裹在一个对象中，name为保留key，不会作为参数传递 -->
+```
 
 另外可以通过`<template v-slot:[动态插槽名]></template>`的方式定义动态的插槽名  
 具名插槽中`v-slot:`在`:`后有参数时`v-slot:`部分可缩写为`#`

@@ -186,6 +186,59 @@ vue2中`<template></template>`中仅支持一个根节点，但vue3中可以有�
 </template>
 ```
 
+## 指令
+
+常用内置指令与vue2中基本一致，参见vue2中[指令](../vue2base.md#指令)  
+自定义指令则略有不同, 除`<script setup>`形式，其他情况指令的注册均需通过directives选项  
+这点与vue2类似，全局注册则是通过`app.directive()`
+
+```vue
+<script setup>
+// 任何以v开头的驼峰式命名变量都可以被用作一个自定义指令，在模板中则可改为kebab-case的写法使用
+const vFocus = { mounted: (el) => el.focus() } //在模板中启用 v-focus
+</script>
+<template>
+  <input v-focus />
+</template>
+```
+
+指令的回调函数(hook)则与vue2中不同，vue3中的指令定义对象hook均为可选
+
+```js
+const myDirective = {
+  // 在绑定元素的 attribute 前或事件监听器应用前调用
+  created(el, binding, vnode, prevVnode) {
+    // el为指令绑定到的元素，可操作DOM
+    // vnode 绑定元素的底层VNode
+    // prevNode 上次渲染中绑定的VNode，仅在beforeUpdate, updated中可用
+    // binding参数较为复杂，见代码下方
+  },
+  // 在元素被插入到 DOM 前调用
+  beforeMount(el, binding, vnode, prevVnode) {},
+  // 在绑定元素的父组件及他自己的所有子节点都挂载完成后调用
+  mounted(el, binding, vnode, prevVnode) {},
+  // 绑定元素的父组件更新前调用
+  beforeUpdate(el, binding, vnode, prevVnode) {},
+  // 在绑定元素的父组件及他自己的所有子节点都更新后调用
+  updated(el, binding, vnode, prevVnode) {},
+  // 绑定元素的父组件卸载前调用
+  beforeUnmount(el, binding, vnode, prevVnode) {},
+  // 绑定元素的父组件卸载后调用
+  unmounted(el, binding, vnode, prevVnode) {}
+}
+```
+
+- binding参数
+  - value, 传递给指令的值`v-your-directive="value"`
+  - oldValue, 旧值，仅在beforeUpdate, updated中可用
+  - arg, 指令的参数`v-your-directive:arg="value"`
+  - modifiers, 修饰符对象如`v-my-directive.foo.bar`，modifiers为`{ foo: true, bar: true }`
+  - instance, 使用该指令的组件实例
+  - dir 指令的定义对象
+
+简化形式`app.directive('demo', (el, binding) => {})`,传入函数默认为常见的mounted和updated  
+在自定义组件上使用时，会总用于组件的根节点，与[透传规则](#入参props)类似，但无法通过`v-bind="$attrs"`来传递给不同的元素  
+
 ## 条件渲染
 
 与vue2基本一致
@@ -329,11 +382,213 @@ import ButtonCounter from './ButtonCounter.vue' // 此处为局部注册
 
 ### 入参props
 
+```vue
+<!-- MyComponent.vue -->
+<script setup>
+const props = defineProps({ // defineProps()宏无需引入即可使用
+  title:String, // 基础类型检查，若指定null或undefined，则会跳过类型检查
+  propA:[String, Number], // 多类型，Boolean类型存在特殊的类型转换
+  propC:{
+    type:String, // 可以时常见的原生构造函数，也可以时自定义的类
+    required:true, // 所有的prop默认都是可选的，定义required表明参数必传
+    default:'默认值', // 未指定default的props默认值为undefined，Boolean类型则为false
+    // default:(rowProps){return {message:''}} 
+    // 若为Object或数组类型，则默认值必须从函数中返回
+    validator(value){ return ['success', 'warning', 'danger'].includes(value)},
+    // 自定义校验规则，函数返回值必须上上述数组中，校验失败在开发模式下会抛出控制台警告
+  }
+});
+// 以对象的形式声明key为prop属性名称,value为其类型的构造函数
+// 此处大写String表示字符串包装类构造函数，注意与ts中的小写类型string表示的类型区分开
+console.log(props.title);
+</script>
+<!-- 没有使用setup的需要通过props选项来声明 -->
+<script>
+export default { // 两种实现方式都是基于props选项
+  props: ['foo'], // 也可以以数组形式声明，但以对象形式带有校验效果因此更为推荐
+  setup(props){console.log(props.foo)}
+}
+</script>
+<!-- 父组件中 -->
+<template>
+ <MyComponent :title="reactiveTitle" v-bind="{foo:'解构传参'}"></MyComponent>
+</template>
+```
+
+为了与Html的attribute对齐props属性名称推荐使用kebab-case的风格  
+与vue2中一样父组件模板通过`v-bind:propsKey`的方式向子组件中传入props参数，子组件中不应该直接修改传入的props，vue无法检测子组件到对传入对象、数组等引用类型的修改，且这些修改将反馈到父组件中  
+
+- 透传attribute
+
+对于单根节点组件，未声明的props,emit会自动透传到子组件模板的根节点上, 与vue2中指定`$attrs`和`$listeners`类似，但vue3中只能在模板中访问`$attrs`，并且该变量包含了未声明的props和emits  
+通过`export default {inheritAttrs:false}`配置向可禁用attributes继承，并在模板中使用`v-bind="$attrs"`绑定到指定的元素上  
+
+TODO:此处`v-bind`是否会同时绑定监听事件，有待验证
+
+js中使用透传attributes
+
+```vue
+<template>
+  <SingleRoot v-bind="$attrs"></SingleRoot>
+  <!-- <Multi-Root1/> 多根节点时若不指定attrs则会警告
+  <Multi-Root2/> -->
+</template>
+<script setup>
+// setup中情况下无法指定inheritAttrs属性，需要额外的<script>标签指定配置
+// 也就是说SFC中支持多<script>标签，但注意减少setup和setup()混用，更不能和选项式api混用
+import { useAttrs } from 'vue';
+const attrs = userAttrs(); // attrs总是反映为最新的透传，但不是响应式对象
+</script>
+<script>
+export default { // 无setup时，attrs被暴露在上下文上
+  setup(props, ctx){console.log(ctx.attrs)}
+}
+</script>
+```
+
 ### 监听事件
+
+自定义组件的事件使用与vue2中的[自定义事件](../vue2base.md#事件处理)基本一致  
+需要补充的是，vue3中自定义组件触发内触发的事件可以通过`defineEmits()`宏进行声明  
+
+```vue
+<template>
+  <button @click="$emit('increaseBy', params)"></button>
+</template>
+<script setup>
+// setup 下无法想模板中一样使用$emit触发事件，需要使用defineEmits声明后使用
+const emit = defineEmits({ // 也支持Array<string> 的方式定义
+  submit(payload){return true}, // 对象形式定义支持对触发事件的参数与进行验证
+  (e:'change', id:numebr):void, // 配合ts可直接写成函数type的形式
+});
+// defineEmits只可在setup顶级作用域下使用
+emit('submit');
+</script>
+<script>
+export default { // setup()函数情况下则通过emits配置定义，与props类似
+  emits:['inFocus', 'submit'],
+  setup(props, ctx){ ctx.emit('submit')} // emit被暴露在上下文对象上
+}
+</script>
+```
+
+v-model与v-bind.sync区别及原理见vue2[指令](../vue2base.md#指令)  
+在vue3自定义组件中没有响应的model配置项，可通过`defineProps(['modelValue'])`和`defineEmits(['update:modelValue'])`的方式实现，而父组件在使用时`<CustomComponent v-model:modelValue="reactiveValue"/>`，因此vue3也支持自定义组件同时绑定多个v-model  
+更多v-model及修饰符相关参见[官方文档](https://cn.vuejs.org/guide/components/events.html)及[vue2指令章节](../vue2base.md#指令)  
+
+监听事件也可透传，详见上一小节，透传  
 
 ### 插槽
 
+与vue2基本相同
+
+### 组件间通信
+
+与vue2基本相同
+
+provide/inject 使用示例：
+
+```vue
+<script setup>
+import { provide, inject, readonly } from 'vue'; // 推荐使用readonly包装provide的值
+provide(key:string|Symbol, readonly(value:any)) // 给后代组件提供数据，可多次调用
+// 注入父级组件provide的数据
+const message = inject(ParentKey:string|Symbol, defaultValue)
+// 在setup()中provide/inject都要要保证在同步代码中调用，对注入的数据推荐仅在提供方组件中进行修改
+</script>
+```
+
+另外app.provide()将在应用层级提供数据
+
 ### 动态组件
+
+`<component></component>`与vue2中基本一致
+
+### 异步组件
+
+在大型项目中，某些组件可能是通过服务器加载的，通过`defineAsyncComponent`方法可生成异步组件  
+通常情况下异步组件会搭配内置组件`<Suspense></Suspense>`使用
+
+```vue
+<template>
+  <AsyncComp/>
+</template>
+<script setup>
+import { defineAsyncComponent } from 'vue';
+const AsyncComp = defineAsyncComponent(() => {
+  // 此处可通过异步请求获取组件或import方式动态导入组件
+  return import('./url/yourComponent.vue') // 需要返回Promise对象
+}) // 异步组件也可以通过app.component()的方式全局注册
+const SafeAsyncComp = defineAsyncComponent({ // 对象配置形式入参
+  loader:()=>import('./Foo.vue'), // 加载函数
+  loadingComponent: Loading, // 异步组件loading状态下只用Loading组件占位
+  delay:200, // 展示组件前的延迟时间, 默认200ms
+  errorComponent:ErrorComponent, // 加载失败后展示ErrorComponent
+  timeout:3000 // 超时限制，超时后展示ErrorComponent，默认值为Infinity
+})
+</script>
+```
+
+## 组合式函数
+
+组合式函数时vue3中利用组合式api来封装和复用有状态逻辑的函数，如封装跟踪鼠标在当前页面中的位置功能  
+
+```js
+// mouse.js
+import { ref, isRef, unref, watchEffect, onMounted, onUnmounted } from 'vue';
+import { useEventListener } from './event'; // 组合式函数可嵌套其他组合式函数
+export function useMouse(url) { // 接收一个参数可以是ref对象
+  const x = ref(0) // 被组合式函数封装和管理的状态
+  const y = ref(0);
+  function update(event) { // 状态更新方法
+    x.value = event.pageX
+    y.value = event.pageY
+  }
+  useEventListener(window, 'mousemove', (event) => {
+    x.value = event.pageX
+    y.value = event.pageY
+  })
+  const data = ref(null);
+  const error = ref(null);
+  function doFetch(){ // 异步状态更新方法
+    data.value = null; error.value = null; // 初始化状态
+    // unref解包可能为ref的值，避免使用url.value访问时与普通对象url访问时的冲突
+    fetch(unref(url)).then(r=>r.json()).then(json=>data.value=json).catch(e=>error.value=e);
+  }
+  // 若url为ref，则启动响应式请求,即外部url变化时更新状态
+  if(isRef(url)) watchEffect(doFetch); 
+  else doFetch(); // 否则仅请求一次，避免监听器开销
+  return { x, y, data, error } // 通过返回值暴露所管理的状态，返回整体为普通对象，方便解构
+}
+// event.js
+import { onMounted, onUnmounted } from 'vue'
+export function useEventListener(target, event, callback) {
+  // 一个组合式函数也可以挂靠在所属组件的生命周期上来启动和卸载副作用
+  onMounted(() => target.addEventListener(event, callback))
+  onUnmounted(() => target.removeEventListener(event, callback))
+}
+```
+
+在组件中使用
+
+```vue
+<script setup>
+import { useMouse } from './mouse.js'
+// 保证在同步代码中调用组合式函数，以保证函数中的生命周期hook、计算属性等能绑定到正确的组件实例上
+const { x, y } = useMouse()
+</script>
+<template>Mouse position is at: {{ x }}, {{ y }}</template>
+```
+
+在选项式api中只能通过setup()的方式使用组合式函数，此时可以将setup()看做最早的生命周期函数，函数返回的状态也必须在setup()中返回，以便暴露给this和模板(不推荐的写法)  
+
+- 与vue2比较
+
+vue2中与组合式函数相类似的时mixins配置，vue3为了兼容项目迁移保留了mixins配置但不推荐主动使用  
+与mixins相比，mixins的缺点有：不清晰的数据来源；命名空间冲突；隐式的跨mixin通信；  
+与无渲染组件(类似于代理工作方式的组件)对比，组合式函数不会产生额外的组件实例开销  
+
+PS：组合式函数的逻辑功能上与React hooks相近，组合式api与组合式函数在思想上借鉴了React
 
 ## 二、常用 Composition API
 
