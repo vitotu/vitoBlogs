@@ -593,23 +593,8 @@ PS：组合式函数的逻辑功能上与React hooks相近，组合式api与组�
 ## 二、常用 Composition API
 
 ### 2.ref函数
-
-- 作用: 定义一个响应式的数据
-- 语法: ```const xxx = ref(initValue)```
-  - 创建一个包含响应式数据的<strong style="color:#DD5145">引用对象（reference对象，简称ref对象）</strong>。
-  - JS中操作数据： ```xxx.value```
-  - 模板中读取数据: 不需要.value，直接：```<div>{{xxx}}</div>```
-- 备注：
-  - 接收的数据可以是：基本类型、也可以是对象类型。
-  - 基本类型的数据：响应式依然是靠``Object.defineProperty()``的```get```与```set```完成的。
-  - 对象类型的数据：内部 <i style="color:gray;font-weight:bold">“ 求助 ”</i> 了Vue3.0中的一个新函数—— ```reactive```函数。
-
-### 3.reactive函数
-
-- 作用: 定义一个<strong style="color:#DD5145">对象类型</strong>的响应式数据（基本类型不要用它，要用```ref```函数）
-- 语法：```const 代理对象= reactive(源对象)```接收一个对象（或数组），返回一个<strong style="color:#DD5145">代理对象（Proxy的实例对象，简称proxy对象）</strong>
-- reactive定义的响应式数据是“深层次的”。
-- 内部基于 ES6 的 Proxy 实现，通过代理对象操作源对象内部数据进行操作。
+TODO:待确认的规则  
+基本类型的数据：响应式依然是靠``Object.defineProperty()``的```get```与```set```完成的。
 
 ### 4.Vue3.0中的响应式原理
 
@@ -662,13 +647,13 @@ PS：组合式函数的逻辑功能上与React hooks相近，组合式api与组�
 
 ### 两种响应式实现方案对比
 
+TODO：待确认的规则  
 vue3中proxy只代理外层属性，节省内存空间，  
 对于想要深层的响应式对象的可使用reactive函数，  
 proxy能够拦截属性的增加与删除等13种操作，能够对数组的索引操作进行拦截  
 
 而vue2中Object.defineProperty(target, props, descriptor)直接在对象上定义新的属性或修改现有的属性,descriptor对象中包含configurable,enumerable,value,set,get,writable等属性用于描述target.props的一些行为，  
 vue2中需要对data中的对象进行深度遍历，对每个属性设置响应式，占用大量内存空间，在对象上设置新的属性时新属性不具有响应式，对于数组直接通过索引操作也不具有响应式  
-TODO：
 
 ### 5.reactive对比ref
 
@@ -696,35 +681,6 @@ TODO：
     - emit: 分发自定义事件的函数, 相当于 ```this.$emit```。
 
 ### 7.计算属性与监视
-
-### 1.computed函数
-
-- 与Vue2.x中computed配置功能一致
-
-- 写法
-
-  ```js
-  import {computed} from 'vue'
-  
-  setup(){
-      ...
-   //计算属性——简写
-      let fullName = computed(()=>{
-          return person.firstName + '-' + person.lastName
-      })
-      //计算属性——完整
-      let fullName = computed({
-          get(){
-              return person.firstName + '-' + person.lastName
-          },
-          set(value){
-              const nameArr = value.split('-')
-              person.firstName = nameArr[0]
-              person.lastName = nameArr[1]
-          }
-      })
-  }
-  ```
 
 ### 2.watch函数
 
@@ -769,14 +725,6 @@ TODO：
       console.log('person的job变化了',newValue,oldValue)
   },{deep:true}) //此处由于监视的是reactive素定义的对象中的某个属性，所以deep配置有效
   ```
-
-### 9.自定义hook函数
-
-- 什么是hook？—— 本质是一个函数，把setup函数中使用的Composition API进行了封装。
-
-- 类似于vue2.x中的mixin。
-
-- 自定义hook的优势: 复用代码, 让setup中的逻辑更清楚易懂。
 
 ### 10.toRef
 
@@ -861,38 +809,6 @@ TODO：
   </script>
   ```
 
-### 5.provide 与 inject
-
-<img src="https://v3.cn.vuejs.org/images/components_provide.png" style="width:300px" />
-
-- 作用：实现<strong style="color:#DD5145">祖与后代组件间</strong>通信
-
-- 套路：父组件有一个 `provide` 选项来提供数据，后代组件有一个 `inject` 选项来开始使用这些数据
-
-- 具体写法：
-
-  1. 祖组件中：
-
-     ```js
-     setup(){
-      ......
-         let car = reactive({name:'奔驰',price:'40万'})
-         provide('car',car)
-         ......
-     }
-     ```
-
-  2. 后代组件中：
-
-     ```js
-     setup(props,context){
-      ......
-         const car = inject('car')
-         return {car}
-      ......
-     }
-     ```
-
 ### 6.响应式数据的判断
 
 - isRef: 检查一个值是否为一个 ref 对象
@@ -913,6 +829,7 @@ TODO：
     <img src="./resource/optionsApi2.gif" style="zoom:50%;width:560px;" />
 </div>
 </div>
+
 ### 2.Composition API 的优势
 
 我们可以更加优雅的组织我们的代码，函数。让相关功能的代码更加有序的组织在一起。
@@ -924,6 +841,7 @@ TODO：
   <img src="./resource/compositionApi2.gif" style="height:360px"/>
 </div>
 </div>
+
 ## 五、新的组件
 
 ### 1.Fragment
@@ -1074,4 +992,3 @@ TODO：
 
   > 过滤器虽然这看起来很方便，但它需要一个自定义语法，打破大括号内表达式是 “只是 JavaScript” 的假设，这不仅有学习成本，而且有实现成本！建议用方法调用或计算属性去替换过滤器。
 
-- ......
