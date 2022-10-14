@@ -1,8 +1,64 @@
 # 前端开发工具
 
+## 包管理器
+
+在没有使用包管理器的情况下，要使用第三方库只能通过`<script>`的方式去引用依赖  
+当依赖发生变化、需要更新升级、第三方库之间的相互依赖、版本管理等问题。会让这种方式变得难以维护，因此需要使用包管理器  
+通常安装node环境之后，node自带npm作为包管理器，你也可以安装其他包管理器如:yarn,pnpm等  
+下面将详细介绍这三种包管理器  
+
+[参考文档1](https://www.51cto.com/article/702067.html)  
+[参考文档2](https://juejin.cn/post/6844903616109641736)  
+[参考文档3](https://juejin.cn/post/7047556067877716004)  
+
+### npm
+
+npm作为node的默认包管理器，同时也是yarn、pnpm的基础  
+npm使用语义版本控制思想设计的使用package.json文件管理依赖  
+依赖记录如`"dependencies": { "包名": "版本命名"}`  
+
+- 版本命名格式x.y.z：
+  - x是大版本，更新可能会导致API不兼容；
+  - y次版本，以兼容的方式添加新功能；
+  - z补丁版本
+- 版本命名前缀：
+  - ^大版本锁定
+  - ~锁定至次版本
+  - 其他符号(>,>=,<,<=,||,-)则对应其符号表意
+
+通过版本命名的方式保证项目在不同的机器上安装一致的依赖  
+
+通常第三方库也有其依赖，并在对应包目录下的package.json中，因此项目依赖整体应该是个树状结构  
+在npm v3及之前存在这些问题
+
+- 相同依赖在不同节点上无法共享，这会导致node_modules体积过大
+- 嵌套层级过深会导致路径太长(windows不能处理过长的路径)
+- 模块实例不能共享(内部单例等变量无法在不同的包中共享)
+
+因此npm v3之后的版本和yarn 将依赖树拍平(将嵌套依赖包提升至顶层便于共享)，安装时会不停的向上层node_modules查找，找到相同的包则不再重复安装，解决了包复用的问题，但扁平化带来了新的问题  
+
+- 扁平化算法复杂度较高，耗时较长
+- 项目中可以非法访问没有声明过的依赖包，即可以访问依赖树上2层甚至叶子节点上的包
+- 依赖结构不确定性即，B、C都依赖于F，但是不同的版本，对于F的哪个版本提升至顶层共享存在不确定性
+
+yarn.lock和npm v5才出现的package-lock.json的出现保证产生确定的依赖结构。  
+仍存在安全性和性能问题  
+
+[npm install模块安装机制](https://juejin.cn/post/6999829253395054623)  
+
+### yarn
+
+yarn为了解决依赖共享等问题，也将依赖树拍平，同时引入了yarn.lock文件解决拍平带来的依赖结构不确定性问题；并且增加并行处理和离线安装模式提升运行速度
+
+### pnpm
+
+pnpm在npm的基础上使用链接(linux下的链接、window下的快捷方式)构成依赖树解决了依赖共享问题。包及依赖包被扁平化到node_modules/.pnpm目录下，当依赖了一个包的不同版本时，仅对变更文件进行更新，不需要重复下载不变的部分  
+对于.pnpm目录下包A的依赖也是同样处理，因此利用链接恢复的依赖树并不存在路径过长的问题  
+同时因为不需要从扁平化恢复依赖树(向上级node_modules查询)，因此也没有扁平化带来的性能和安全问题  
+
 ## npm使用笔记  
 
-！使用ubuntu的同学安装node的时可能会使用apt-get安装node，此时要注意安装的node和npm的版本，若版本过低(如npm -v：3.5.2)请卸载后去官网下载安装包解压后使用软连接添加变量的方式安装  
+[npm官方文档](https://www.npmjs.com/)|[使用命令文档](https://docs.npmjs.com/cli/v8)
 下载安装node之后一般都会附带安装npm包管理器  
 查看npm版本  
 ```npm -v```  
@@ -10,32 +66,22 @@
 ```npm config list```  
 
 ### npm设置镜像源  
-  
-推荐使用nrm管理镜像源`npm install -g nrm`  
-  
-由于npm官方源在海外，没有搭梯子的直接使用npm安装一些依赖包会遇到访问速度慢的问题  
 
-* 官方源备份：<https://registry.npmjs.org/>  
+由于npm官方源<https://registry.npmjs.org/>在海外，没有搭梯子的直接使用npm安装一些依赖包会遇到访问速度慢的问题  
 通过设置国内的镜像源加速依赖包的安装  
-目前发现国内仅有淘宝源  
-官网地址<https://developer.aliyun.com/mirror/NPM?from=tnpm>  
-推荐使用全局配置的方式添加国内镜像源，使用cnpm可能遇到的麻烦有：cnpm安装第三方包后不会更新package.json也不会生成package-lock.json可能存在相关风险  
-根据官方介绍安装的cnpm带有gzip压缩  
-```npm install -g cnpm --registry=https://registry.npm.taobao.org```  
-而后使用cnpm代替npm命令;可能需要设置环境变量  
-淘宝源：  
-* <https://registry.npm.taobao.org>  
-  
-设置方法：  
+淘宝源地址：<https://registry.npm.taobao.org>，文档地址：<https://developer.aliyun.com/mirror/NPM?from=tnpm>  
+全局配置镜像源`npm config set registry https://registry.npm.taobao.org`  
+临时使用镜像源`npm install <包名> --registry=https://registry.npm.taobao.org`  
 
-* 全局配置  
-```npm config set registry https://registry.npm.taobao.org```  
-* 临时使用  
-```npm install <包名> --registry=https://registry.npm.taobao.org```  
+推荐使用[nrm](https://github.com/Pana/nrm)管理镜像源`npm install -g nrm`  
+可自由切换镜像源  
+
+### 常用npm命令  
   
-### 常见npm命令  
-  
-```shell  
+```shell
+npm -v # 查看版本
+npm config list # 查看npm 配置信息
+
 npm init # 初始化项目，会生成package.json  
   
 npm install --save-dev <package-name> # 项目内安装开发环境依赖包  
@@ -58,10 +104,7 @@ main 设置了应用程序的入口点
 private 如果设置为 true，则可以防止应用程序/软件包被意外地发布到 npm  
 engines 设置了此软件包/应用程序在哪个版本的 Node.js 上运行  
 browserslist 用于告知要支持哪些浏览器（及其版本）  
-  
-版本命名中x.y.z：x是大版本，更新可能会导致API不兼容；y次版本，以兼容的方式添加新功能；z补丁版本  
-依赖版本控制中：^大版本锁定,~锁定至次版本，其他符号(>,>=,<,<=,||,-)则对应其符号表意  
-  
+
 ## package-lock.json  
 
 该文件旨在跟踪被安装的每个软件包的确切版本，以便产品可以以相同的方式被 100％ 复制  

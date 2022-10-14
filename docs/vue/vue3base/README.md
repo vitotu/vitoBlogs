@@ -590,6 +590,36 @@ vue2中与组合式函数相类似的时mixins配置，vue3为了兼容项目迁
 
 PS：组合式函数的逻辑功能上与React hooks相近，组合式api与组合式函数在思想上借鉴了React
 
+## 插件
+
+与vue2中基本一致
+
+## 内置组件
+
+`<component/>`、 `<KeepAlive>`
+
+### Transition
+
+与vue2中[过渡](../vue2base.md#过渡)类似
+动画类名有v-enter和v-leave分别更改为v-enter-from和v-leave-from, 自定义过渡class的key也有响应的调整  
+更详细的使用方法参见官方文档[transition章节](https://cn.vuejs.org/guide/built-ins/transition.html)  
+
+### Teleport
+
+`<Teleport to=".target"></Teleport>`组件将包裹的结构传送到to指定的目标元素下，'.target'可以是一个css选择器字符串或DOM元素对象，常见场景如全屏模态框  
+该组件仅改变了DOM结构，不影响组件间的逻辑关系；多个Teleport共享目标时，按出现次序在末尾追加
+
+## Suspense
+
+`<Suspense></Suspense>`用于在组件树中协调对异步依赖的处理，让组件数上层等待下层多个嵌套异步依赖解析完成，并在等待是渲染一个加载状态  
+Suspense包裹异步组件，类似于async修饰的函数中使用await，用于顶层统一处理各异步组件的加载状态  
+`async setup()`和`<script setup> await /*顶层await*/</script>`均被视为异步依赖  
+异步组件suspensible选项幕刃为true，组件关系链上有`<Suspense></Suspense>`时组件内部的加载、报错、延时、超时等选型将被忽略，也可以显式的指定为false表明不受Suspense控制  
+`<Suspense></Suspense>`包裹的组件，也即Suspense的插槽有两种，`#default`和`#fallback`，两者都只允许一个直接子节点，即一个根节点  
+初始渲染时，将在内存中渲染默认插槽中的内容，若遇到异步以来则进入挂起状态，并展示fallback内容，当所有状态完成后进入完成状态，展示默认插槽的内容  
+进入完成状态后，只有当默认插槽的根节点被替换时，<Suspense> 才会回到挂起状态。组件树中新的更深层次的异步依赖不会造成 <Suspense> 回退到挂起状态。  
+发生回退时，默认展示之前的default内容，在配置了timeout且超时后才会展示fallback内容  
+
 ## 二、常用 Composition API
 
 ### 2.ref函数

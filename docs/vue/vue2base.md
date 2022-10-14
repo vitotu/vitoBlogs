@@ -665,7 +665,7 @@ vue在插入、更新、移除DOM或组件时提供不同的方式应用过渡�
 </transition>
 ```
 
-- 使用vue封装的`<transition></transition>`组件包裹需要动画的标签或组件，这些标签或组件通常需要设置动态状态如:v-if、v-show、动态组件或组件根节点等
+- 使用vue封装的`<transition></transition>`组件包裹需要动画的单标签或单根组件，这些标签或组件通常需要设置动态状态如:v-if、v-show、动态组件或组件根节点等
 
 当插入或删除包含在 transition 组件中的元素时，Vue 将会做以下处理：
 
