@@ -5,7 +5,7 @@
 
 ## 模板语法
 
-vue的`.vue`文件是SFC(Single File Components 单文件组件)风格的编码，即一个文件中包含了`<template>`，`<script>`，`<style>`，详细如下：  
+vue的`.vue`文件是SFC(Single File Components 单文件组件)风格的编码，即一个文件中包含了html,js,css三部分对应`<template>`，`<script>`，`<style>`，详细如下：  
 
 ```vue
 <template>
@@ -13,16 +13,15 @@ vue的`.vue`文件是SFC(Single File Components 单文件组件)风格的编码�
 此部分将通过@vue/complier-dom的处理，预编译为js的渲染函数render
 template本身最终将不会被渲染为DOM结构，并且内部可以多层嵌套template -->
 </template>
-
 <script>
 // 在这里书写js
 </script>
-
 <style>
 /* 在这里书写css */
 </style>
 ```
 
+SFC有这内聚关注、作用域css，预编译模板避免运行编译开销、利于模块化等优点，但也必须使用构建工具  
 与之对应的`.jsx`风格即是在js中书写xml格式语法用于表示html结构，vue想要使用jsx风格需要自己书写render函数  
 vue在`<template>`中书写`{ {js表达式}}`,`v-指令:参数='表达式'`等语法样式，这些语法样式由Vue实例来解析。这种方式统称为模板语法  
 

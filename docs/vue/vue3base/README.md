@@ -609,7 +609,7 @@ PS：组合式函数的逻辑功能上与React hooks相近，组合式api与组�
 `<Teleport to=".target"></Teleport>`组件将包裹的结构传送到to指定的目标元素下，'.target'可以是一个css选择器字符串或DOM元素对象，常见场景如全屏模态框  
 该组件仅改变了DOM结构，不影响组件间的逻辑关系；多个Teleport共享目标时，按出现次序在末尾追加
 
-## Suspense
+### Suspense
 
 `<Suspense></Suspense>`用于在组件树中协调对异步依赖的处理，让组件数上层等待下层多个嵌套异步依赖解析完成，并在等待是渲染一个加载状态  
 Suspense包裹异步组件，类似于async修饰的函数中使用await，用于顶层统一处理各异步组件的加载状态  
@@ -617,8 +617,75 @@ Suspense包裹异步组件，类似于async修饰的函数中使用await，用�
 异步组件suspensible选项幕刃为true，组件关系链上有`<Suspense></Suspense>`时组件内部的加载、报错、延时、超时等选型将被忽略，也可以显式的指定为false表明不受Suspense控制  
 `<Suspense></Suspense>`包裹的组件，也即Suspense的插槽有两种，`#default`和`#fallback`，两者都只允许一个直接子节点，即一个根节点  
 初始渲染时，将在内存中渲染默认插槽中的内容，若遇到异步以来则进入挂起状态，并展示fallback内容，当所有状态完成后进入完成状态，展示默认插槽的内容  
-进入完成状态后，只有当默认插槽的根节点被替换时，<Suspense> 才会回到挂起状态。组件树中新的更深层次的异步依赖不会造成 <Suspense> 回退到挂起状态。  
+进入完成状态后，只有当默认插槽的根节点被替换时，`<Suspense>` 才会回到挂起状态。组件树中新的更深层次的异步依赖不会造成 `<Suspense>` 回退到挂起状态。  
 发生回退时，默认展示之前的default内容，在配置了timeout且超时后才会展示fallback内容  
+
+## 工具链
+
+### 构建工具
+
+vite由vue团队基于rollup开发的轻量级构建工具，在vue3中推荐使用vite构建而不是webpack  
+TODO：学习笔记  
+vue cli 官方提供的基于webpack的脚手架工具，当前处于维护模式，vue3中非必要不使用  
+
+### 路由
+
+此处特指客户端路由  
+与vue2的vue-router v3.x对应的vue-router v4.x则时为vue3准备的路由库，[文档地址](https://router.vuejs.org/zh/introduction.html)
+
+### 状态管理
+
+vue2中使用了vuex作为全局状态管理库，，在vue3中vue团队在vuex的基础上开发了 [pinia](https://pinia.vuejs.org/introduction.html) 状态管理库，同时兼容vue2和vue3
+
+## 与TS一起使用
+
+vue3是十分推荐组合式api与TS一起使用的，在`<script setup></script>`的情况下, 类型标注示例如下：  
+
+```vue
+<script setup lang='ts'>
+import { ref, computed, reactive, computed, provide, inject } from 'vue';
+import type { Ref, InjectionKey } from 'vue';
+import CustomComponent from './CustomComponent.vue'
+
+const props1 = defineProps({foo:{type:String, required:true}}); // 推导类型
+const props2 = defineProps<{foo:string}>() // 通过泛型指定类型
+interface Props { foo:string } // Props可以上从其他文件引入的类型引用，但不能是导入的类型
+const props3 = defineProps<Props>() // 通过接口指定props类型
+const props4 = withDefaults(defineProps<Props>(), {
+  msg:'hello' // 通过withDefaults指定props默认值
+})
+
+const emit1 = defineEmits(['change']) // 运行时声明
+const emit2 = defineEmits<{(e:'change', id:number):void}>() // 通过泛型声明类型
+
+const year = ref(2020); // 推导为Ref<number>类型
+const date:Ref<string | number> = ref('13'); // 引入Ref覆盖默认推导行为
+// 若指定了泛型，但未给出初始值，则最后将是一个包含undefined的联合类型
+const time = ref<string | number>('12') // 调用时指定泛型也可指定类型
+
+// reactive的类型标注与ref大同小异
+const book:{title:string} = reactive({title:"book"}) // 指定并推导类型
+
+// computed也可从返回值中进行类型推导，也可以通过泛型指定类型
+const double = computed<number>(()=>{ /* 泛型指定computed类型，若不符则会报错 */})
+
+// 事件处理函数的入参event默认类型为any，若开启严格模式则ts会报错，可将其标注为Event类型，取值时配合断言使用
+function handleChange(event:Event){console.log((event.target as HTMLInputElement).value)}
+
+const key = Symbol() as InjectionKey<string>; // 定义provide数据类型
+provide(key, 'foo') // 推荐将key类型放入单独的文件中共享
+// 在后代组件中注入，注入类型将带有undefined的联合类型，因为无法保障父组件提供了该值，可通过默认值消除
+const foo = inject<string>(key) // foo类型为 string|undefined
+
+const el = ref<HTMLInputElement| null>(null); // 为模板引用标注类型
+const modal = ref<InstanceType<typeof CustomComponent> | null>(null) // 自定义组件标注类型
+</script>
+<template>
+  <input ref="el"/>
+  <CustomComponent ref="modal"></CustomComponent>
+</template>
+<!-- 非setup下使用类型推导需要需要使用defineComponent函数包裹整个对象才可进行推导 -->
+```
 
 ## 二、常用 Composition API
 
