@@ -5,6 +5,8 @@
 vue3相对于vue2进行了一次大的升级, 仓库地址[github](https://github.com/vuejs/core)|[官方文档](https://cn.vuejs.org/guide/introduction.html)(ps:搜索栏下方可切换vue3语法风格)  
 在语法上vue3目前同时支持选项式api和组合式api两种风格，选项api与vue2中的语法大同小异，但组合式api则是全新的写法，本文将以官方推荐的组合式api展开，浓缩、对比vue2学习vue3的基础用法。  
 
+- 概览vue3对比vue2的一些改变
+
 - 1.性能的提升
   - 打包大小减少41%
   - 初次渲染快55%, 更新渲染快133%
@@ -29,7 +31,17 @@ vue3相对于vue2进行了一次大的升级, 仓库地址[github](https://githu
     - data 选项应始终被声明为一个函数
     - 移除keyCode支持作为 v-on 的修饰符
 
-## 一、创建Vue3.0工程
+- 组合式api与选项式api
+
+选项式api中，同一个代码逻辑分布于不同的配置项中导致逻辑关注点分散，不利于逻辑复用  
+组合式api有如下优点：
+
+1. 更好的逻辑复用(组合函数)
+2. 更灵活的代码组织(逻辑关注点集中，相同处理逻辑放置于连续的相近位置)
+3. 更好的类型推导，主要利用变量和函数，逻辑部分纯js的书写风格更利于与ts结合的类型推导
+4. 更小的生产包体积，`<script setup></script>`书写形式的组件模板`<template/>`被编译为内敛函数，与setup处于同一作用于，因此省去了this上下文访问属性，更利于代码压缩(本地变量名可以被压缩，但对象属性名不能)
+
+## 创建Vue3.0工程
 
 确保已安装最新版nodejs
 
@@ -88,7 +100,8 @@ vue3中的模板语法风格与[vue2的](../vue2base.md#模板语法)基本一�
 
 ## 响应式
 
-此部分对应vue2的data配置项相对应，vue3中使用了es6中的 proxy 对象代替vue2中的 defineProperty 来实现响应式，克服了vue2中操作数组索引和添加新属性等场景响应式丢失等问题  
+此部分对应vue2的data配置项相对应，vue3中使用了es6中的 proxy 对象代替[vue2中的 defineProperty ](../vue2plus/README.md#双向绑定与响应式)来实现响应式，克服了vue2中操作数组索引和增删属性等场景响应式失效等问题  
+
 vue3中的选项式api中的data和methods配置项与vue2中基本一致，但组合式api大有不同，且本质上选项式api是在组合式api基础上实现的  
 
 ```vue
@@ -118,35 +131,39 @@ export default {
 </script>
 ```
 
-reactive默认创建深层的响应式，使用shallowReactive函数可以创建只有顶层响应式的对象  
+- reactive()
+
+reactive基于proxy，默认创建深层的响应式，使用shallowReactive函数可以创建只有顶层响应式的对象  
 对一个proxy对象应用reactive返回的是proxy对象本身  
 
 响应式是通过对属性对象的访问进行追踪的，因此使用属性赋值`let count = state.count`或解构至本地变量`let {count} = state`, 又或者使用属性传参`fn(state.count)`都会让被赋值的变量不具有响应式，即`count++`不会响应式更新`state.count`  
 同样对state整体赋值 `state = {count:0}`, 会让state指向另一个对象,从而丢失对原先的proxy对象的引用, 后续对state操作将不具有响应式  
 
+- ref()
+
 另外reactive仅对对象类型有效，对string、number、boolean等原始类型无效  
-vue中引入了`ref`来解决原始类型响应式的问题, 使用方法同reactive, ref将入参包装为一个带有value属性的Ref对象, 如果入参为对象类型，则会调用reactive方法挂载到Ref对象的value属性上  
+vue中引入了`ref`并通过`Object.defineProperty()`来解决原始类型响应式的问题, 使用方法同reactive, ref将入参包装为一个带有value属性的Ref对象, 如果入参为对象类型，则会调用reactive方法挂载到Ref对象的value属性上，利用reactive处理对象类型的深层次响应式  
 ref和reactive生成的对象在解构、传参、赋值时的响应式丢失情况相同，即传递对象本身，被赋值的变量响应式被保留，但传递普通属性，则响应式丢失  
 
 ```vue
 <script setup>
-  import { ref, reactive } 'vue';
-  const count = ref(0);
-  console.log(count.value); // setup作用域中count为{value:0}对象，访问其值需要用.value
-  let state = ref({count:0});
-  function add(){ // 操作对象时先使用value，再访问属性
-    state.value.count++;
-  };
-  function stop(){state = {count:0};}; // 同样改变state引用的对象会导致响应式丢失
-  state.value = {count:9} // 响应式替换
-  // let {count} = state // 这种方式解构 count 为 undefined
-  let {count} = state.value // 这种方式解构count无响应式
+import { ref, reactive } 'vue';
+const count = ref(0);
+console.log(count.value); // setup作用域中count为{value:0}对象，访问其值需要用.value
+let state = ref({count:0});
+function add(){ // 操作对象时先使用value，再访问属性
+  state.value.count++;
+};
+function stop(){state = {count:0};}; // 同样改变state引用的对象会导致响应式丢失
+state.value = {count:9} // 响应式替换
+// let {count} = state // 这种方式解构 count 为 undefined
+let {count} = state.value // 这种方式解构count无响应式
 
-  const data = reactive({count:ref(0)})
-  console.log(data.count) // 深层的reactive响应式对象中嵌套ref，则对应ref会自动解包，无须data.count.value访问
-  // 当ref作为响应式的数组、map等集合类型的元素访问时则不会自动解包
-  const dataArr = reactive([ref('list')]);
-  console.log(dataArr[0].value);
+const data = reactive({count:ref(0)})
+console.log(data.count) // 深层的reactive响应式对象中嵌套ref，则对应ref会自动解包，无须data.count.value访问
+// 当ref作为响应式的数组、map等集合类型的元素访问时则不会自动解包
+const dataArr = reactive([ref('list')]);
+console.log(dataArr[0].value);
 </script>
 <template>
   <!-- 模板中使用顶层属性count会自动解包，不需要.value
@@ -155,6 +172,56 @@ ref和reactive生成的对象在解构、传参、赋值时的响应式丢失情
   <button @click="stop">阻断响应式</button>
 </template>
 ```
+
+- 浅析vue3的响应式原理
+
+严格来讲vue3混合使用了defineProperty和proxy对象，对于原始对象使用ref，对于Object对象使用了proxy
+
+利用proxy提供的13中拦截方法，拦截属性的读写，属性增删等操作，通过Reflect对代理的源对象进行操作, 如：  
+
+```js
+new Proxy(data, {
+  get (target, prop) { // 拦截读取属性值
+    return Reflect.get(target, prop)
+  },
+  set (target, prop, value) { // 拦截设置属性值或添加新属性
+    return Reflect.set(target, prop, value)
+  },
+  deleteProperty (target, prop) { // 拦截删除属性
+    return Reflect.deleteProperty(target, prop)
+  }
+})
+proxy.name = 'tom'   
+```
+
+- 浅层响应式`shallowReactive()`和`shallowRef()`
+
+仅处理对象最外层的响应式，过于庞大的深层响应式有中性能和内存占用问题，在适当的地方使用浅层响应式可以环节这些问题，也常用于与外部系统集成  
+
+- `readonly()`和`shallowReadonly()`
+
+`readonly`让响应式数据变为只读(深层), `shallowReadonly()`浅层只读  
+
+- `toRef()`和`toRefs()`
+
+`toRef()`创建一个 ref 对象，其value值指向另一个对象中的某个属性。如`const name = toRef(person,'name')`, 通常用于要将响应式对象中的某个属性单独提供给外部使用时  
+`toRefs()`将响应式对象转换为普通对象，普通对象的每个属性都是只想源对象的ref，且为`toRef`创建的，常用于组合函数返回响应式对象时，便于消费组件解构展开，同时保持响应式  
+
+- `toRaw()`与`markRaw()`
+
+`toRaw()`将`reactive`生成的响应式对象转换为普通对象，适用于创建响应式对象副本，对副本进行操作但不想引起页面更新  
+`markRaw()`标记一个对象，永远不能再成为响应式对象；用于渲染不可变数据源大列表、第三方类库等场景  
+
+- `customRef()`
+
+`customRef()`函数一个工厂函数入参为track和trigger，返回带有get(), set()方法的对象，可以自行控制track和trigger的调用时机，用于生成自定的ref
+
+- 响应式判断相关工具函数
+
+- `isRef`: 检查一个值是否为一个 ref 对象
+- `isReactive`: 检查一个对象是否是由 `reactive` 创建的响应式代理
+- `isReadonly`: 检查一个对象是否是由 `readonly` 创建的只读代理
+- `isProxy`: 检查一个对象是否是由 `reactive` 或者 `readonly` 方法创建的代理
 
 ## 计算属性computed
 
@@ -279,6 +346,14 @@ vue3的生命周期函数与vue2中大同小异,对比表格如下：
   1. 若返回一个对象，则对象中的属性、方法, 在模板中均可以直接使用。
   2. 若返回一个渲染函数：则可以自定义渲染内容。
   3. 使用async setup()或`<script setup>await fun()</script>`的方式会让组件变为异步组件，并返回promise，需要配合内置组件`<Suspense>`使用
+
+- setup的参数
+  - props：值为对象，包含：组件外部传递过来，且组件内部声明接收了的属性。
+  - context：上下文对象
+    - attrs: 值为对象，包含：组件外部传递过来，但没有在props配置中声明的属性, 相当于vue2的 `this.$attrs`
+    - slots: 收到的插槽内容, 相当于vue2的 `this.$slots`
+    - emit: 分发自定义事件的函数, 相当于vue2的 `this.$emit`
+    - expose： `expose({})`函数用于限制组件暴露出的属性
 
 ## 侦听器watch
 
@@ -689,96 +764,6 @@ const modal = ref<InstanceType<typeof CustomComponent> | null>(null) // 自定�
 
 ## 二、常用 Composition API
 
-### 2.ref函数
-TODO:待确认的规则  
-基本类型的数据：响应式依然是靠``Object.defineProperty()``的```get```与```set```完成的。
-
-### 4.Vue3.0中的响应式原理
-
-### vue2.x的响应式
-
-- 实现原理：
-  - 对象类型：通过```Object.defineProperty()```对属性的读取、修改进行拦截（数据劫持）。
-  
-  - 数组类型：通过重写更新数组的一系列方法来实现拦截。（对数组的变更方法进行了包裹）。
-  
-    ```js
-    Object.defineProperty(data, 'count', {
-        get () {}, 
-        set () {}
-    })
-    ```
-
-- 存在问题：
-  - 新增属性、删除属性, 界面不会更新。
-  - 直接通过下标修改数组, 界面不会自动更新。
-
-### Vue3.0的响应式
-
-- 实现原理:
-  - 通过Proxy（代理）:  拦截对象中任意属性的变化, 包括：属性值的读写、属性的添加、属性的删除等。
-  - 通过Reflect（反射）:  对源对象的属性进行操作。
-  - MDN文档中描述的Proxy与Reflect：
-    - Proxy：<https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy>
-
-    - Reflect：<https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect>
-
-      ```js
-      new Proxy(data, {
-       // 拦截读取属性值
-          get (target, prop) {
-           return Reflect.get(target, prop)
-          },
-          // 拦截设置属性值或添加新属性
-          set (target, prop, value) {
-           return Reflect.set(target, prop, value)
-          },
-          // 拦截删除属性
-          deleteProperty (target, prop) {
-           return Reflect.deleteProperty(target, prop)
-          }
-      })
-      
-      proxy.name = 'tom'   
-      ```
-
-### 两种响应式实现方案对比
-
-TODO：待确认的规则  
-vue3中proxy只代理外层属性，节省内存空间，  
-对于想要深层的响应式对象的可使用reactive函数，  
-proxy能够拦截属性的增加与删除等13种操作，能够对数组的索引操作进行拦截  
-
-而vue2中Object.defineProperty(target, props, descriptor)直接在对象上定义新的属性或修改现有的属性,descriptor对象中包含configurable,enumerable,value,set,get,writable等属性用于描述target.props的一些行为，  
-vue2中需要对data中的对象进行深度遍历，对每个属性设置响应式，占用大量内存空间，在对象上设置新的属性时新属性不具有响应式，对于数组直接通过索引操作也不具有响应式  
-
-### 5.reactive对比ref
-
-- 从定义数据角度对比：
-  - ref用来定义：<strong style="color:#DD5145">基本类型数据</strong>。
-  - reactive用来定义：<strong style="color:#DD5145">对象（或数组）类型数据</strong>。
-  - 备注：ref也可以用来定义<strong style="color:#DD5145">对象（或数组）类型数据</strong>, 它内部会自动通过```reactive```转为<strong style="color:#DD5145">代理对象</strong>。
-- 从原理角度对比：
-  - ref通过``Object.defineProperty()``的```get```与```set```来实现响应式（数据劫持）。
-  - reactive通过使用<strong style="color:#DD5145">Proxy</strong>来实现响应式（数据劫持）, 并通过<strong style="color:#DD5145">Reflect</strong>操作<strong style="color:orange">源对象</strong>内部的数据。
-- 从使用角度对比：
-  - ref定义的数据：操作数据<strong style="color:#DD5145">需要</strong>```.value```，读取数据时模板中直接读取<strong style="color:#DD5145">不需要</strong>```.value```。
-  - reactive定义的数据：操作数据与读取数据：<strong style="color:#DD5145">均不需要</strong>```.value```。
-
-### 6.setup的两个注意点
-
-- setup执行的时机
-  - 在beforeCreate之前执行一次，this是undefined。
-  
-- setup的参数
-  - props：值为对象，包含：组件外部传递过来，且组件内部声明接收了的属性。
-  - context：上下文对象
-    - attrs: 值为对象，包含：组件外部传递过来，但没有在props配置中声明的属性, 相当于 ```this.$attrs```。
-    - slots: 收到的插槽内容, 相当于 ```this.$slots```。
-    - emit: 分发自定义事件的函数, 相当于 ```this.$emit```。
-
-### 7.计算属性与监视
-
 ### 2.watch函数
 
 - 与Vue2.x中watch配置功能一致
@@ -823,175 +808,11 @@ vue2中需要对data中的对象进行深度遍历，对每个属性设置响应
   },{deep:true}) //此处由于监视的是reactive素定义的对象中的某个属性，所以deep配置有效
   ```
 
-### 10.toRef
-
-- 作用：创建一个 ref 对象，其value值指向另一个对象中的某个属性。
-- 语法：```const name = toRef(person,'name')```
-- 应用:   要将响应式对象中的某个属性单独提供给外部使用时。
-
-- 扩展：```toRefs``` 与```toRef```功能一致，但可以批量创建多个 ref 对象，语法：```toRefs(person)```
-
-## 三、其它 Composition API
-
-### 1.shallowReactive 与 shallowRef
-
-- shallowReactive：只处理对象最外层属性的响应式（浅响应式）。
-- shallowRef：只处理基本数据类型的响应式, 不进行对象的响应式处理。
-
-- 什么时候使用?
-  - 如果有一个对象数据，结构比较深, 但变化时只是外层属性变化 ===> shallowReactive。
-  - 如果有一个对象数据，后续功能不会修改该对象中的属性，而是生新的对象来替换 ===> shallowRef。
-
-### 2.readonly 与 shallowReadonly
-
-- readonly: 让一个响应式数据变为只读的（深只读）。
-- shallowReadonly：让一个响应式数据变为只读的（浅只读）。
-- 应用场景: 不希望数据被修改时。
-
-### 3.toRaw 与 markRaw
-
-- toRaw：
-  - 作用：将一个由```reactive```生成的<strong style="color:orange">响应式对象</strong>转为<strong style="color:orange">普通对象</strong>。
-  - 使用场景：用于读取响应式对象对应的普通对象，对这个普通对象的所有操作，不会引起页面更新。
-- markRaw：
-  - 作用：标记一个对象，使其永远不会再成为响应式对象。
-  - 应用场景:
-    1. 有些值不应被设置为响应式的，例如复杂的第三方类库等。
-    2. 当渲染具有不可变数据源的大列表时，跳过响应式转换可以提高性能。
-
-### 4.customRef
-
-- 作用：创建一个自定义的 ref，并对其依赖项跟踪和更新触发进行显式控制。
-
-- 实现防抖效果：
-
-  ```vue
-  <template>
-   <input type="text" v-model="keyword">
-   <h3>{{keyword}}</h3>
-  </template>
-  
-  <script>
-   import {ref,customRef} from 'vue'
-   export default {
-    name:'Demo',
-    setup(){
-     // let keyword = ref('hello') //使用Vue准备好的内置ref
-     //自定义一个myRef
-     function myRef(value,delay){
-      let timer
-      //通过customRef去实现自定义
-      return customRef((track,trigger)=>{
-       return{
-        get(){
-         track() //告诉Vue这个value值是需要被“追踪”的
-         return value
-        },
-        set(newValue){
-         clearTimeout(timer)
-         timer = setTimeout(()=>{
-          value = newValue
-          trigger() //告诉Vue去更新界面
-         },delay)
-        }
-       }
-      })
-     }
-     let keyword = myRef('hello',500) //使用程序员自定义的ref
-     return {
-      keyword
-     }
-    }
-   }
-  </script>
-  ```
-
-### 6.响应式数据的判断
-
-- isRef: 检查一个值是否为一个 ref 对象
-- isReactive: 检查一个对象是否是由 `reactive` 创建的响应式代理
-- isReadonly: 检查一个对象是否是由 `readonly` 创建的只读代理
-- isProxy: 检查一个对象是否是由 `reactive` 或者 `readonly` 方法创建的代理
-
-## 四、Composition API 的优势
-
-### 1.Options API 存在的问题
-
-使用传统OptionsAPI中，新增或者修改一个需求，就需要分别在data，methods，computed里修改 。
-<div style="display:flex;flex-direction:row;overflow:auto">
-<div style="flex:0 0 auto;width:600px;height:370px;overflow:hidden;">
-    <img src="./resource/optionsApi1.gif" style="width:600px;" />
-</div>
-<div style="flex:0 0 auto;width:300px;height:370px;overflow:hidden;">
-    <img src="./resource/optionsApi2.gif" style="zoom:50%;width:560px;" />
-</div>
-</div>
-
-### 2.Composition API 的优势
-
-我们可以更加优雅的组织我们的代码，函数。让相关功能的代码更加有序的组织在一起。
-<div style="display:flex;flex-direction:row;overflow:auto">
-<div style="flex:0 0 auto;width:500px;height:340px;">
-  <img src="./resource/compositionApi.gif" style="height:360px"/>
-</div>
-<div style="flex:0 0 auto;width:430px;height:340px;">
-  <img src="./resource/compositionApi2.gif" style="height:360px"/>
-</div>
-</div>
-
-## 五、新的组件
-
 ### 1.Fragment
 
 - 在Vue2中: 组件必须有一个根标签
 - 在Vue3中: 组件可以没有根标签, 内部会将多个标签包含在一个Fragment虚拟元素中
 - 好处: 减少标签层级, 减小内存占用
-
-### 2.Teleport
-
-- 什么是Teleport？—— `Teleport` 是一种能够将我们的<strong style="color:#DD5145">组件html结构</strong>移动到指定位置的技术。
-
-  ```vue
-  <teleport to="移动位置">
-   <div v-if="isShow" class="mask">
-    <div class="dialog">
-     <h3>我是一个弹窗</h3>
-     <button @click="isShow = false">关闭弹窗</button>
-    </div>
-   </div>
-  </teleport>
-  ```
-
-### 3.Suspense
-
-- 等待异步组件时渲染一些额外内容，让应用有更好的用户体验
-
-- 使用步骤：
-
-  - 异步引入组件
-
-    ```js
-    import {defineAsyncComponent} from 'vue'
-    const Child = defineAsyncComponent(()=>import('./components/Child.vue'))
-    ```
-
-  - 使用```Suspense```包裹组件，并配置好```default``` 与 ```fallback```
-
-    ```vue
-    <template>
-     <div class="app">
-      <h3>我是App组件</h3>
-      <Suspense>
-       <template v-slot:default>
-        <Child/>
-       </template>
-       <template v-slot:fallback>
-        <h3>加载中.....</h3>
-       </template>
-      </Suspense>
-     </div>
-    </template>
-    ```
 
 ## 六、其他
 

@@ -27,17 +27,17 @@ Vue中双向数据大致可以划分三个模块：Observer、Compile、Watcher�
 }
 var obj = { name:'Vue是响应式吗？' }
 Object.defineProperty(obj, "name",{
-    get(){       
-        console.log("get方法被触发");
-        dep.depend(); // 这里进行依赖收集
-        return value;
-    },
-    set(val){       
-        console.log("set方法被触发");
-        value = newValue;
-        // self.render();
-        dep.notify();  // 这里进行virtualDom更新，通知需要更新的组件render
-    }
+  get(){       
+    console.log("get方法被触发");
+    dep.depend(); // 这里进行依赖收集
+    return value;
+  },
+  set(val){       
+    console.log("set方法被触发");
+    value = newValue;
+    // self.render();
+    dep.notify();  // 这里进行virtualDom更新，通知需要更新的组件render
+  }
 })
 var str = obj.name;         // get方法被触发
 obj.name = "Vue是响应式的";  // set方法被触发
