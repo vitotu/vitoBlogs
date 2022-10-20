@@ -79,6 +79,16 @@ curl可用于模拟get、post请求等网络请求
 `nohup test.py --arg1 > runlog.out 2>&1 &`
 挂起test.py程，将运行log输出到runlog.out文件中，将标准错误(2)重定向(>)标准输出(&1)中也就是屏幕上，组合起来即为2>&1  
 
+### 进程管理
+
+TODO:待完善
+
+`ps`命令用于查看当前运行的进程，配合grep进行字符串查找，可筛选出想要的进程  
+配合awk命令 `awk '{print $2}'` 打印第二列的内容，即进程PID  
+通过xargs将筛选到的PID传递给kill命令，批量杀掉指定进程  
+
+`ps -ef | grep <string> | awk '{print $2}' | xargs kill -9`
+
 ### shell编程
 
 获取shell表达式的输出并重定向到a变量中  
