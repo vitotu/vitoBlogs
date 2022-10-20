@@ -40,10 +40,10 @@ export default defineUserConfig({
         { text:'css进阶', link: '/css/css3plus/'},
         { text:'scss', link: '/css/scss/'},
       ]},
-      {text: 'hybridApp', children:[
-        {text:'概述', link:'/hybrid-app/abstract'},
-        {text:'微信小程序基础', link:'/hybrid-app/wechat-miniAppBase'},
-      ]},
+      // {text: 'hybridApp', children:[
+      //   {text:'概述', link:'/hybrid-app/abstract'},
+      //   {text:'微信小程序基础', link:'/hybrid-app/wechat-miniAppBase'},
+      // ]},
       {text: '浏览器', link: '/browser/browser'},
       {text: '网络通信', link: '/network/webNetwork'},
       {text: 'Linux', link: '/linuxNote/'},
