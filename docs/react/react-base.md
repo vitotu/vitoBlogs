@@ -72,14 +72,41 @@ class Clock extends React.Component {
 }
 ```
 
+- state
+
 不可直接修改state，直接修改不会重新渲染组件，而应该使用setState方法更新状态，setState是通过浅合并对象的方式更新数据  
 setState的更新可能是异步的，为提升性能多个setState可能被合并成一个调用  
 若依赖this.props和this.state的值更新下一个状态，请通过给setState传递一个函数，在函数中返回新的状态  
 React同vue一样也是单向数据流的  
 
+- 生命周期
+
+定时器例子中，在将Clock传递给render时，constructor首先调用，其次时Clock的render函数，当Clock组件被挂载到DOM上时，componentDidMount调用，当被从DOM上移除时componentWillUnmount调用  
+TODO：完善生命周期
+
 ### 事件处理
 
 React事件命名采用小驼峰`<button onClick={this.handleClick}>click me</button>`，这里的`this.handleClick`通常是自定义组件的方法  
+在`{}`中，若传递的回调函数中想通过this引用当前组件，如调用`this.setState`方法等, 需要进行特殊处理，如下例：
+
+```jsx
+class Demo extends React.Component {
+  constructor(props){
+    super(props);
+    // 通常定义的方法引用this，需要通过bind绑定this
+    this.handleClick = this.handleClick.bind(this);
+  }
+  handleClick(){this.setState({})} // 回调函数中引用了this
+  // 或定义为属性，并利用箭头函数保存this
+  // handleClick = () => console.log('this is: ', this);
+  render(){
+    return ( // 或绑定时使用箭头函数包装
+      <button onClick={()=>this.handleClick()}>click</button>
+    )
+  }
+}
+```
+
 向事件处理函数传递额外的参数`(e)=>this.handleClick(params, e)`或`this.handleClick.bind(this, params)`  
 
 ### 条件渲染
@@ -90,11 +117,82 @@ jsx表达式中`{}`同样也支持jsx表达式嵌套，因此可以通过if-else
 
 ```jsx
 const numbers = [1,2,3,4,5];
-const listItems = <ul>{
+const listItems = <ul>{ // 表达式中支持map的方式渲染列表
     numbers.map(num=><li key={num.toString()}>{num}</li>)
   }</ul>
 ```
 
+列表渲染需要给子元素绑定一个独一无二的key用于react高效的渲染与更新，key在兄弟节点中必须独一无二，在不同的列表渲染之间则可以重复
+
+### 表单
+
+- 基本示例
+
+```jsx
+class NameForm extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {value:''};
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  handleChange(event){ this.setState({value:event.target.value});}
+  handleSubmit(event){
+    alert('提交的名字' + this.state.value);
+    event.preventDefault();
+  }
+  render(){
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          名字:<input type="text" value={this.state.value} onChange={this.handleChange}/>
+        </label>
+        <input type="submit" value="提交"/>
+      </form>
+    );
+  }
+}
+```
+
+- textarea标签
+
+在html中`<textarea>通过子元素定义文本</textarea>`，在react中则使用value属性代替
+
+- select标签
+
+select标签通过value绑定选中的值，同时option上selected属性失效
+
+```jsx
+const demo = (
+  <select value={this.state.value} onChange={this.handleChange}>
+    <option value="grapefruit">葡萄柚</option>
+    <option value="lime">酸橙</option>
+  </select>
+)
+```
+
+::: tip 需要注意的点
+当处理多个输入时，通常给组件绑定name属性，然后通过event.target.name取出name属性，借用name作为变量更新对应的state值`this.setState({[name]:value})`  
+在受控组件上传入不为undefined或null的prop设置value，会阻止用户更改输入  
+以上介绍的组件均为受控组件，即可以通过state管理其状态。另一类非受控组件如`<input type="file">`，详见  
+TODO：补充非受控组件  
+:::
+
+### 状态提升
+
+在没有共享状态库的情况下，共享的state通常需要提升到公共父组件中，并通过prop传参的方式传递对应的state和修改state的方法给子组件。以维护React的单向数据流  
+
+### 组合和继承
+
+React推荐使用组合而不是继承的方式实现组件间的代码复用  
+
+- 包含关系
+
+在使用子组件时，子组件标签包裹的所有内容都会作为一个prop属性传递给子组件，子组件中通过`props.children`进行引用，与vue的默认插槽类似  
+至于命名插槽等方式可以通过prop传参的方式传递React元素的方式实现  
+
 ## 高级指引
 
 ## Hook
+
+Hook 可以在不写class的情况下使用state和一塔react特性  
