@@ -195,4 +195,85 @@ React推荐使用组合而不是继承的方式实现组件间的代码复用
 
 ## Hook
 
-Hook 可以在不写class的情况下使用state和一塔react特性  
+Hook 可以在不写class的情况下使用state和其他react特性  
+
+### 概览
+
+Hook是允许在函数组件中“钩入”React state、生命周期等特性的函数，不可在class中使用  
+useState Hook使用示例  
+
+```jsx
+import React, { useState } from 'react';
+function Example(){
+  const [count, setCount] = useState(0); // 入参为state初始值
+  return (
+    <div onClick={()=>setCount(count+1)}>{count}</div>
+  )
+}
+```
+
+Hook就是js函数，只能在函数组件(自定义Hook中除外)的最外层调用，不可在循环、条件判断、或子函数中调用  
+因为React通过Hook调用的顺序来对应相应的操作，若顺序发生变化则会导致bug的产生  
+Hook是一种复用状态逻辑的方式，不复用state本身，因此可以在单个组件中多次调用，每次调用都有一个完全独立的state
+
+### State Hook
+
+state hook可以在函数式组件中添加state，用法如[概览](#概览)一节例子中所示  
+state在组件首次渲染时被创建，下次重新渲染时，返回当前state  
+调用解构出的set方法时，更新state，此处更新为替换而不是合并  
+
+### Effect Hook
+
+Effect Hook可以在函数组件中执行副作用操作(发送网络请求、更新DOM、设置定时器等操作)  
+内置hook，useEffect可以看做componentDitMount、componentDidUpdate、componentWillUnmount的组合  
+组件在每次渲染后(首次渲染和每次更新)执行useEffect，React保证每次运行effect的同时，DOM已经更新完毕  
+与其他生命周期函数不同，useEffect调度的effect不会阻塞浏览器更新屏幕；  
+在调用一个新的effect之前会对前一个effect进行清理，保证了在更新时引用到state为最新  
+
+```jsx
+import React, { useState, useEffect } from 'react';
+function FriendStatus(props){
+  const [isOnline, setIsOnline] = useState(null);
+  useEffect(() => { // 回调函数传递给useEffect，React将在合适的时机调用
+    function handleStatusChange(status) { setIsOnline(status.isOnline);}
+    ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+    return function cleanup() { // 返回一个函数，React将会在执行清除操作时调用，若无返回则不会进行任何操作
+      ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+    }
+  },[props.friend.id]) // 默认每次更新重新渲染时也会调用回调函数
+  // 通过传入第二个可选参数，设置仅在props.friend.id变化时才会调用effect
+  if(isOnline === null) return 'Loading...';
+  return isOnline ? 'Online' : 'Offline';
+}
+```
+
+vue3中的组合式函数与React Hook类似，将相关的逻辑组合到一起，多次调用hook组合不同的功能
+
+更多内置Hook参见[HookApi索引文档](https://zh-hans.reactjs.org/docs/hooks-reference.html)  
+
+### 自定义Hook
+
+```jsx
+import React, { useState, useEffect } from 'react';
+function useFriendStatus(friendID){ // 以use开头自定义Hook，内部可调用其他Hook
+  const [isOnline, setIsOnline] = useState(null);
+  // 确保自定义Hook中顶层无条件的调用其他Hook
+  useEffect(()=>{
+    function handleStatusChange(status){setIsOnline(status.isOnline)}
+    ChatAPI.subscribeToFriendStatus(friendID, handleStatusChange);
+    return ()=>{
+      ChatAPI.unsubscribeFromFriendStatus(friendID, handleStatusChange);
+    }
+  })
+  return isOnline; // 自定义Hook可自定决定返回什么
+}
+// 组件中使用
+function FriendListItem(props){ // 每次调用的state都是独立的
+  const isOnline = useFriendStatus(props.friend.id);
+  return (
+    <li style={{color:isOnline ? 'green' : 'black'}}>
+      {props.friend.name}
+    </li>
+  )
+}
+```
