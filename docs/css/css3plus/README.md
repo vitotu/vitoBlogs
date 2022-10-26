@@ -41,8 +41,6 @@ a:link 正常链接; a:visited 访问过的链接; a:hover 鼠标悬浮的链接
   
 `p :first-child`选择p的一个后代元素,`p:first-child`选取某元素的第一个p元素，为避免混淆可引入全局选择器，将前者改写为`p *:first-child`  
 
-
-
 ## 默认样式  
   
 ## 盒模型  
@@ -55,8 +53,6 @@ a:link 正常链接; a:visited 访问过的链接; a:hover 鼠标悬浮的链接
   
 另外通过设置`box-sizing:border-box`可以将标准盒模型转为代替盒模型，代替盒模型的实际宽高就是其设置值，而content的宽高则是实际宽高的基础上减去各自方向上padding和border的大小  
   
-当两个元素的margin相邻时只会取较大的margin值作为两元素的实际间距，这种现象称为外边距折叠  
-  
 内边距padding与外边距不同其值必须为正，应用与元素的任何背景都将显示在内边距后面  
   
 ### 内联盒子  
@@ -66,6 +62,47 @@ inline box盒子不会换行，width和height不会起作用,垂直方向的padd
 `display:inline-block`提供了一个特殊的中间态，其width和height生效，margin、border、padding都会生效且推开其他元素，但不会换行  
   
 css外部显示类型来决定盒子是块级还是内联，内部显示类型决定盒子内部元素(子元素)如何布局,如设置`display:flex`  
+
+## BFC
+
+BFC（Block Formatting Context）即[块级格式化上下文](https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Block_formatting_context)  
+简单理解类似独立的布局作用域，创建了一个新的BFC，BFC内部的布局不受外部干扰  
+
+常见的触发BFC的css属性有：
+
++ `<html>`根元素
++ float不为none
++ position为absolute或fixed
++ display为inline-block,table类,flow-root,flex,grid
++ overflow不为visible
++ contain值为layout，content，paint  
+
+创建新的BFC具有以下特性
+
+1. 包含内部浮动：计算BFC高度时将包含内部浮动元素
+2. 排除外部浮动：新建的BFC不与外部的任何浮动元素重叠
+3. 阻止外边距重叠
+
+PS：`display:flow-root`用于创建一个新的流式布局，通常用于无副作用的创建一个新的BFC
+
+### 外边距折叠
+
+外边距折叠(Margin collapsing)：当两个元素的margin相邻时只会取较大的margin值作为两元素的实际间距，这种现象称为外边距折叠。[参考文档](https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing)  
+若外边距折叠中有负值的情况，则为折叠后实际间距为最大值和最小值(负值)之和，若都为负值，则取最大值  
+
+通常两元素触发外边距折叠需要同时满足条件：  
+
+1. 都是普通流中的元素且属于同一个 BFC  
+2. 没有被 padding、border、clear 或非空内容隔开
+3. 两个或两个以上垂直方向的「相邻元素」(兄弟元素或父子元素)
+
+PS：父子元素重叠的部分将会溢出到父级块元素的外面  
+
+另外空的块级元素margin-top和margin-bottom贴在一起时(inline、clear-fix及其他几何属性)，也会自行触发外边距折叠
+
++ 清除外边距折叠的方法
+  1. 破坏上述三个条件
+  2. 后一个元素上设置clear-fix
 
 ## 文本属性
 
@@ -165,10 +202,10 @@ grid网格布局
 
 + float指定元素沿其容器的左侧或右侧放置，该元素将被移出文档流。取值为left | right | none | inline-start | inline-end  
 + float将使用块布局，因此display设置为内联也无效，但float对flex元素不生效  
-+ float会生成[BFC块格式上下文](https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Block_formatting_context)
++ float会生成[BFC块格式上下文](#bfc)
   + 浮动定位和清除浮动时只会应用于同一个BFC内的元素。
   + 浮动不会影响其它BFC中元素的布局，而清除浮动只能清除同一BFC中在它前面的元素的浮动。
-  + 外边距折叠（Margin collapsing）也只会发生在属于同一BFC的块级元素之间。
+  + [外边距折叠](#外边距折叠)（Margin collapsing）也只会发生在属于同一BFC的块级元素之间。
 
 >清除浮动的几种方法:  
 由于浮动元素脱离文档流，因此浮动元素无法撑开父元素，造成父元素“高度塌陷”问题，清除浮动的目标就是让父元素的高度恢复正常
@@ -189,19 +226,9 @@ grid网格布局
 
 总结：清除浮动的方法主要分为两类：1、利用clear属性，2、触发父元素的BFC使父元素包含浮动元素
 
->BFC 简单理解类似独立的布局作用域，创建了一个新的BFC，BFC内部的布局不受外部干扰，计算BFC高度时，浮动元素也参与计算  
-常见的触发BFC的css属性有：
+例如：在清除浮动中设置父元素overflow:hidden时创建了脱离根元素`<html>`的BFC，在计算父元素(新的BFC)高度时，子元素即时浮动也能参与高度计算，因此能够撑开父元素高度
 
-+ `<html>`根元素
-+ float不为none
-+ position为absolute或fixed
-+ display为inline-block,table类,flow-root,flex,grid
-+ overflow不为visible
-+ contain值为layout，content，paint  
-
-例如：在清除浮动中设置父元素overflow:hidden时创建了脱离根元素`<html>`的BFC，在计算父元素高度时，子元素即时浮动也能参与高度计算，因此能够撑开父元素高度
-
-### position定位  
+### position定位
 
 position属性可取static(默认值),relative,fixed,absolute,sticky  
 
