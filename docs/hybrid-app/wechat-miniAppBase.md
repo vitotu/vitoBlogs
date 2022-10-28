@@ -183,7 +183,7 @@ wx.onUnhandledRejection可以监听未处理的Promise拒绝事件
 
 ## 生命周期
 
-[生命周期](https://res.wx.qq.com/wxdoc/dist/assets/img/page-lifecycle.2e646c86.png)  
+![生命周期](https://res.wx.qq.com/wxdoc/dist/assets/img/page-lifecycle.2e646c86.png)  
 TODO:
 
 冷启动：用户首次打开或小程序销毁后用户再次打开，再次打开时，若带有path则进入对应path页面，若无path则进入首页或遵循重新启动策略`restartStrategy`  

@@ -48,7 +48,7 @@ a:link 正常链接; a:visited 访问过的链接; a:hover 鼠标悬浮的链接
 ### 块级盒子  
 
 绝大多数盒子会和父元素一样宽，每个盒子都会换行  
-![avatar](https://mdn.mozillademos.org/files/16558/box-model.png)  
+![avatar](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model/box-model.png)  
 如图content区域用来显示内容，大小可通过width和height设置，而盒子的实际大小需要再各自的方向上加上padding和border  
   
 另外通过设置`box-sizing:border-box`可以将标准盒模型转为代替盒模型，代替盒模型的实际宽高就是其设置值，而content的宽高则是实际宽高的基础上减去各自方向上padding和border的大小  
