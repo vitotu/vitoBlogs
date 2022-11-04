@@ -200,7 +200,11 @@ TODO:
 创建自定义组件：在js中通过`Component()`来注册组件，在json文件中声明`"component":true`字段  
 使用组件: 在json文件使用声明`"usingComponents":{"component-tag-name":"自定义组件的路径"}"`
 
-### data数据定义与读写
+### 模板语法
+
+与vue类似，小程序wxml可以通过`{{xxx}}`引用data选项中的数据xxx,并且xxx支持简单的js表达式
+
+### data配置项
 
 ```js
 Component({ // Page() 页面构造器也相同
