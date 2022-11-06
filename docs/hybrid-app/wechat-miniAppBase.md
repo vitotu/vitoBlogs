@@ -203,7 +203,20 @@ TODO:
 ### 模板语法
 
 与vue类似，小程序wxml可以通过`{{xxx}}`引用data选项中的数据xxx,并且xxx支持简单的js表达式  
-同时数据绑定、条件渲染、列表渲染等  
+同时支持数据绑定、条件渲染、列表渲染等  
+
+- 数据绑定
+
+如在wxml中`<input value="{{valueOfData}}"/>`的方式单项绑定data配置项中的数据，使用`this.setData()`更相关数据后wxml也会做出相应更新  
+简易双向绑定`<input model:value="{{valueOfData}}">`当输入框值被改变时，`this.data.valueOfData`也会被改变，`valueOfData`不能为路径形式(如a.b)  
+TODO: 自定义组件的双向绑定  
+
+- 列表渲染
+
+如`<view wx:for="{{array}}">{{index}}:{{item}}</view>`遍历array默认数据的当前项下标为index，值为item,可通过`wx:for-index="i"`和`wx:for-item="itemName"`属性指定下标和值变量名  
+`wx:key`属性与vue和react中类似，指定列表项目中的唯一标识，其值为字符串(标识item的某个属性，该属性是字符串或数字类型)或`*this`保留关键字(标识item本身)  
+
+ps：花括号和引号之间如果有空格，将最终被解析成为字符串`wx:for="{{[1,2]}} "`等价于`wx:for="{{[1,2]+' '}}"`  
 
 ### data配置项
 
