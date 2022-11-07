@@ -218,6 +218,37 @@ TODO: 自定义组件的双向绑定
 
 ps：花括号和引号之间如果有空格，将最终被解析成为字符串`wx:for="{{[1,2]}} "`等价于`wx:for="{{[1,2]+' '}}"`  
 
+- 条件渲染
+
+通过指令`wx:if="{{condition}}"`、`wx:elif="{{}}"`、`wx:else`组合使用可以控制标签或组件是否渲染  
+通过与`<block></block>`标签配合可一次性控制多个标签的渲染，并且block本身不会在页面中做任何渲染，不影响DOM结构  
+与vue类似，条件渲染包含了组件的创建销毁或重新渲染，与hidden属性直接控制显示与隐藏不同  
+
+- 模板`<template/>`
+
+与vue中的`<template/>`标签不同，小程序中模板标签更类似于在wxml中定义“标签变量”，通过name属性和is属性用于定义和指定使用的“变量”  
+使用时通过data prop传入模板中使用的数据，PS：模板有自己的独立作用于，只能使用data传入的数据以及模板定义文件中定义的`<wxs/>`模块  
+
+```xml
+<template name="odd">
+  <view>odd{{index}}</view>
+</template>
+<template name="even">
+  <view>even{{index}}</view>
+</template>
+
+<block wx:for=""{{[1,2,3,4,5]}}>
+  <template is="{{item % 2 === 0 ? 'even' : 'odd'}}" data="{{index}}"></template>
+</block>
+```
+
+- 引用
+
+`<import src="filePath.wxml"/>`可以引用filePath.wxml中定义的template“标签变量”，而后在当前文件中使用  
+import有作用域，不能做到“深度”引用，如 C import B , B import A, B中可以使用A中的template，但C不可直接使用A中的template  
+
+`<include src="filePath.wxml"/>`可以引入filePath.wxml中除了template和wxs外的全部代码，并替换include标签位置  
+
 ### data配置项
 
 ```js
