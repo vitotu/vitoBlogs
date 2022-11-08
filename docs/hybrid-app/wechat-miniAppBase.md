@@ -251,6 +251,8 @@ import有作用域，不能做到“深度”引用，如 C import B , B import 
 
 ### data配置项
 
+这里data在页面加载时将数据传至渲染层，随后与react风格类似通过`this.setData()`对数据进行更新  
+
 ```js
 Component({ // Page() 页面构造器也相同
   data:{
