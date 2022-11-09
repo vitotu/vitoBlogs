@@ -269,6 +269,28 @@ Component({ // Page() 页面构造器也相同
 其中Object中的key对应data配置项中的key，支持数据路径形式给出`a[1].b.`，也不需要在data中预先定义  
 [详细规则参考](https://developers.weixin.qq.com/miniprogram/dev/reference/api/Page.html#Page-prototype-setData-Object-data-Function-callback)
 
+### observers数据监听器
+
+与vue的watch选项类似，监听数据变化，并且可同时监听多个
+
+```js
+Component({
+  observers:{
+    'numberA, numberB':function(numberA, numberB){}, // 同时监听多个数据
+    'some.subfield.*':function(subfield){}, // 支持监听子属性，也支持使用通配符*
+    'arr[12]':function(arr12){} // 监听特定索引值
+  }
+})
+```
+
+### 实例
+
+通过`getApp()`方法可以获取到小程序的全局唯一app实例  
+
+`getCurrentPages()`获取当前页面栈，数组中第一个元素为首页，最后一个元素为当前页面  
+
+[节点查询api](https://developers.weixin.qq.com/miniprogram/dev/api/wxml/wx.createSelectorQuery.html)则与`document.querySelector()`api类似可获取节点实例，但能进行的操作有限  
+
 TODO
 
 组件wxml模板中支持`<slot></slot>`标签，与vue中插槽类似，默认情况只能有一个slot，多个slot需要在js中声明启用  
@@ -406,20 +428,6 @@ Component({
 
 另外子组件使用了共同的behaviors选项后，path key可以用对用behaviors来代替并在父组件中设置target为对应behaviors，type可分别设置为ancestor, descendant  
 
-### observers数据监听器
-
-与vue的watch选项类似，监听数据变化，并且可同时监听多个
-
-```js
-Component({
-  observers:{
-    'numberA, numberB':function(numberA, numberB){}, // 同时监听多个数据
-    'some.subfield.*':function(subfield){}, // 支持监听子属性，也支持使用通配符*
-    'arr[12]':function(arr12){} // 监听特定索引值
-  }
-})
-```
-
 ### 纯数据字段
 
 纯数据字段类似于vue中无响应式的字段(但不完全)，仅用于组件内部，不可用于wxml中，也不可能传递给其他组件  
@@ -477,3 +485,5 @@ Component({
   }
 }
 ```
+
+## 页面栈(路由)
