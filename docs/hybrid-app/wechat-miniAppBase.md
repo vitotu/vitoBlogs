@@ -128,18 +128,6 @@ wxs是小程序的一套脚本语言，类似于`<script>`标签，但有其独�
 <view>{{m1.message}}</view>
 ```
 
-- 事件系统
-
-在wxml标签属性中，可以使用bind*="callback" (或bind:*="callback") 来绑定一个事件；  
-也可以使用catch绑定来阻止事件向上冒泡；  
-使用mut-bind绑定则会在在mut-bind各级绑定中仅有一个绑定函数会被触发；  
-给上述绑定加上capture-前缀则可在事件捕获阶段监听事件  
-
-wxs从2.4.4基础库版本后支持函数绑定事件，接收2个参数event和ownerInstance对象，具体用法[详见](https://developers.weixin.qq.com/miniprogram/dev/framework/view/interactive-animation.html)  
-事件分为冒泡事件与非冒泡事件，冒泡事件包含touch*, tap, longpress, longtap以及动画相关事件，其他如无特殊声明均为非冒泡事件  
-
-事件对象的种类即其包含的属性方法[详见](https://developers.weixin.qq.com/miniprogram/dev/framework/view/wxml/event.html)  
-
 - 获取界面上的节点信息(类似DOM api)
 
 ```js
@@ -291,6 +279,20 @@ Component({
 `getCurrentPages()`获取当前页面栈，数组中第一个元素为首页，最后一个元素为当前页面  
 
 [节点查询api](https://developers.weixin.qq.com/miniprogram/dev/api/wxml/wx.createSelectorQuery.html)则与`document.querySelector()`api类似可获取节点实例，但能进行的操作有限  
+
+### 事件
+
+- 内置事件(原生事件)
+
+在wxml标签属性中，可以使用bind*="callback" (或bind:*="callback") 来绑定一个事件；  
+也可以使用catch绑定来阻止事件向上冒泡；  
+使用mut-bind绑定则会在在mut-bind各级绑定中仅有一个绑定函数会被触发；  
+给上述绑定加上capture-前缀则可在事件捕获阶段监听事件  
+
+wxs从2.4.4基础库版本后支持函数绑定事件，接收2个参数event和ownerInstance对象，具体用法[详见](https://developers.weixin.qq.com/miniprogram/dev/framework/view/interactive-animation.html)  
+事件分为冒泡事件与非冒泡事件，冒泡事件包含touch*, tap, longpress, longtap以及动画相关事件，其他如无特殊声明均为非冒泡事件  
+
+事件对象的种类即其包含的属性方法[详见](https://developers.weixin.qq.com/miniprogram/dev/framework/view/wxml/event.html)  
 
 TODO
 
