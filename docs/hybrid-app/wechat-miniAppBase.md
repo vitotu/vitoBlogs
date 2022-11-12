@@ -286,6 +286,7 @@ Component({
 
 在wxml标签属性中，可以使用bind*="callback" (或bind:*="callback") 来绑定一个事件；  
 也可以使用catch绑定来阻止事件向上冒泡；  
+
 使用mut-bind绑定则会在在mut-bind各级绑定中仅有一个绑定函数会被触发；  
 给上述绑定加上capture-前缀则可在事件捕获阶段监听事件  
 
