@@ -274,26 +274,49 @@ Component({
 
 ### 实例
 
+- app实例
+
 通过`getApp()`方法可以获取到小程序的全局唯一app实例  
+
+- 页面实例
 
 `getCurrentPages()`获取当前页面栈，数组中第一个元素为首页，最后一个元素为当前页面  
 
+- 普通标签实例
+
 [节点查询api](https://developers.weixin.qq.com/miniprogram/dev/api/wxml/wx.createSelectorQuery.html)则与`document.querySelector()`api类似可获取节点实例，但能进行的操作有限  
+
+- 组件实例
+
+在父组件中通过`this.selectComponent("cssSelector")`方法获取子组件实例对象  
 
 ### 事件
 
 - 内置事件(原生事件)
 
-在wxml标签属性中，可以使用bind*="callback" (或bind:*="callback") 来绑定一个事件；  
-也可以使用catch绑定来阻止事件向上冒泡；  
+在wxml标签属性中，可以使用bind前缀：`bind*="callback"` (或`bind:*="callback"`) 来绑定一个事件；  
 
-使用mut-bind绑定则会在在mut-bind各级绑定中仅有一个绑定函数会被触发；  
-给上述绑定加上capture-前缀则可在事件捕获阶段监听事件  
+阻止冒泡：也可以使用`catch*`前缀绑定来阻止事件向上冒泡(包括阻断从子元素冒泡上来的事件)；  
+
+互斥事件：使用`mut-bind:`前缀绑定则会在`mut-bind:`各级绑定中仅有一个绑定函数会被触发；  
+
+捕获阶段：给上述三种绑定加上`capture-*`前缀则可在事件捕获阶段监听事件,其中`capture-catch*`将取消冒泡阶段  
+
+- wxs中的回调函数
 
 wxs从2.4.4基础库版本后支持函数绑定事件，接收2个参数event和ownerInstance对象，具体用法[详见](https://developers.weixin.qq.com/miniprogram/dev/framework/view/interactive-animation.html)  
+
+- 事件种类与冒泡
+
 事件分为冒泡事件与非冒泡事件，冒泡事件包含touch*, tap, longpress, longtap以及动画相关事件，其他如无特殊声明均为非冒泡事件  
 
 事件对象的种类即其包含的属性方法[详见](https://developers.weixin.qq.com/miniprogram/dev/framework/view/wxml/event.html)  
+
+- 自定义事件
+
+在父组件或页面上中调用自定义组件时可通过`bindmyevent="onMyEvent"`绑定自定义的事件及回调  
+在自定义组件中通过`this.triggerEvent('myevent', params, options)`触发对应的事件，并传递数据和选项  
+选项包括bubbles, composed, capturePhase分别表示事件是否冒泡、是否可穿越组件边界、是否拥有捕获阶段，默认值均为false  
 
 TODO
 
