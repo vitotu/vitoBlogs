@@ -289,6 +289,7 @@ Component({
 - 组件实例
 
 在父组件中通过`this.selectComponent("cssSelector")`方法获取子组件实例对象  
+子组件实例对象上可访问的数据是由子组件的`behaviors:wx//component-export`来控制  
 
 ### 事件
 
@@ -318,21 +319,6 @@ wxs从2.4.4基础库版本后支持函数绑定事件，接收2个参数event和
 在自定义组件中通过`this.triggerEvent('myevent', params, options)`触发对应的事件，并传递数据和选项  
 选项包括bubbles, composed, capturePhase分别表示事件是否冒泡、是否可穿越组件边界、是否拥有捕获阶段，默认值均为false  
 
-TODO
-
-组件wxml模板中支持`<slot></slot>`标签，与vue中插槽类似，默认情况只能有一个slot，多个slot需要在js中声明启用  
-多个slot用不同的name区别，使用时通过`<view slot="name"/>`方式指定要插入的slot，与具名插槽类似  
-
-```js
-Component({
-  options:{multipleSlots:true}
-})
-```
-
-小程序中也支持类似vue的prop的方式传参
-
-使用Component构造页面时，组件的properties属性可用于接收页面query参数，页面的生命周期方法应该写在methods中
-
 ### 组件样式
 
 组件对应wxss仅对组件内节点生效，组件定义与使用时仅能使用class选择器，避免使用后代选择器，继承样式会影响到组件内，其他样式则不会影响  
@@ -358,6 +344,21 @@ Component({
 另外使用标签选择器或其他特殊选择器，则对应样式会全局生效  
 通过`class="~class-name"`的方式组件可以引用页面中对应的样式, 通过`^`前缀的方式可以引用父组件中对应的样式，该系列前缀可连续使用  
 css中background-image不支持本地url()，仅可使用网络图片或base64
+
+TODO:...
+
+组件wxml模板中支持`<slot></slot>`标签，与vue中插槽类似，默认情况只能有一个slot，多个slot需要在js中声明启用  
+多个slot用不同的name区别，使用时通过`<view slot="name"/>`方式指定要插入的slot，与具名插槽类似  
+
+```js
+Component({
+  options:{multipleSlots:true}
+})
+```
+
+小程序中也支持类似vue的prop的方式传参
+
+使用Component构造页面时，组件的properties属性可用于接收页面query参数，页面的生命周期方法应该写在methods中
 
 ### 组件生命周期
 

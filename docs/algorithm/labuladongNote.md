@@ -1426,3 +1426,48 @@ O表示一组函数集合`O(g(n))`，`g(n)`表示上限，即只保留增长速�
 - debug：算法出错时可以先检查下代码，然后print出一些关键变量，对于递归算法，在关键变量前打印缩进方便观察每轮递归对应的变量
 
 机试前最好把各题型都过一遍，避免死磕某道题  
+
+## 递归之反转链表
+
+对于仅反转链表中指定部分问题，可使用递归来解决
+
+- leetcode 206 反转整个链表
+
+```ts
+function reverseList(head: ListNode | null): ListNode | null {
+  if(head === null || head.next === null) return head;
+  const last:ListNode|null = reverseList(head.next); // 递归返回新的链表头
+  head.next.next = head; // 此时head.next指向反转后链表末尾,将head添加为新末尾
+  head.next = null; // 新链表尾部清空
+  return last; // 返回新链表头部
+};
+```
+
+在此基础上，反转链表的前N个节点  
+
+```ts
+successor:ListNode|null = null;
+function reverseList(head: ListNode | null, n:number): ListNode | null {
+  if(n === 1){ // 递归终点，暂存范围外的头结点，便于恢复剩余的节点
+    successor = head.next;
+    return head;
+  }
+  const last:ListNode|null = reverseList(head.next, n-1); // 递归返回新的链表头，并将递归计数减1
+  head.next.next = head; // 此时head.next指向反转后链表末尾,将head添加为新末尾
+  head.next = successor; // 新的链表尾部连接successor，反转过程中为清空，递归结束时修复剩余节点了连接
+  return last; // 返回新链表头部
+};
+```
+
+- leetcode 92 反转链表2 反转链表指定范围的节点
+
+```ts
+// 在上面反转前N个节点的基础上
+function reverseBetween(head: ListNode | null, left: number, right: number): ListNode | null {
+  // 当起点为1时，则相当于反转前right个节点
+  if(left === 1) return reverseList(head, right);
+  // 起点不为1时，递归转换为起点为1的情况，即对以head.next为新起点
+  head.next = reverseBetween(head.next, left - 1, right - 1);
+  return head;
+};
+```
