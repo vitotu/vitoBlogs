@@ -1471,3 +1471,35 @@ function reverseBetween(head: ListNode | null, left: number, right: number): Lis
   return head;
 };
 ```
+
+- leetcode 25 k个一组反转链表
+
+以k个节点为一组，反转链表，若剩余节点不足k则不进行反转
+
+思路：进行问题拆分，首先实现反转链表函数，并通过传入终点节点，完成指定范围的节点反转reverseRange  
+循环移动终点指针b，调用reverseRange对指定范围的链表进行反转，获取反转后的头结点last，此时起点a即为反转链表的末尾节点,将a与剩余节点(起点为b)递归反转后的结果相连  
+返回新的头节点last即可
+
+```ts
+function reverseRange(a:ListNode|null, b:ListNode|null):ListNode|null{
+  let pre:ListNode|null = null, cur:ListNode|null = a, next:ListNode|null = a;
+  while(cur !== b){ 
+    next = cur.next; // 移动next
+    cur.next = pre; // 断开并反转cur
+    pre = cur; // 移动pre和cur，准备下次迭代
+    cur = next;
+  }
+  return pre; // 返回的pre头节点并未与b主链相连
+}
+
+function reverseKGroup(head: ListNode | null, k: number): ListNode | null {
+  let a:ListNode|null = head, b:ListNode|null = head;
+  for(let i = 0; i < k; i++){
+    if(b === null) return a; // 不满k无需反转，则返回head
+    b = b.next;
+  }
+  let last = reverseRange(a, b); // 反转[a, b)，获取反转后的头指针
+  a.next = reverseKGroup(b, k); // 从b开始递归，上一个已反转子链末尾a
+  return last;
+};
+```

@@ -258,6 +258,24 @@ Component({ // Page() 页面构造器也相同
 其中Object中的key对应data配置项中的key，支持数据路径形式给出`a[1].b.`，也不需要在data中预先定义  
 [详细规则参考](https://developers.weixin.qq.com/miniprogram/dev/reference/api/Page.html#Page-prototype-setData-Object-data-Function-callback)
 
+### properties
+
+组件独有的，用于定义组件的组参
+
+```js
+Component({
+  properties: {
+    customName:{
+      type: Number, // 属性类型必填项
+      optionalTypes: Array, // 可选属性类型，非必填
+      value: defaultValue, // 属性初始值，非必填
+      observer: Function // 属性变化时的回调函数，非必填，暂不推荐使用该选项
+    }
+  }
+  // 在其他方法或hook中访问时，通过data访问 ： this.data.customName
+})
+```
+
 ### observers数据监听器
 
 与vue的watch选项类似，监听数据变化，并且可同时监听多个
