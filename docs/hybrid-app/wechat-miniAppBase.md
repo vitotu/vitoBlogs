@@ -169,7 +169,15 @@ TODO：npm包管理器的使用
 小程序通过API开放微信的能力，主要分为同步API和异步API； 异步api支持回调和promise两种方式，若结构参数Object中不含`success/fail/complete`时，默认返回promise对象，但部分结构`downloadFile, request, createCamera`等还需要自行promisify封装  
 wx.onUnhandledRejection可以监听未处理的Promise拒绝事件  
 
-## 生命周期
+## 页面生命周期
+
+`Page()`定义的页面在不同的运行阶段提供了生命周期函数：
+
+- onLoad(query) 页面加载时触发，query传递了当前页面路径中的参数，类似于路由query参数
+- onShow 页面显示或切入前台时触发
+- onReady 页面初次渲染完成时触发，页面此时可以和视图层进行交互
+- onHide 页面隐藏或切入后台时触发 如 wx.navigateTo 或底部 tab 切换到其他页面
+- onUnload 页面卸载时触发，如wx.redirectTo或wx.navigateBack到其他页面时
 
 ![生命周期](https://res.wx.qq.com/wxdoc/dist/assets/img/page-lifecycle.2e646c86.png)  
 
