@@ -1503,3 +1503,119 @@ function reverseKGroup(head: ListNode | null, k: number): ListNode | null {
   return last;
 };
 ```
+
+- leetcode 234 回文链表 判断一个链表是否是回文链表
+
+分析：通常查找回文串是指针由中心向两边扩散，判断是否是回文串时由指针从两边向中间对撞  
+对于链表，因为只能单向遍历的特性无法直接应用双指针，但可以有以下思路进行解题  
+
+思路1：创建一个反转的链表再比较是否相同  
+思路2：借助二叉树的后序遍历思路，在递归的遍历链表算法中可类比二叉树的遍历:
+
+```js
+function traverse(head){
+  // 前序遍历代码， 此处可打印val
+  traverse(head.next);
+  // 后序遍历代码， 此处可倒序遍历链表
+}
+```
+
+其本质是在利用递归栈存储之前的部分“right右子树”, 递归版双指针题解：
+
+```ts
+function isPalindrome(head: ListNode | null): boolean {
+  let left = head;
+  return reverse(head);
+  function reverse(right: ListNode | null):boolean {
+    // 前序位置代码
+    if(right === null) return true; // 递归终止条件
+    let res = reverse(right.next); // res记录递归的双端指针比较结果，初始值为true
+    // 后序遍历位置执行比较逻辑
+    res = res && right.val === left.val; // 上一步比较结果res为true则进行本次比较
+    left = left.next; // 向右移动左指针，右指针由递归栈自动移动
+    return res; // 递归的返回比较结果
+  }
+};
+```
+
+思路3：先通过快慢指针找到链表中点，再反转后半部分并与前半部分进行比较
+
+```ts
+function reserve(head: ListNode | null):ListNode|null {
+  let pre:ListNode|null = null, cur = head, next = head;
+  while(next !== null){
+    next = next.next;
+    cur.next = pre;
+    pre = cur;
+    cur = next;
+  }
+  return pre;
+}
+
+function isPalindrome(head: ListNode | null): boolean {
+  let fast = head, slow = head;
+  while(fast !== null && fast.next !== null){
+    slow = slow.next;
+    fast = fast.next.next;
+  }
+  if(fast) slow = slow.next; // fast不为null说明链表长度为奇数，slow需要向后移一步
+  let left = head, right = reserve(slow); // 反转后半部分
+  while(left !== null && right !== null){
+    if(left.val !== right.val) return false;
+    left = left.next;
+    right = right.next;
+  }
+  return true;
+};
+```
+
+## 前缀和数组
+
+“前缀和”数组可以用于快速频繁的计算数组的指定区间内的元素和  
+
+- leetcode 303 区域和检索-数组不可变，计算数组指定区间内的元素和
+
+通常计算数组指定区间内的元素和可以通过循环遍历指定区间累加求和得出，但面对频繁查询指定区间元素和的需求，每次重新计算则性能消耗过大  
+“前缀和”数组正是用来解决这个问题，数组preSum的第i个位置记录了前i个元素的和，因此查询区间left到right的元素和可直接返回`preSum[right+1] - preSum[left]`  
+
+```ts
+class NumArray {
+  preSum:number[];
+  constructor(nums: number[]) {
+    let preSum = new Array<number>(nums.length + 1).fill(0);
+    for (let i = 1; i <= nums.length; i++) {
+      preSum[i] = nums[i - 1] + preSum[i - 1]; // nums[i-1]与preSum[i]对齐
+    }
+    this.preSum = preSum;
+  }
+  sumRange(left: number, right: number): number {
+    // preSum 从1开始对齐nums 的0
+    return this.preSum[right + 1] - this.preSum[left];
+  }
+}
+```
+
+- leetcode 304 二维区域和检索-矩阵不可变，计算指定子矩阵区间内元素之和
+
+思路与上题类似，维护以原点为定点，任意坐标为终点的“前缀和”矩阵，返回  
+`preSum[x2+1][y2+1] - preSum[x1][y2+1] - preSum[x2+1][y1] + preSum[x1][y1]`即可
+
+```ts
+class NumMatrix {
+  preSum: number[][];
+  constructor(matrix: number[][]) {
+    let preSum: number[][] = new Array(matrix.length + 1).fill(0).map(() => 
+      new Array(matrix[0].length + 1).fill(0)
+    ); // 构造m+1*n+1的二维前缀和矩阵
+    for(let i = 1; i <= matrix.length; i++) {
+      for(let j = 1; j <= matrix[0].length; j++) {
+        preSum[i][j] = matrix[i-1][j-1] + preSum[i-1][j] + preSum[i][j-1] - preSum[i-1][j-1];
+      }
+    }
+    this.preSum = preSum;
+  }
+  sumRegion(row1: number, col1: number, row2: number, col2: number): number {
+    return this.preSum[row2+1][col2+1] - this.preSum[row2+1][col1] - this.preSum[row1][col2+1] + this.preSum[row1][col1];
+  }
+}
+```
