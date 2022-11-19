@@ -194,8 +194,10 @@ TODO:
 
 ## 组件化开发
 
-创建自定义组件：在js中通过`Component()`来注册组件，在json文件中声明`"component":true`字段  
-使用组件: 在json文件使用声明`"usingComponents":{"component-tag-name":"自定义组件的路径"}"`
+小程序的页面通常通过`Page()`构造器定义，但也可以视为自定义组件通过`Component()`来构造，此时需要对应json文件中配置usingComponents字段，此时组件可接收页面参数(query参数等)，详见[properties](#properties)章节  
+
+- 创建自定义组件：在js中通过`Component()`来注册组件，在json文件中声明`"component":true`字段  
+- 使用组件: 在json文件使用声明`"usingComponents":{"component-tag-name":"自定义组件的路径"}"`
 
 ### 模板语法
 
@@ -239,7 +241,7 @@ ps：花括号和引号之间如果有空格，将最终被解析成为字符串
 </block>
 ```
 
-- 引用
+- 使用模板
 
 `<import src="filePath.wxml"/>`可以引用filePath.wxml中定义的template“标签变量”，而后在当前文件中使用  
 import有作用域，不能做到“深度”引用，如 C import B , B import A, B中可以使用A中的template，但C不可直接使用A中的template  
@@ -385,7 +387,6 @@ css中background-image不支持本地url()，仅可使用网络图片或base64
 - error 组件方法抛出错误时执行
 
 这些生命周期函数可以在一级参数中声明，但更推荐在lifetimes字段中进行声明(优先级更高)  
-TODO：多处声明的优先级关联话题behavior中的生命周期函数优先级
 
 组件所在页面的生命周期函数，定义与pageLifetimes字段中
 
@@ -393,24 +394,9 @@ TODO：多处声明的优先级关联话题behavior中的生命周期函数优�
 - hide 组件所在页面被隐藏时执行
 - resize 组件所在页面尺寸变化时执行
 
-behavior中也可声明同名的生命周期函数，并且不会与其他behavior中的同名相互覆盖
+[behavior](#behaviors)中也可声明同名的生命周期函数，并且不会与其他behavior中的同名相互覆盖  
 
-
-
-TODO:...
-
-组件wxml模板中支持`<slot></slot>`标签，与vue中插槽类似，默认情况只能有一个slot，多个slot需要在js中声明启用  
-多个slot用不同的name区别，使用时通过`<view slot="name"/>`方式指定要插入的slot，与具名插槽类似  
-
-```js
-Component({
-  options:{multipleSlots:true}
-})
-```
-
-小程序中也支持类似vue的prop的方式传参
-
-使用Component构造页面时，组件的properties属性可用于接收页面query参数，页面的生命周期方法应该写在methods中
+作为页面时，页面的生命周期函数应该写在methods字段中
 
 ### 组件间通信
 
@@ -443,7 +429,18 @@ wx://component-export 使组件支持export定义，可用于执行组件被`sel
 在behavior中可使用definitionFilter函数对自检进行扩展，函数接收两个参数:defFields为使用方对象(component/behaviors)  definitionFilterArr是该behavior所引入的behavior的definitionFilter函数列表  
 示例：A使用了B，A的声明就会调用B的definitionFilter函数，并传入A的定义对象  
 若B还使用了C和D则，B可以决定要不要通过definitionFilterArr调用C和D的definitionFilter函数  
-TODO：不确定时B决定还是A决定，此处待详细学习  
+TODO：不确定是B决定还是A决定，此处待详细学习  
+
+### 插槽
+
+组件wxml模板中支持`<slot></slot>`标签，与vue中插槽类似，默认情况只能有一个slot，多个slot需要在js中声明启用  
+多个slot用不同的name区别，使用时通过`<view slot="name"/>`方式指定要插入的slot，与具名插槽类似  
+
+```js
+Component({
+  options:{multipleSlots:true}
+})
+```
 
 ### relations组件间关系
 
@@ -546,3 +543,5 @@ Component({
 ```
 
 ## 页面栈(路由)
+
+## 插件
