@@ -1632,9 +1632,54 @@ class NumMatrix {
 长度为n的数组，初始数字都为0，给出k个更新操作，每次操作会选定区间`[startIndex, endIndex]`的数字增加inc，返回k次操作后的数组  
 
 ```ts
-class Difference{
-  diff:number[]
-  
+class Difference {
+  diff:number[];
+  constructor(nums:number[]){
+    this.diff = new Array(nums.length).fill(0);
+    if(nums.length < 1) return;
+    this.diff[0] = nums[0];
+    for(let i = 1; i < nums.length; i++){
+      this.diff[i] = nums[i] - nums[i-1];
+    }
+  }
+  increment(i:number, j:number, val:number):void{
+    this.diff[i] += val;
+    if(j+1 < this.diff.length) this.diff[j+1] -= val;
+  }
+  result():number[]{
+    let res = new Array(this.diff.length).fill(0);
+    res[0] = this.diff[0];
+    for(let i = 0; i < this.diff.length; i++) res[i] = res[i-1] + this.diff[i];
+    return res;
+  }
 }
+// 入口算法
+function getModifiedArray(length:number, updates:number[][]){
+  let nums = new Array(length).fill(0); // 生成目标数组
+  let df = new Difference(nums);
+  for(let i = 0; i < updates.length; i++){
+    let [start, end, val] = updates[i];
+    df.increment(start, end, val);
+  }
+  return df.result();
+}
+```
+
+- leetcode 1109 航班预定统计
+
+n个航班，从1到n编号； 航班预定表第i条`bookings[i] = [i,j,k]`表示从i到j的每个航班预定了k个座位  
+返回长度为n的数组answer，按航班编号顺序返回每个航班预定的座位数  
+
+思路：问题本质也可通过差分数组来解决
+
+```ts
+
+```
+
+- leetcode 1094 拼车
+
+公交车最大载客量capacity沿途需要经过若干车站，乘客行程表trips， `trips[i] = [num, start, end]`表示有num个乘客从start站上车，end站下车，计能否一次把所有乘客运完(即不能超过最大载客量capacity)  
+
+```ts
 
 ```
