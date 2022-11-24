@@ -1673,12 +1673,128 @@ n个航班，从1到n编号； 航班预定表第i条`bookings[i] = [i,j,k]`表�
 思路：问题本质也可通过差分数组来解决
 
 ```ts
-
+// 需要用到上面的Difference类
+function corpFlightBookings(bookings: number[][], n: number): number[] {
+  let nums = new Array(n).fill(0); // 初始航班座位预定数为0，索引从0开始
+  let diff = new Difference(nums); // 构造差分类
+  for(let i = 0; i < bookings.length; i++){ // 循环应用预定座位
+    let start = bookings[i][0] - 1; // 航班号转换为索引因此减1
+    let end = bookings[i][1]; // 闭区间，结束航班号转换为索引则不必减1
+    let val = bookings[i][2]; // 预定数量
+    diff.increase(start, end, val);
+  }
+  return diff.result();
+};
 ```
 
 - leetcode 1094 拼车
 
 公交车最大载客量capacity沿途需要经过若干车站，乘客行程表trips， `trips[i] = [num, start, end]`表示有num个乘客从start站上车，end站下车，计能否一次把所有乘客运完(即不能超过最大载客量capacity)  
+
+```ts
+// 需要用到上面的Difference类
+function carPooling(trips: number[][], capacity: number): boolean {
+  let actualCount = new Array(1001).fill(0);
+  let diff = new Difference(actualCount);
+  for(let i = 0; i < trips.length; i++){
+    let val = trips[i][0];
+    let start = trips[i][1]; // 此站上车
+    let end = trips[i][2]; // 
+    diff.increase(start, end, val);
+  }
+  let res = diff.result();
+  for(let n of res){
+    if(n > capacity) return false
+  }
+  return true;
+};
+```
+
+## 二维数组的遍历技巧
+
+- leetcode 48 旋转图像
+
+给定n*n矩阵matrix表示一个图像，将图像顺时针旋转90度(必须原地修改)  
+思路：直观去旋转二维矩阵，操作十分麻烦；将其拆分为行变列，列边行，然后反转操作则较为简单  
+针对本题即，将矩阵沿(0,0)和(n,n)对角线镜像翻转。然后对每一行进行反转即可
+TODO:添加图片
+
+若要逆时针旋转，则镜像另一条对角线即可  
+
+```ts
+function rotate(matrix: number[][]): void {
+  let n = matrix.length;
+  for(let i = 0; i < n; i++){ // 镜像矩阵
+    for(let j = i + 1; j < n; j++){
+      let temp = matrix[i][j]
+      matrix[i][j] = matrix[j][i];
+      matrix[j][i] = temp;
+    }
+  }
+  for(let i = 0; i < n; i++){
+    reverse(matrix[i]);
+  }
+};
+function reverse(nums:number[]):void{ // 双指针就地反转数组
+  let start = 0, end = nums.length - 1;
+  while(start < end){
+    let temp = nums[start];
+    nums[start] = nums[end];
+    nums[end] = temp;
+    start++;
+    end--;
+  }
+}
+```
+
+- leetcode 151 颠倒字符串中的单词
+
+反转字符串中的单词，并且单词间空格仅保留一个，如"the sky  is blue " --> "blue i sky the"
+
+```ts
+function reverseWords(s: string): string {
+  let strs = Array.from(s.trim()); // 生成数组，便于就地修改字符串
+  reverse(strs, 0, strs.length - 1); // 先对整体进行翻转
+  let start = 0, end = 0, n = strs.length; // 初始化区间双指针
+  while(end < n){
+    end++;
+    if(strs[start] === ' '){ // 保证start指针始终指向非空格字符
+      // 若同时指向空格，则使用空字符替代，表示删除,保证删除后字符数组索引正常
+      if(strs[end] === ' ') strs[start] = '';
+      start = end; // 更新start指针位置，并直接进入下一轮循环
+      continue;
+    }
+    if(strs[end] === ' '){ // 在保证了start指向字符的前提下，发现end指向空格，指定反转
+      reverse(strs, start, end - 1); // 对单个单词，即区间[start, end)进行反转
+      start = end;
+    }
+  }
+  // 若不以空格结尾，则对最后一个单词进行反转
+  if(start !== end) reverse(strs, start, end-1);
+  return strs.join('')
+};
+function reverse(s:string[], start:number, end:number){
+  while(start < end){
+    let temp = s[start];
+    s[start] = s[end];
+    s[end] = temp;
+    start++;
+    end--;
+  }
+}
+```
+
+- leetcode 54 螺旋矩阵
+
+给定m*n的矩阵matrix，按顺时针螺旋遍历矩阵  
+
+```ts
+
+```
+
+- leetcode 59 螺旋矩阵2
+
+给定整数n，生成包含1到n^2所有元素，且按顺时针螺旋排列的n*n矩阵matrix
 
 ```ts
 
