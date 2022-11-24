@@ -1717,7 +1717,14 @@ function carPooling(trips: number[][], capacity: number): boolean {
 给定n*n矩阵matrix表示一个图像，将图像顺时针旋转90度(必须原地修改)  
 思路：直观去旋转二维矩阵，操作十分麻烦；将其拆分为行变列，列边行，然后反转操作则较为简单  
 针对本题即，将矩阵沿(0,0)和(n,n)对角线镜像翻转。然后对每一行进行反转即可
-TODO:添加图片
+
+如图：
+沿对角线进行旋转  
+![rotateMatrix01](./resource/rotateMatrix01.jpeg)  
+再对矩阵的每一行进行反转  
+![rotateMatrix02](./resource/rotateMatrix02.jpeg)  
+所得结果即为顺时针旋转90度  
+![rotateMatrix03](./resource/rotateMatrix03.jpeg)  
 
 若要逆时针旋转，则镜像另一条对角线即可  
 
