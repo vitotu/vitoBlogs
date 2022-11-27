@@ -1795,14 +1795,82 @@ function reverse(s:string[], start:number, end:number){
 
 给定m*n的矩阵matrix，按顺时针螺旋遍历矩阵  
 
-```ts
+思路：设定上下左右四个动态边界，当结果数组res长度小于m*n时，循环判断四个边界是否收缩完成，若没有完成则在边界内遍历对应的行或列，最后返回res数组即可
 
+```ts
+function spiralOrder(matrix: number[][]): number[] {
+  let m = matrix.length, n = matrix[0].length;
+  let upper_bound = 0, lower_bound = m - 1;
+  let left_bound = 0, right_bound = n - 1;
+  let res = [];
+  while(res.length < m*n){
+    if(upper_bound <= lower_bound){
+      for(let j = left_bound; j <= right_bound; j++){
+        res.push(matrix[upper_bound][j]);
+      }
+      upper_bound++;
+    }
+    if(left_bound <= right_bound){
+      for(let i = upper_bound; i <= lower_bound; i++){
+        res.push(matrix[i][right_bound])
+      }
+      right_bound--;
+    }
+    if(upper_bound <= lower_bound){
+      for(let j = right_bound; j >= left_bound; j--){
+        res.push(matrix[lower_bound][j]);
+      }
+      lower_bound--;
+    }
+    if(left_bound <= right_bound){
+      for(let i = lower_bound; i >= upper_bound; i--){
+        res.push(matrix[i][left_bound]);
+      }
+      left_bound++
+    }
+  }
+  return res;
+};
 ```
 
 - leetcode 59 螺旋矩阵2
 
 给定整数n，生成包含1到n^2所有元素，且按顺时针螺旋排列的n*n矩阵matrix
 
-```ts
+思路：原理同上
 
+```ts
+function generateMatrix(n: number): number[][] {
+  let matrix:number[][] = new Array(n).fill(0).map(i=>{
+    return new Array(n).fill(0);
+  })
+  let upper_bound = 0, lower_bound = n - 1;
+  let left_bound = 0, right_bound = n - 1;
+  let num = 1
+  while(num <= n*n){
+    if(upper_bound <= lower_bound){
+      for(let j = left_bound; j <= right_bound; j++) matrix[upper_bound][j] = num++;
+    upper_bound++;
+    }
+    if(left_bound <= right_bound){
+      for(let i = upper_bound; i <= lower_bound; i++){
+        matrix[i][right_bound] = num++;
+      }
+      right_bound--;
+    }
+    if(upper_bound <= lower_bound){
+      for(let j = right_bound; j >= left_bound; j--){
+        matrix[lower_bound][j] = num++;
+      }
+      lower_bound--;
+    }
+    if(left_bound <= right_bound){
+      for(let i = lower_bound; i >= upper_bound; i--){
+        matrix[i][left_bound] = num++;
+      }
+      left_bound++;
+    }
+  }
+  return matrix
+};
 ```
