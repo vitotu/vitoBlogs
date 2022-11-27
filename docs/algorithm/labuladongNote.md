@@ -1874,3 +1874,9 @@ function generateMatrix(n: number): number[][] {
   return matrix
 };
 ```
+
+## 滑动窗口算法扩展: RABIN KARP字符匹配算法
+
+- leetcode 187
+
+- leetcode 28  
