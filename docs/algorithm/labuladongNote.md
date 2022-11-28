@@ -1877,6 +1877,80 @@ function generateMatrix(n: number): number[][] {
 
 ## 滑动窗口算法扩展: RABIN KARP字符匹配算法
 
-- leetcode 187
+- leetcode 187 重复的DNA序列
 
-- leetcode 28  
+DNA序列仅包含ACGT字符，给定一个表示 DNA序列 的字符串 s ，返回所有在 DNA 分子中出现不止一次的 长度为 10 的序列(子字符串)。你可以按 任意顺序 返回答案。  
+
+思路：首先想到的时暴力解法，取出s中长度为10的子串放入哈希表中，遍历s取出并与哈希表进行比较，发现重复则放入结果数组中，不重复则加入哈希表中，遍历完成后返回结果即可  
+
+优化解法，取出长度为10的子串操作类似于滑动窗口，而取出子串操作可以优化为动态哈希，时间复杂度为`O(1)`  
+动态哈希：将四种字符编码为4进制数，窗口滑动时仅需要增加最低位，删除最高位操作即可获取新的4进制编码数，同时10位4进制数可以用8位10进制完成表示，因此不存在溢出问题  
+
+```ts
+function findRepeatedDnaSequences(s: string): string[] {
+  let n = s.length;
+  let sNums = Array.from(s).map(i => { // 将字符串转换为数组便于索引，同时进行4进制编码
+    if(i === 'A') return 0;
+    if(i === 'C') return 1;
+    if(i === 'G') return 2;
+    if(i === 'T') return 3;
+    else throw new Error(`unexpected char ${i}`);
+  })  // 使用set收集重复的字符串，避免出现3次及以上的字符串被多次收集
+  let res = new Set<string>();
+  let L = 10, R = 4, windowHash = 0; // 初始化位数，进制数，以及当前窗口哈希状态
+  const cacheLR = Math.pow(R, L-1); // 计算最高位乘数
+  let left = 0, right = 0, hashList = new Set<number>(); // 初始化左右指针和查重表
+  while(right < n){ // 当右指针遍历到末尾时退出，right从0开始包含了初始窗口哈希值的计算
+    windowHash = windowHash*R + sNums[right]; // 计算当前窗口哈希值
+    right++; // 向右扩大窗口，此前窗口区间[left, right)
+    if(right - left === L){ // 窗口扩大前的大小等于L时进行哈希判断
+      if(hashList.has(windowHash)){ // 发现重复字符串
+        res.add(s.substring(left, right)) // right已经扩大，因此不必加1
+      } else { // 不重复则将哈希添加到查重表
+        hashList.add(windowHash);
+      } // 收缩窗口，删除最高位字符
+      windowHash = windowHash - sNums[left] * cacheLR;
+      left++;
+    }
+  }
+  return Array.from(res); // 返回Array
+};
+```
+
+- leetcode 28  找出字符串中第一个匹配项的下标
+
+给你两个字符串 haystack 和 needle ，请你在 haystack 字符串中找出 needle 字符串的第一个匹配项的下标（下标从 0 开始）。如果 needle 不是 haystack 的一部分，则返回  -1 。
+
+思路：有了上述经验，暴力解法可以是从haystack中取出needle长度的子串，然后逐一比较，返回第一个匹配的索引  
+
+借鉴上题思路，可以使用滑动庄口和自定义动态哈希也即Rabin-Karp指纹字符串查找算法；  
+由于字符对应的ASCII码为256进制，直接编码很可能造成整型溢出，因此可以采用除Q取余的方式约束在`[0, Q-1]`范围， 若发生哈希冲突，则手动调用一次暴力比较即可。其中Q应取尽可能大的素数  
+
+```ts
+function strStr(haystack: string, needle: string): number {
+  let L = needle.length, R = 256, Q = 1658598167;
+  let RL = 1;
+  for(let i = 1; i <= L - 1; i++){ // 对最高位乘数防溢出
+    RL = (RL * R) % Q;
+  }
+  let needleHash = 0; // 计算目标字符串hash
+  for(let i = 0; i < needle.length; i++){
+    needleHash = (R*needleHash + needle.charCodeAt(i)) % Q;
+  }
+  let windowHash = 0, left = 0, right = 0;
+  while(right < haystack.length){
+    windowHash = (R * windowHash) % Q + haystack.charCodeAt(right) % Q;
+    right++;
+    if(right - left === L){
+      if(windowHash === needleHash){ // 哈希匹配还需进一步比较
+        if(needle === haystack.substring(left, right)){
+          return left; // 发现目标则直接返回
+        }
+      } // 删除高位数，缩小窗口
+      windowHash = ( windowHash - (haystack.charCodeAt(left)* RL)%Q + Q) % Q;
+      left++;
+    }
+  }
+  return -1;
+};
+```
