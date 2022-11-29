@@ -1954,3 +1954,44 @@ function strStr(haystack: string, needle: string): number {
   return -1;
 };
 ```
+
+## 带权重的随机算法
+
+- leetcode 528 按权重随机选择
+
+给你一个 下标从 0 开始 的正整数数组 w ，其中 w[i] 代表第 i 个下标的权重。
+
+请你实现一个函数 pickIndex ，它可以 随机地 从范围 [0, w.length - 1] 内（含 0 和 w.length - 1）选出并返回一个下标。选取下标 i 的 概率 为 w[i] / sum(w) 。  
+
+思路：此题可使用前缀和数组和二分查找法，首先利用前缀和数组preSum模拟权重概率区域，生成范围为`[0,preSum[n-1])`的随机数rand，通过二分查找法，在preSum中找到刚好大于rand的元素的索引，而后根据索引即可取出对应权重的数字
+
+```ts
+class Solution {
+  preSum: number[]; // 声明前缀和数组
+  constructor(w: number[]) { // 构造前缀和数组
+    let n = w.length;
+    this.preSum = new Array(n + 1).fill(0);
+    for(let i = 1; i <= n; i++){
+      this.preSum[i] = this.preSum[i-1] + w[i-1];
+    }
+  }
+
+  pickIndex(): number {
+    let n = this.preSum.length;
+    let target = Math.floor(Math.random()*this.preSum[n-1] + 1); // 生成随机数
+    // 二分查找，返回下标，因为preSum下标从0开始，1对齐，需要减1后返回
+    return this.left_bound(this.preSum, target) - 1;
+  }
+  left_bound(nums:number[], target:number):number{ // 左边界的二分查找
+    if(nums.length === 0) return -1;
+    let left = 0, right = nums.length;
+    while(left < right){
+      let mid = left + Math.floor((right - left) / 2); // 查找左边界，因此向下取整
+      if(nums[mid] === target) right = mid;
+      else if(nums[mid] < target) left = mid + 1;
+      else if(nums[mid] > target) right = mid;
+    }
+    return left;
+  }
+}
+```
