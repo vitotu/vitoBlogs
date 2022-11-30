@@ -650,6 +650,12 @@ function search(nums: number[], target: number): number {
 };
 ```
 
+- leetcode 1011 在D天内送达包裹的能力(付费题)
+- leetcode 410 分割数组的最大值
+- leetcode 875 爱吃香蕉的珂珂
+
+TODO:本篇为付费文章，暂时跳过(https://labuladong.gitee.io/algo/2/20/31/)
+
 ## 双指针之链表
 
 - leetcode 21 合并两个有序链表
@@ -1994,4 +2000,33 @@ class Solution {
     return left;
   }
 }
+```
+
+## 特殊算法
+
+- leetcode 870 优势洗牌(田忌赛马决策算法)
+
+类似于田忌赛马，输入长度相等的数组nums1和nums2，重新组织nums1元素的位置，使nums1中的优势最大化
+
+思路：对数组进行排序，若双方最强对决优势，则直接派出即可，若劣势，则派出最弱顶替
+
+```ts
+function advantageCount(nums1: number[], nums2: number[]): number[] {
+  let n = nums1.length;
+  let nums2Cache = nums2.map((val, i) => [val, i]).sort((a, b) => a[0] < b[0] ? 1 : -1); // 不可修改nums2，故生成[val, index]数组，并降序排序
+  nums1.sort((a, b) => a < b ? -1 : 1); // 升序排序nums1
+  let left = 0, right = n - 1; // 初始化双指针
+  let res:number[] = new Array(n).fill(0);
+  for(let i = 0; i < n; i++){ // 遍历排序后的nums2
+    let [val, index] = nums2Cache[i]; // 取出nums2当前最大值和对应的索引位置
+    if(val < nums1[right]){ // “最强马对决优势”，则直接在对应索引处填入值(列入对战位置)
+      res[index] = nums1[right];
+      right--; // 收缩右边界
+    } else { // “当前最强马劣势，将最弱的马列入对战位”
+      res[index] = nums1[left];
+      left++;
+    }
+  }
+  return res;
+};
 ```
