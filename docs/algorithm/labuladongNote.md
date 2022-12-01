@@ -2030,3 +2030,74 @@ function advantageCount(nums1: number[], nums2: number[]): number[] {
   return res;
 };
 ```
+
+- leetcode 380 O(1)时间插入、删除、获取随机元素
+
+设计平均时间复杂度为O(1)执行插入、删除，获取随机元素的数据结构
+
+思路：常量时间获取随机元素只能由紧凑型数组来存储数字，而数组仅能在末尾实现常量时间的插入和删除操作，因此可以增加辅助哈希表用于记录每个元素对应索引，将数组中间的元素搬运到尾部实现常量时间的插入和删除
+
+```ts
+class RandomizedSet {
+  nums: number[] = []; // 声明并初始化数组和辅助hash
+  indexMap = new Map<number, number>();
+  constructor() {
+
+  }
+
+  insert(val: number): boolean { // 插入时在数组末尾插入，并更新辅助hash
+    if(this.indexMap.has(val)) return false;
+    this.nums.push(val);
+    this.indexMap.set(val,this.nums.length - 1);
+    return true;
+  }
+
+  remove(val: number): boolean {
+    if(!this.indexMap.has(val)) return false;
+    let index = this.indexMap.get(val); // 获取要删除值对应的索引
+    // 在辅助hash中与数组末尾交换索引位置，并删除val的辅助hash
+    this.indexMap.set(this.nums[this.nums.length - 1], index);
+    this.indexMap.delete(val); // val可直接删除无需执行交换动作，删除值时同理
+    // 在存储数组中与数组末尾交换值，并从数组末尾删除val
+    this.nums[index] = this.nums[this.nums.length - 1];
+    this.nums.pop()
+    return true;
+  }
+
+  getRandom(): number { // 生成区间内随机索引，返回随机数
+    return this.nums[Math.floor(Math.random()*this.nums.length)];
+  }
+}
+```
+
+- leetcode 710 黑名单中的随机数
+
+给定整数n和黑名单数组blacklist，等概率的选取[0, n)范围内且不包含blacklist的整数
+
+思路：与上题类似，通过辅助hash将blacklist索引映射到范围末尾，然后随机选取前方数据即可
+
+```ts
+class Solution {
+  indexMap = new Map<number, number>();
+  sz:number;
+  constructor(n: number, blacklist: number[]) {
+    this.sz = n - blacklist.length; // 有效数字区间[0, this.sz)
+    for(let i = 0; i < blacklist.length; i++){
+      this.indexMap.set(blacklist[i],-999); // 先将黑名单都标记，添加到辅助hash中
+    }
+    let last = n - 1; // last指针始终指向不为非黑名单中的末尾元素
+    for(let i = 0; i < blacklist.length; i++){
+      if(blacklist[i] >= this.sz) continue; // 黑名单在范围外，不用做任何处理
+      while(this.indexMap.has(last)) last--; // 移动last直到不指向黑名单
+      this.indexMap.set(blacklist[i], last); // 设置黑名单索引映射
+      last--; // 移动last指针
+    }
+  }
+
+  pick(): number { // 在区间[0,this.sz)生成随机索引, 本题中既是索引也是值
+    let index = Math.floor(Math.random() * this.sz);
+    if(this.indexMap.has(index)) return this.indexMap.get(index);
+    return index;
+  }
+}
+```
