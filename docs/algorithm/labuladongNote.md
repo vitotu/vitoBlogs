@@ -2004,7 +2004,9 @@ class Solution {
 
 ## 特殊算法
 
-- leetcode 870 优势洗牌(田忌赛马决策算法)
+### 田忌赛马中的决策算法
+
+- leetcode 870 优势洗牌
 
 类似于田忌赛马，输入长度相等的数组nums1和nums2，重新组织nums1元素的位置，使nums1中的优势最大化
 
@@ -2030,6 +2032,8 @@ function advantageCount(nums1: number[], nums2: number[]): number[] {
   return res;
 };
 ```
+
+### 常量取随机数
 
 - leetcode 380 O(1)时间插入、删除、获取随机元素
 
@@ -2101,3 +2105,42 @@ class Solution {
   }
 }
 ```
+
+### 单调栈数组去重
+
+- leetcode 316 去除重复的字母
+
+给定仅包含小写字母的字符串，去除字符串中的重复字母，保证返回结果中字典序最小，也不能打乱其他字符的相对位置
+
+思路：利用两个辅助hash分别用于标记去重和count次数保证字典序，同时通过栈承接结果，组合起来即为单调栈
+先利用辅助hash数组count记录每个字符出现的次数  
+遍历字符串，每次遍历时将字符出现次数减1，判断字符是否出现在hash数组inStack中，若有则跳过，若无则进一步处理。  
+循环比较，当当前字符c字典序小于结果栈res栈顶且计数大于0时(即其后还有相同元素)，弹出栈顶，并清除inStack中对应的标记，此步用于去重的同时保证字典序  
+将c推入结果栈，并在inStack中标记  
+组合结果栈res中的字符即可获得结果
+
+```ts
+function removeDuplicateLetters(s: string): string {
+  let res:string[] = [];
+  let count:number[] = new Array(256).fill(0); // count辅助hash声明
+  let inStack:boolean[] = new Array(256).fill(false); // inStack去重hash声明
+  for(let i = 0; i < s.length; i++) count[s.charCodeAt(i)]++; // count初始化
+  for(let i = 0; i < s.length; i++){ // 遍历字符串，每次需先将对应count减1
+    count[s.charCodeAt(i)]--; // 更新i处之后相同的字符串数量
+    if(inStack[s.charCodeAt(i)]) continue; // 字符串已被标记过则跳过本轮循环
+    while(res.length > 0 && res[res.length - 1].charCodeAt(0) > s.charCodeAt(i)){ // 当前字符字典序小于栈顶字符时，处理最小字典序
+      // 往后再无栈顶相同元素时，则不做调整跳出循环
+      if(count[res[res.length - 1].charCodeAt(0)] === 0) break;
+      // 往后有栈顶相同元素时，栈顶出栈，同时将对应元素标记清除
+      inStack[res.pop().charCodeAt(0)] = false;
+    }
+    res.push(s.charAt(i)); // 当前元素无重复，入栈并清除标记
+    inStack[s.charCodeAt(i)] = true;
+  }
+  return res.join(''); // 组合并返回去重后的字符串
+};
+```
+
+- leetcode 1081 不同字符的最小子序列
+
+此题与上题相同复制粘贴代码即可通过  
