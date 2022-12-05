@@ -145,6 +145,7 @@ function recursion(root:TreeNode|null):TreeNode|null{
 给定完美二叉树，所有叶子结点都在同一层，填充next指针指向下一个右侧节点，若无则填充为null
 
 思路：可通过遍历的方法来解题，我们实际要遍历的是两个节点之间的空隙，可以将来相邻的两个节点看做一个，因此二叉树被抽象成了三叉树，遍历这颗“三叉树”  
+此题暂无递归的解法  
 
 ```ts
 function connect(root: Node | null): Node | null {
@@ -163,6 +164,8 @@ function traverse(node1:Node|null, node2:Node|null){
 ```
 
 - leetcode 114 将二叉树展开为链表
+
+给定根节点root，展开为单链表，展开后right指向下一个节点，左子节点为null，展开后单链表与二叉树先序遍历顺序相同
 
 ## 动态规划
 
