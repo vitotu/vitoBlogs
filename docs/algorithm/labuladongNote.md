@@ -102,6 +102,68 @@ class Solution {
 }
 ```
 
+### 二叉树思路篇
+
+二叉树解题思路分为两类：  
+
+1. 能否通过遍历二叉树获得答案
+2. 能否通过递归(子问题)推导出答案
+
+- leetcode 226 翻转二叉树
+
+思路：
+遍历的解法，遍历每个节点，交换左右子节点  
+递归的解法，分别翻转节点的左右子树，然后交换左右子树
+
+```ts
+function invertTree(root: TreeNode | null): TreeNode | null {
+  reverse(root);
+  return root; // 遍历的方法
+  // return recursion(root); // 递归方法
+};
+
+function reverse(root:TreeNode|null):TreeNode|null{
+  if(!root) return null; // 交换左右节点，随后遍历其他节点
+  let temp = root.left;
+  root.left = root.right;
+  root.right = temp;
+  reverse(root.left);
+  reverse(root.right);
+}
+function recursion(root:TreeNode|null):TreeNode|null{
+  if(!root) return null; // 翻转左右子树
+  let left = recursion(root.left);
+  let right = recursion(root.right);
+  root.left = right; // 交换左右子树
+  root.right = left;
+  return root;
+}
+```
+
+- leetcode 116 填充每个二叉树节点的右侧指针
+
+给定完美二叉树，所有叶子结点都在同一层，填充next指针指向下一个右侧节点，若无则填充为null
+
+思路：可通过遍历的方法来解题，我们实际要遍历的是两个节点之间的空隙，可以将来相邻的两个节点看做一个，因此二叉树被抽象成了三叉树，遍历这颗“三叉树”  
+
+```ts
+function connect(root: Node | null): Node | null {
+  if(root === null) return null;
+  traverse(root.left, root.right); // 遍历“三叉树”，需要输入两个相邻的节点
+  return root;
+};
+
+function traverse(node1:Node|null, node2:Node|null){
+  if(node1 === null || node2 === null) return;
+  node1.next = node2; // 连接两个相邻节点
+  traverse(node1.left, node1.right); // 遍历下一个“三叉树”节点
+  traverse(node2.left, node2.right);
+  traverse(node1.right, node2.left);
+}
+```
+
+- leetcode 114 将二叉树展开为链表
+
 ## 动态规划
 
 动态规划三要素：重叠子问题、最优子结构、状态转移方程  
