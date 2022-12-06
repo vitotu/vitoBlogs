@@ -165,7 +165,127 @@ function traverse(node1:Node|null, node2:Node|null){
 
 - leetcode 114 将二叉树展开为链表
 
-给定根节点root，展开为单链表，展开后right指向下一个节点，左子节点为null，展开后单链表与二叉树先序遍历顺序相同
+给定根节点root，展开为单链表，展开后right指向下一个节点，左子节点为null，展开后单链表与二叉树先根序遍历顺序相同  
+
+思路：因为需要原地展开，只能使用递归的方式：先展开左子树，然后展开右子树，将右子树连接到左子树下方，然后将整个左子树作为右子树
+
+```ts
+function flatten(root: TreeNode | null): void {
+  if(root === null) return;
+  flatten(root.left); // 展开左右子树
+  flatten(root.right);
+  let left = root.left; // 缓存左右子树节点
+  let right = root.right;
+  root.left = null; // 连接root节点
+  root.right = left;
+  let p = root; // 循环遍历到拉伸后左子树的末尾节点
+  while(p.right !== null){
+    p = p.right;
+  }
+  p.right = right; // 连接右子树
+};
+```
+
+### 二叉树构造篇
+
+构造问题一般使用分解问题的思路，即根节点+构造左子树+构造右子树
+
+- leetcode 654 最大二叉树
+
+给定无重复元素的整数数组，根节点为最大元素，左子树为最大元素左边的部分构造的最大二叉树，右子树为有部分  
+
+思路：遍历数组找到最大值及其索引，分别取左右部分递归构造左右子树
+
+```ts
+function constructMaximumBinaryTree(nums: number[]): TreeNode | null {
+  return build(nums, 0, nums.length - 1);
+};
+function build(nums:number[], start:number, end:number):TreeNode|null{
+  if(start > end) return null;
+  let maxVal = Number.MIN_SAFE_INTEGER;
+  let index = -1;
+  for(let i = start; i <= end; i++){ // 遍历查找最大值
+    if(maxVal > nums[i]) continue;
+    maxVal = nums[i];
+    index = i;
+  }
+  let root = new TreeNode(maxVal); // 递归构造左右子树
+  root.left = build(nums, start, index - 1);
+  root.right = build(nums, index+1, end);
+  return root;
+}
+```
+
+- leetcode 105 从前序和中序遍历结果构造二叉树(无重复元素)
+
+思路：前序遍历第一个元素即为根节点，在中序中找到对应节点，其左边对应即为左子树，右边为右子树，在前序序列中找到对应的左右子树，递归构造左右子树
+
+```ts
+function buildTree(preorder: number[], inorder: number[]): TreeNode | null {
+  return build(preorder, inorder , [0, preorder.length - 1, 0, inorder.length - 1]);
+};
+function build(preorder:number[], inorder:number[], [pStart, pEnd, iStart, iEnd]:number[]){
+  if(pStart > pEnd || iStart > iEnd) return null;
+  let root = new TreeNode(preorder[pStart]); // 构造根节点
+  let iRootIndex = -1; // 查找根节点在中序序列中的索引
+  for(let i = iStart; i <= iEnd; i++){
+    if(preorder[pStart] === inorder[i]) iRootIndex = i;
+  }
+  if(iRootIndex === -1) return null;
+  let leftLength = iRootIndex - iStart; // 计算左子序列长度， PS：单闭区间长度
+  root.left = build(preorder, inorder, [pStart+1, pStart+leftLength, iStart, iStart + leftLength - 1]); // 递归构造左右子树
+  root.right = build(preorder, inorder, [pStart + leftLength + 1, pEnd, iRootIndex+1, iEnd]);
+  return root;
+}
+```
+
+- leetcode 106 通过中序和后序遍历结果构造二叉树(无重复，与上题类似)
+
+```ts
+function buildTree(inorder: number[], postorder: number[]): TreeNode | null {
+  return build(inorder, postorder, [0, inorder.length-1, 0, postorder.length-1]);
+};
+function build(inorder:number[], postorder:number[], [iStart, iEnd, pStart, pEnd]:number[]):TreeNode |null {
+  if(iStart > iEnd || pStart > pEnd) return null;
+  let root = new TreeNode(postorder[pEnd]);
+  let iRootIndex = -1;
+  for(let i = iStart; i <= iEnd; i++){
+    if(postorder[pEnd] === inorder[i]) iRootIndex = i;
+  }
+  if(iRootIndex === -1) return null;
+  let leftLength = iRootIndex - iStart;
+  root.left = build(inorder, postorder, [iStart, iRootIndex - 1, pStart, pStart + leftLength - 1]);
+  root.right = build(inorder, postorder, [iRootIndex+1, iEnd, pStart + leftLength, pEnd - 1]);
+  return root;
+}
+```
+
+- leetcode 889 通过后序和前序遍历结果构造二叉树
+
+与上题类似，但通过后序和前序无法确定唯一一颗二叉树，因此返回任意一种结果即可  
+
+思路：与上题区别在于左右子树范围的确定方式，首先取前序序列第一个元素为根节点，第二个元素为左子树的根节点，遍历后序序列找到左子树根节点，确定左右子树边界，递归构造左右子树即可
+
+```ts
+function constructFromPrePost(preorder: number[], postorder: number[]): TreeNode | null {
+  return build(preorder, postorder, [0, preorder.length - 1, 0, postorder.length - 1]);
+};
+
+function build(preorder:number[], postorder:number[], [pStart, pEnd, bStart, bEnd]:number[]):TreeNode|null{
+  if(pStart > pEnd || bStart > bEnd) return null;
+  let root = new TreeNode(preorder[pStart]);
+  if(pStart === pEnd) return root;
+  let boundIndex = -1;
+  for(let i = bStart; i < bEnd; i++){
+    if(preorder[pStart+1] === postorder[i]) boundIndex = i;
+  }
+  if(boundIndex === -1) return null;
+  let leftLength = boundIndex - bStart; // 半闭区间，但此时应包含root，故左区间终点+1
+  root.left = build(preorder, postorder, [pStart+1, pStart+leftLength+1, bStart, boundIndex]); // 右子树起点对应调整
+  root.right = build(preorder, postorder, [pStart+leftLength+2, pEnd, boundIndex+1, bEnd - 1]);
+  return root;
+}
+```
 
 ## 动态规划
 
