@@ -287,6 +287,105 @@ function build(preorder:number[], postorder:number[], [pStart, pEnd, bStart, bEn
 }
 ```
 
+### 二叉树序列化与反序列化
+
+- leetcode 297 二叉树的序列化与反序列化
+
+类似与json的序列化与反序列化，只要两个函数自洽即可；  
+通常将二叉树序列化为字符串，可采用前序遍历、中序遍历、后序遍历、层序遍历的方式，空节点采用特殊占位符'#'占位便于反序列化  
+其中由于中序遍历无法确定根节点位置，故无法进行反序列化
+
+```ts
+function serialize(root: TreeNode | null): string {
+  return Solution.layerSerialize(root);
+};
+function deserialize(data: string): TreeNode | null {
+  let strArr = data.split(','); // 去掉分隔符，转换为数组方便处理
+  return Solution.layerDeserialize(strArr);
+};
+
+class Solution {
+  // 前序遍历实现
+  static preSerialize(root:TreeNode|null):string{
+    if(root === null) return '#';
+    let res:string[] = []; // 先收集字符串，返回时使用分隔符拼接
+    res.push(root.val.toString());
+    res.push(Solution.preSerialize(root.left))
+    res.push(Solution.preSerialize(root.right))
+    return res.join(',');
+  }
+  static preDeserialize(strArr:string[]):TreeNode|null{
+    if(strArr.length < 1) return null;
+    let val = strArr.shift();
+    if(val === '#') return null;
+    let root = new TreeNode(Number(val));
+    root.left = Solution.preDeserialize(strArr);
+    root.right = Solution.preDeserialize(strArr);
+    return root;
+  }
+  // 后序遍历实现
+  static postSerialize(root:TreeNode|null):string{
+    if(root === null) return '#';
+    let res:string[] = [];
+    res.push(Solution.postSerialize(root.left));
+    res.push(Solution.postSerialize(root.right));
+    res.push(root.val.toString());
+    return res.join(',')
+  }
+  static postDeserialize(strArr:string[]):TreeNode|null{
+    if(strArr.length < 1) return null;
+    let val = strArr.pop();
+    if(val === '#') return null;
+    let root = new TreeNode(Number(val)); // 为了确定根节点，需要从右子树开始反序列化
+    root.right = Solution.postDeserialize(strArr);
+    root.left = Solution.postDeserialize(strArr);
+    return root;
+  }
+  // 层序遍历实现
+  static layerSerialize(root:TreeNode|null):string{
+    let dp:Array<TreeNode|null> = [root]; // 队列存储节点
+    let res:string[] = []; // 收集结果
+    while(dp.length>0){
+      let curNode = dp.shift();
+      if(curNode === null){ // 遇到空节点收集结果，但不推入队列
+        res.push('#');
+        continue;
+      };
+      res.push(curNode.val.toString());
+      dp.push(curNode.left, curNode.right); // 将左右子节点推入队列
+    }
+    return res.join(',');
+  }
+  static layerDeserialize(strArr:string[]):TreeNode|null{
+    if(strArr.length < 1) return null;
+    let val = strArr.shift();
+    if(val === '#') return null;
+    let root = new TreeNode(Number(val)); // 确定根节点
+    let dp:TreeNode[] = [root]; // 使用队列存储节点
+    while(dp.length > 0){
+      let curNode = dp.shift();
+      let leftVal = strArr.shift(); // 分别获取左右子节点的值进行判断
+      let rightVal = strArr.shift();
+      if(leftVal !== '#') { // 左子节点不为空则恢复节点并推入队列，若为空则不用处理
+        curNode.left = new TreeNode(Number(leftVal));
+        dp.push(curNode.left);
+      }
+      if(rightVal !== '#') {
+        curNode.right = new TreeNode(Number(rightVal));
+        dp.push(curNode.right);
+      }
+    }
+    return root;
+  }
+}
+```
+
+### 二叉树巧用后序遍历
+
+- leetcode 652 寻找重复的子树
+
+如果两棵树具有 相同的结构和相同的结点值 ，则认为二者是重复的。
+
 ## 动态规划
 
 动态规划三要素：重叠子问题、最优子结构、状态转移方程  
