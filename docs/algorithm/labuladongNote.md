@@ -386,6 +386,35 @@ class Solution {
 
 如果两棵树具有 相同的结构和相同的结点值 ，则认为二者是重复的。
 
+思路：对于子树可使用序列化的方式描述，遍历二叉树，使用哈希表存储子树的描述，发现重复则将对应根节点推入结果收集器中  
+可选用前序、后序、层序的方式，但遍历过程中就是在遍历各子树，因此可以同时查重，而查重需要完整的子树序列(即包含当前根节点)，故后序遍历最为合适
+
+```ts
+function findDuplicateSubtrees(root: TreeNode | null): Array<TreeNode | null> {
+  let soluton = new Solution();
+  soluton.traverse(root);
+  return soluton.res;
+};
+class Solution {
+  cacheMap = new Map<string, number>();
+  res:TreeNode[] = [];
+  traverse(subRoot:TreeNode|null):string{
+    if(subRoot === null) return '#';
+    let res:string[] = [];
+    res.push(this.traverse(subRoot.left));
+    res.push(this.traverse(subRoot.right));
+    res.push(subRoot.val.toString());
+    let strTree = res.join(','); // 后序遍历序列化的过程会递归序列化子树，在此过程可查重
+    if(this.cacheMap.get(strTree) === 1){ // 第二次出现，加入结果数组，增加次数
+      this.res.push(subRoot);
+      this.cacheMap.set(strTree, 2);
+      // 首次出现，记录次数，出现次数>=2则不做记录，放置多次记录重复的子树
+    } else if(!this.cacheMap.get(strTree)) this.cacheMap.set(strTree, 1);
+    return strTree;
+  }
+}
+```
+
 ## 动态规划
 
 动态规划三要素：重叠子问题、最优子结构、状态转移方程  
