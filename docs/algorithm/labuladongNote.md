@@ -415,6 +415,89 @@ class Solution {
 }
 ```
 
+### 二叉树之归并排序
+
+- leetcode 912 排序数组 给定整数数组按升序排列
+
+思路：虽然题目没有规定使用的排序算法，但此处尝试结合二叉树使用归并排序  
+归并排序本质是将排序问题拆分为子问题，然后合并两个排序好的序列，类似于二叉树的后序遍历框架
+
+```ts
+function sortArray(nums: number[]): number[] {
+  merge(nums, 0, nums.length - 1)
+  return nums;
+};
+function merge(nums:number[], start, end):number[]{ // 选取闭区间[start, end]
+  if(start >= end) return [] // 单个元素则直接返回
+  let mid = start + Math.floor((end - start) / 2); // 确定分隔点
+  merge(nums, start, mid); // 递归左右序列
+  merge(nums, mid + 1, end); // 在后序遍历位置合并序列
+  let left = start, right = mid + 1; // 双指针合并左右子数组(类似双指针合并链表)
+  let res = new Array(end - start + 1).fill(-999);
+  for(let i = 0; i <= end - start + 1; i++){
+    if(left > mid){
+      res.splice(i, end - right + 1, ...nums.slice(right, end+1))
+      break;
+    } else if (right > end){
+      res.splice(i, mid - left + 1, ...nums.slice(left, mid+1))
+      break;
+    } else if (nums[left] > nums[right]){
+      res[i] = nums[right];
+      right++;
+    } else if (nums[left] <= nums[right]){
+      res[i] = nums[left];
+      left++;
+    }
+  }
+  nums.splice(start, end - start + 1, ...res);
+  return nums;
+}
+```
+
+- leetcode 315 计算右侧小于当前元素的个数
+
+给定整数数组 nums ，返回新数组 counts，其中`counts[i]`的值是`nums[i]`右侧小于`nums[i]`的元素的数量。
+
+思路：遍历nums，对与每个值i想知道其后有多少小于i的值，旧必须遍历完成整个数组，这就类似与后序遍历框架，先完成子问题，然后解决当前问题  
+直接应用后序遍历框架则复杂度与暴力遍历解法没有区别，观察归并排序过程发现，当将某元素i填充至res临时数组中时,左子树中比i小的元素数量为右子序列已填充的元素数(right - mid - 1)，而对于右子树中的元素，因为已经排序，右侧不存在比当前元素小的数  
+因此可以对归并算法修改，递归累计计数
+
+```ts
+function countSmaller(nums: number[]): number[] {
+  let count = new Array(nums.length).fill(0);
+  let tempArr = nums.map((val, index) => ({val, index})); // 辅助排序数组，记录到count的索引映射
+  const mergeCount = (nums:{val:number, index:number}[], start, end) => {
+    if(start >= end) return; // 对辅助数组进行归并排序
+    let mid = start + Math.floor((end - start) / 2);
+    mergeCount(nums, start, mid);
+    mergeCount(nums, mid + 1, end);
+    let left = start, right = mid + 1;
+    let res = new Array(end - start + 1).fill(-999);
+    for(let i = 0; i < end - start + 1; i++){
+      if(left > mid){
+        res[i] = nums[right++];
+      } else if (right > end){ // 右侧序列全部填充，左侧剩余的元素都大于右侧序列
+        res[i] = nums[left]; // 收集剩余的左侧元素，对每个左侧元素累计计数
+        count[nums[left].index] += end - mid
+        left++
+      } else if (nums[left].val > nums[right].val){
+        res[i] = nums[right++];
+      } else if(nums[left].val <= nums[right].val){
+        res[i] = nums[left]; // 收集左侧元素，统计此前已填充的右侧元素
+        count[nums[left].index] += right - mid - 1
+        left++
+      }
+    }
+    nums.splice(start, end - start + 1, ...res);
+  }
+  mergeCount(tempArr, 0, tempArr.length - 1);
+  return count;
+};
+```
+
+- leetcode 327 区间和的个数
+- leetcode 493 翻转对
+
 ## 动态规划
 
 动态规划三要素：重叠子问题、最优子结构、状态转移方程  
