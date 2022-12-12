@@ -495,8 +495,64 @@ function countSmaller(nums: number[]): number[] {
 };
 ```
 
-- leetcode 327 区间和的个数
 - leetcode 493 翻转对
+
+给定一个数组 nums ，如果 i < j 且 `nums[i] > 2*nums[j]` 我们就将 (i, j) 称作一个重要翻转对。返回翻转对的数量
+
+思路：与315题类似相当于查找条件变为`nums[i] > 2*nums[j]`,因此同样可以使用归并排序来解题，但与315题不同，统计数量的时机不能与排序判断的代码融合，因此考虑增加一个循环来独立统计反转对的数量  
+使用左右指针同时遍历左右排好序的子序列，固定左指针，移动右指针到刚好不满足`nums[i] > 2*nums[j]`条件，即此时i处元素均与`[mid + 1, j)`构成翻转对  
+
+```ts
+function reversePairs(nums: number[]): number {
+  let solution = new Solution();
+  solution.merge(nums, 0, nums.length - 1);
+  return solution.count;
+};
+
+class Solution {
+  count:number = 0;
+  merge(nums:number[], start:number, end:number){
+    if(start >= end) return;
+    let mid = start + Math.floor((end - start) / 2);
+    this.merge(nums, start, mid);
+    this.merge(nums, mid+1, end);
+    let right = mid + 1;
+    for(let left = start; left <= mid; left++){ // 对左序列的每个元素统计翻转对
+      while(right <= end && nums[left]/2 > nums[right]) right++;
+      this.count += right - (mid + 1); // 恰好不满足条件时，统计左闭右开区间元素数量
+    } // 随后进行就地修改的归并排序
+    let left = start, res = new Array(end - start + 1).fill(-999);
+    right = mid + 1;
+    for(let i = 0; i < end - start + 1; i++){
+      if(left > mid){
+        res.splice(i, end - right + 1, ...nums.slice(right, end + 1));
+        break;
+      } else if(right > end){
+        res.splice(i, mid - left + 1, ...nums.slice(left, mid + 1));
+        break;
+      } else if(nums[left] > nums[right]){
+        res[i] = nums[right++];
+      } else if(nums[left] <= nums[right]){
+        res[i] = nums[left++];
+      }
+    }
+    nums.splice(start, end - start + 1, ...res);
+    return nums;
+  }
+}
+```
+
+- leetcode 327 区间和的个数
+
+给定数组nums，及整数lower、upper，求有多少个区间求和后在`[lower, upper]`范围内
+
+思路：利用之前的前缀和数组，可以求得任意区间的和，因此同样可以利用索引i,j计算区间，表述成数学语言即为:`count[i] = COUNT(j) where lower <= preSum[j] - preSum[i] <= upper`,  
+题目仅要求统计不要求索引，因此可以对前缀和数组进行归并排序，并在归并过程中比较区间和是否在目标范围  
+每次和并左右序列时，可在左序列中遍历固定左边界left，在右序列中使用双指针找到刚好满足范围的下届minRight，和刚好不满足范围的上届maxRight,因此maxRight - minRight就是固定左边界left后满足目标范围的区间数  
+
+```ts
+
+```
 
 ## 动态规划
 
