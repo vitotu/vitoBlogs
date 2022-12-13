@@ -551,8 +551,72 @@ class Solution {
 每次和并左右序列时，可在左序列中遍历固定左边界left，在右序列中使用双指针找到刚好满足范围的下届minRight，和刚好不满足范围的上届maxRight,因此maxRight - minRight就是固定左边界left后满足目标范围的区间数  
 
 ```ts
+function countRangeSum(nums: number[], lower: number, upper: number): number {
+  let demo = new Solution(nums, lower, upper);
+  return demo.count;
+};
+
+class Solution {
+  count:number = 0;
+  preSum:number[] = [];
+  lower:number;
+  upper:number;
+  constructor(nums:number[], lower:number, upper:number){
+    this.lower = lower;
+    this.upper = upper
+    // 构造前缀和数组
+    this.preSum = new Array(nums.length+1).fill(0);
+    for(let i = 0; i < nums.length; i++){
+      this.preSum[i+1] = nums[i] + this.preSum[i];
+    }
+    this.merge(this.preSum, 0, this.preSum.length - 1)
+
+  }
+  merge(nums:number[], start:number, end:number){
+    if(start >= end) return;
+    let mid = start + Math.floor((end - start)/2);
+    this.merge(nums, start, mid);
+    this.merge(nums, mid + 1, end);
+    let minRight = mid + 1, maxRight = mid + 1; // 初始化最小/最大右边界
+    for(let left = start; left <= mid; left++){ // 遍历左子序列作为左边界
+      // 找到恰好满足条件的右边界(最小右边界)
+      while(minRight <= end && nums[minRight] - nums[left] < this.lower) minRight++;
+      // 找到恰好不满足的右边界(最大右边界)
+      while(maxRight <= end && nums[maxRight] - nums[left] <= this.upper) maxRight++;
+      this.count += maxRight - minRight; //统计满足条件的区间数量[minRight, maxRight）
+    }
+    let res = new Array(end - start + 1).fill(-999); // 归并排序
+    let left = start, right = mid + 1;
+    for(let i = 0; i < end - start + 1; i++){
+      if(left > mid) {
+        res.splice(i, end - right + 1, ...nums.slice(right, end + 1));
+        break;
+      } else if(right > end) {
+        res.splice(i, mid - left + 1, ...nums.slice(left, mid + 1));
+        break;
+      } else if(nums[left] > nums[right]) res[i] = nums[right++];
+      else if(nums[left] <= nums[right]) res[i] = nums[left++];
+    }
+    nums.splice(start, end - start +1, ...res);
+  }
+}
+```
+
+### 二叉搜索树特性篇
+
+- leetcode 230 二叉搜索树中第K小的元素
+
+给定二叉搜索树，找出其中第k小的元素
+
+思路：中序遍历展开，找到其中第k个元素返回即可
+
+```ts
 
 ```
+
+- leetcode 1038 把二叉搜索树转换为累加树
+
+- leetcode 538 把二叉搜索树转换为累加树
 
 ## 动态规划
 
