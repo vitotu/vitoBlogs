@@ -608,15 +608,58 @@ class Solution {
 
 给定二叉搜索树，找出其中第k小的元素
 
-思路：中序遍历展开，找到其中第k个元素返回即可
+思路：中序遍历展开，定义变量在中序遍历时计数，并比对计数是否为k，若等于k则返回对应元素即可
 
 ```ts
-
+function kthSmallest(root: TreeNode | null, k: number): number {
+  let solution = new Solution();
+  solution.traverse(root, k);
+  return solution.res;
+};
+class Solution {
+  count:number = 0;
+  res:number;
+  traverse(root:TreeNode|null, k:number){
+    if(root === null) return;
+    this.traverse(root.left, k);
+    this.count++; // 中序位置计数并判断是否为第k个
+    if(this.count === k){
+      this.res = root.val;
+      return;
+    }
+    this.traverse(root.right, k);
+  }
+}
 ```
 
-- leetcode 1038 把二叉搜索树转换为累加树
-
 - leetcode 538 把二叉搜索树转换为累加树
+
+给定根节点，该树节点值各不相同，将其转换为累加树，每个节点的新值为树中所有大于等于该节点原来值的节点值之和(包括自己),如：
+某节点值为4, 树中节点值大于4的节点有 5, 6, 7, 8，再加上节点本身，因此该节点新值为4+5+6+7+8=30
+
+思路：可利用中序遍历有序的属性，维护sum累加值，并降序遍历(右根左)，累加每个节点的值，并赋给当前节点即可实现累加树的转换
+
+```ts
+function convertBST(root: TreeNode | null): TreeNode | null {
+  let solution = new Solution();
+  solution.traverse(root);
+  return root;
+};
+class Solution {
+  sum:number = 0;
+  traverse(root:TreeNode|null){
+    if(root === null) return;
+    this.traverse(root.right); // 先遍历右子树，即满足大于该节点的值先累加
+    this.sum += root.val; // 中序位置累加，并更新节点值
+    root.val = this.sum;
+    this.traverse(root.left);
+  }
+}
+```
+
+- leetcode 1038 从二叉搜索树到更大和树
+
+与上题相同，直接采用上题解法即可
 
 ## 动态规划
 
