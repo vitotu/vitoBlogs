@@ -311,7 +311,7 @@ ES5中提供了`var anotherObject = Object.create(parentClass, {newProperty:newP
 组合继承会调用两次父类构造函数，造成子类实例中和子类原型中都有一组从父类继承的相同的属性。  
 寄生组合式继承，通过借用构造函数来继承属性，原型链的混成形式来继承方法，其基本模式如下：  
 
-```JavaScript  
+```js
 function inheritPrototype(subType, superType) {  
   var prototype = object(superType.prototype); // 创建父类原型的副本  
   prototype.contructor = subType; // 修复contructor指针  
