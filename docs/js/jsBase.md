@@ -55,7 +55,7 @@ Number(),parseInt(),parseFloat(),3个函数用于把非数值转换为数值,Num
 
 with语句，示例：  
 
-```javaScript  
+```js
 with(location) {  
   var qs = search.substring(1);  
   var hostName = hostname;  
@@ -130,7 +130,7 @@ Math对象还有很多的方法,具体方法及用于可以上MDN查找
   
 要改变属性的默认特性需要使用Object.defineProperty()方法如:  
 
-```JavaScript  
+```js
 var person = {}  
 Object.defineProperty(person, "name", {  
   writable:false,  
@@ -155,7 +155,7 @@ alert(person.name); // nigl
   
 访问器属性必须通过Object。defineProperty()来定义,如:  
 
-```JavaScript  
+```js
 var book = {  
   _year : 2004,  
   edition: 1  
@@ -202,7 +202,7 @@ Object.getOwnPropertyDescriptor()方法可用于读取属性的特性,configurab
   
 组合使用构造函数和原型模式是最广泛的创建自定义类型的方法：  
 
-```JavaScript  
+```js
 function Person(name){  
   // 在构造函数中定义实例的属性和方法  
   this.name = name;  
@@ -219,7 +219,7 @@ Person.prototype = {
 
 动态原型模式整合构造函数和原型模式，仅在第一次调用构造函数时初始化原型：  
 
-```JavaScript  
+```js
 function Person(name){  
   this.name = name;  
   // 初次初始化原型,此处不可用字面量对象覆写原型  
@@ -257,7 +257,7 @@ console.info(instance.getSuperValue());
 
 在子类构造函数中调用父类构造函数, 如:  
 
-```JavaScript  
+```js
 function SubType(){  
   // 继承SuperType  
   SuperType.call(this);  
@@ -343,7 +343,7 @@ SubType.prototype.sayAge = function(){console.info(this.age)};
 
 在递归函数中调用函数自身时需要使用arguments.callee()代替函数名，在严格模式下不能访问arguments.callee时需要使用命名函数表达式来实现：  
 
-```JavaScript  
+```js
 var factorial = function f(num) {  
   if(num <= 1){  
     return 1;  
@@ -359,7 +359,7 @@ var factorial = function f(num) {
 闭包引用了外部函数的作用域，因此当匿名函数返回时，外部函数的作用域仍然没有被销毁  
 闭包中保存的仅为外部函数作用域的引用，当外部函数作用域持续变换时，闭包中的相关变量也会跟着变化，如：  
 
-```JavaScript  
+```js
 function createFunction(){  
   var result = new Array();  
   for(var i=0; i< 10;i++){  
@@ -379,7 +379,7 @@ function createFunction(){
 
 JavaScript中没有块级作用域，使用立即执行函数可模仿块级作用域:  
 
-```JavaScript  
+```js
 (function(){  
   // 块级作用域  
 })(); //立即调用  
@@ -390,7 +390,7 @@ JavaScript中没有块级作用域，使用立即执行函数可模仿块级作�
 JavaScript中没有私有成员的概念，但任何在函数中定义的变量都可以认为时私有变量，闭包中有权访问私有变量或私有方法的公共方法成为特权方法  
 > 构造函数模式  
 
-```JavaScript  
+```js
 function Person(name){  
   this.getName = function(){  
     return name;  
@@ -409,7 +409,7 @@ alert(person.getName()); // greg
 原型模式中没有对Person进行声明，初始化未经声明的变量，总是会创建一个全局变量  
 这种方式创建静态私有变量会因为原型而增进代码复用  
 
-```JavaScript  
+```js
 (function(){  
   var name = '';  
   Person = function(value){  
@@ -435,7 +435,7 @@ alert(person2.getName()); //michael
 > 模块模式  
 模块模式是为单例创建私有变量和特权方法  
 
-```JavaScript  
+```js
 var application = function() {  
   var components = new Array();  
   components.push(new BaseComponents());  
@@ -454,7 +454,7 @@ var application = function() {
 
 > 增强模块模式  
 
-```JavaScript  
+```js
 var application = function() {  
   var components = new Array();  
   components.push(new BaseComponents());  
@@ -541,7 +541,7 @@ window.open(url, target, feature, bool)方法可以导航到一指定的url,targ
   
 #### 间歇调用和超时调用  
   
-```javascript  
+```js
 // 超时调用  
 let timeoutId = setTimeout(function() {  
 alert('timeout')  
@@ -590,7 +590,7 @@ screen对象基本上只用来表明客户端的能力,其中包括浏览器窗�
 history对象保存着用户上网的历史记录,history对象与window对相关联因此每个标签或框架都有自己的history对象.  
 用法:  
 
-```JavaScript  
+```js
 history.go(-1); // 后退一页  
 history.go(1); // 前进一页  
 history.go(2); // 前进2页  
@@ -662,7 +662,7 @@ Element类型用于表现xml或html元素，通过nodeName和tagName可以访问
 2. 操作特性的方法有getAttribute(), setAttribute(), removeAttribute()；getAttribute()方法可以访问到标准特性和自定义特性,但在访问style和onclick这样的属性时返回的均为字符串  
 3. setAttribute()可用于替换或创建属性,但:  
 
-```JavaScript  
+```js
 div.mycolor = "somecolor";  
 alert(div.getAttribute('mycolor')); // null (IE除外)  
 ```  
@@ -705,7 +705,7 @@ DocumentFragment文档片段在文档中没有对应的标记,是一种轻量级
 
 是在页面加载时不存在,但将来的某一时刻通过修改DOM动态添加的脚本,如:  
 
-```JavaScript  
+```js
 function loadScript(url){  
    var script = document.createElement("script");  
    script.type = "text/javascript";  
@@ -718,7 +718,7 @@ function loadScript(url){
 
 与动态脚本类似，示例：  
 
-```JavaScript  
+```js
 function loadStyles(url){  
    var link = document.createElement("link");  
    link.rel = "stylesheet";  
@@ -738,7 +738,7 @@ function loadStyles(url){
 NodeList, NamedNodeMap,HTMLCollection这三个集合都是随DOM动态更新的.所有NodeList对象都是在访问 DOM文档时实时运行的查询,应该尽量减少访问NodeList的次数.  
 如下示例代码将导致无限循环,因为divs取得的HTMLCollection是动态的,每次查询divs.length都会获得新的值:  
 
-```JavaScript  
+```js
 var divs = document.getElementsByTagName("div"),  
     i,  
     div;  
@@ -750,7 +750,7 @@ for (i=0; i < divs.length; i++){
 
 代码可改为  
 
-```JavaScript  
+```js
 var divs = document.getElementsByTagName("div"),  
     i,  
     len,  
@@ -772,7 +772,7 @@ for (i=0, len=divs.length; i < len; i++){
 querySelector()方法接收一个 CSS 选择符,返回调用对象后代中与该模式匹配的第一个元素,如果没有找到匹  
 配的元素,返回 null。  
 
-```JavaScript  
+```js
 //取得类为"selected"的第一个元素  
 var selected = document.querySelector(".selected");  
 ```  
@@ -798,7 +798,7 @@ childElementCount, firstElementChild, lastElementChild, previousElementSibling, 
 `var allCurrentUsernames = document.getElementsByClassName("username current");`  
 + classList属性,className属性返回字符串不易操作,新增的classList属性对象,访问方式与集合类似.还定义了如下示例方法:  
 
-  ```JavaScript  
+  ```js
   //添加"current"类  
   div.classList.add("current");  
   // 返回bool是否包含'bd'类  
@@ -827,7 +827,7 @@ charset 属性表示文档中实际使用的字符集;defaultCharset文档中的
 
 HTML5规定可以为元素添加非标准的属性,但要添加前缀data-; 元素的dataset属性来访问自定义属性的值,如:  
 
-```JavaScript  
+```js
 //取得自定义属性的值  
 var appId = div.dataset.appId; // 对应自定义属性在标签中的名称为data-appId  
 var myName = div.dataset.myname; // 对应自定义属性在标签中的名称为data-myname  
@@ -917,7 +917,7 @@ div.box {
 }  
 ```  
 
-```JavaScript  
+```js
 var sheet = document.styleSheets[0];  
 var rules = sheet.cssRules || sheet.rules;  
 var rule = rules[0];  
@@ -998,7 +998,7 @@ DOM事件流实现了事件捕获和事件冒泡的结合，其过程为事件�
 
 基本添加方式如下例:  
 
-```JavaScript  
+```js
 var btn = document.getElementById('myBtn');  
 btn.onclick = function() {  
   alert(this.id); // "myBtn"  
@@ -1315,7 +1315,7 @@ effectAllowed属性表示放置目标允许哪种dropEffect, 取值为dropEffect
 
 #### try-catch语句  
 
-```javascript  
+```js
 try {  
   // 不确定会不会出错的代码  
 } catch (error) {  
@@ -1362,7 +1362,7 @@ JSON.parse()方法,类似也可接收第二个参数函数作为过滤器
 如下方代码示例,创建XMLHttpRequest对象,通过open方法启动一个请求,此时可设置请求头,调用send方法时才真正发送了请求,响应成功后XHR对象有responseText,responseXML,status,statusText几个属性会被填充  
 另外在收到响应之前可调用abort()方法取消请求,并在之后解除引用  
 
-```JavaScript  
+```js
 let xhr = new XMLHttpRequest();  
 // 发送异步请求时需要监听readyState的状态,4为已完成,该事件需在open调用前添加  
 xhr.onreadystatechange = function() {  
@@ -1479,7 +1479,7 @@ Object.freeze(person),冻结对象的属性不可被修改,Object.isFreeze()
 
 对于周期性事件,特别是进行了DOM操作的函数,需要对函数进行节流,避免多次重复执行,示例:  
 
-```JavaScript  
+```js
 function throttle(method, context) {  
   clearTimeout(method.tId);  
   method.tId= setTimeout(function(){  
