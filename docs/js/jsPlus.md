@@ -43,7 +43,7 @@ null和undefined没有constructor属性，不能使用此方法进行判断.另�
   
 以下是一些示例  
 
-```JavaScript  
+```js
 Object.prototype.toString.call(Symbol('a')) // '[object Symbol]'  
 Object.prototype.toString.call(null) // [object Null]  
 Object.prototype.toString.call(NaN) // [object Number]  
