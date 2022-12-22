@@ -9,3 +9,9 @@
 autojs的新版本已经收费，并且封禁了部分app，因此推荐使用其衍生版本autoxjs，[文档地址](http://doc.autoxjs.com/#/?id=%e7%bb%bc%e8%bf%b0)  
 
 而对于冰狐智能辅助、aibote等平台在autojs基础上还提供了微服务，云服务等持久化的一整套支持商业化的系统服务  
+
+## autojs
+
+由于autojs最新版本开始收费并且限制诸多，这里使用其衍生免费版本autox.js
+
+控件选择器api，与前端中的css选择器类似  
