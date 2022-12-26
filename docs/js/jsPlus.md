@@ -298,6 +298,23 @@ function debounceAsync(fn, delay) {
     })
   }
 }
+
+function throttle(fn, delay, isImmediate = false){
+  let flag = true;
+  return function(){
+    if(flag){
+      let _self = this;
+      let args = arguments;
+      flag = false; // 执行代码，并加锁
+      isImmediate && fn.apply(_self, args); // 立即执行时机
+      setTimeout(()=>{
+        !isImmediate && fn.apply(_self, args); // 延迟执行时机
+        flag = true; // 在延迟执行后释放执行锁
+      }, delay)
+    }
+  }
+}
+
 /**
  * @description: 节流wrap函数异步版本，返回值与防抖类似,节流也可使用时间戳与间隔时间对比实现
  * 节流也有立即执行和非立即执行的版本，实现思路与防抖类似
