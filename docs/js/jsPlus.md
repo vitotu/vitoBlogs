@@ -344,11 +344,11 @@ function throttleAsync(fn, interval) {
 ## js运行机制  
 <!-- TODO：迁移到浏览器原理中 -->
 js执行是会将对象放在堆(heap)中，将基础变量以及对象的引用(指针)放在栈(stack)中;  
-js还维护了一个执行栈与数据栈意义不同  
+js还维护了一个执行栈用于存放执行过程数据, 与数据栈意义不同  
 
 ### 浏览器  
 
-js重要的运行环境之一浏览器，可能时多进程或单进程的；但浏览器都是多线程的。js是单线程的；  
+js重要的运行环境之一浏览器，可能是多进程或单进程的(现代浏览器大多是多进程的)；但浏览器都是多线程的。js是单线程的；  
 不同的浏览器有不同的内核：`chrome, Safari:webkit, firefox:Gecko, IE:Trident等`，这些内核提供了html，css文档解析，dom/css模块在内存中的管理，布局和渲染以及js解释器等模块，chrome和nodejs中的js解释器为v8  
 
 ### 事件循环模型  
@@ -358,7 +358,8 @@ js重要的运行环境之一浏览器，可能时多进程或单进程的；但
 先运行同步代码，绑定DOM事件监听，定时器，发送ajax请求等。其中将异步函数交给事件管理模块，当事件触发时，管理器将回调函数添加到任务队列，主线程不断从任务队列中取出任务执行。  
   
 更进一步的：  
-任务队列又分为宏任务(macro task)和微任务(micro task)，其中由Promise和MutationObserver传入的回调函数属于微任务，而setTimeout和setInterval属于宏任务；js的初始化代码执行完后会优先处理微任务队列中的所有事件，然后是宏任务。  
+任务队列又分为宏任务(macro task)和微任务(micro task)，其中由Promise和MutationObserver传入的回调函数属于微任务，而setTimeout和setInterval属于宏任务；  
+js的初始化代码执行完同步代码后会优先处理微任务队列中的所有事件，然后是宏任务队列。  
 示例代码：  
 
 ```js  
