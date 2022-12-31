@@ -604,7 +604,8 @@ es6中多使用寄生组合式继承模式
 
 ### 首屏时间优化
 
-1. 对于pv量(page view)比较高的页面，比如 b 站等流量图也比较大的，采用 ssr 采用 ssr 如何优化性能
+1. 对于pv量(page view)比较高的页面，比如 b 站等流量图也比较大的，采用 ssr  
+  采用 ssr 如何优化性能
    + 性能瓶颈在于 react-dom render/hydrate 和 server 端的 renderToString
    + 尽量减少 dom 结构， 采用流式渲染，jsonString 一个对象，而不是 literal 对象
    + server 去获取数据
