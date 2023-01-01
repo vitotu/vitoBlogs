@@ -697,14 +697,8 @@ class MyPromise {
         try {
           let result = fn(_self.result);
           if(result instanceof MyPromise){
-            result.then(r=>{
-              res(r);
-            }, e=>{
-              rej(e);
-            })
-          }else {
-            res(result);
-          }
+            result.then(r=>{res(r)}, e=>{rej(e)})
+          }else {res(result);}
         } catch (err) {
           rej(err)
         }
@@ -734,20 +728,14 @@ class MyPromise {
   static resolve(data){ // 绑定在类上的resolve方法，传入promise时，根据其结果返回状态，否则返回成功的且结果为data的新promise对象
     return new MyPromise((res, rej) => {
       if(data instanceof MyPromise){
-        data.then(r => {
-          res(r);
-        }, e => {
-          rej(e);
-        })
+        data.then(r => {res(r)}, e => {rej(e)})
       }else{
         res(data);
       }
     })
   }
   static reject(err){ // 返回新的promise对象，状态为rejected，结果为err
-    return new MyPromise((res, rej)=> {
-      rej(err);
-    })
+    return new MyPromise((res, rej)=> {rej(err)})
   }
   
   static all(promises){ // 传入promise数组，当所有promise都成功时返回成功的promise，结果是所有promise成功结果组成的数组，当有一个promise失败时直接返回失败的结果
@@ -755,26 +743,23 @@ class MyPromise {
       let count = 0;
       let arr = [];
       for(let i = 0;i < promises.length;i++){
-        promises[i].then(r=>{
-          count++;
-          arr[i] = r;
-          if(count === promises.length){ // 翻转数量和promise长度相同时，翻转返回新promise对象的状态
-            res(arr);
-          }
-        }, e=>{
-          rej(e);
-        })
+        promises[i].then(
+          r=>{
+            count++;
+            arr[i] = r;
+            if(count === promises.length){ // 翻转数量和promise长度相同时，翻转返回新promise对象的状态
+              res(arr);
+            }
+          },
+          e=>{rej(e)}
+        )
       }
     })
   }
   static race(promises){ // 当第一个promise翻转状态时直接返回相同状态的新promise对象
     return new MyPromise((res, rej) => {
       for(let i = 0; i < promises.length; i++){
-        promises[i].then(r=>{
-          res(r)
-        }, e=>{
-          rej(e)
-        })
+        promises[i].then(r=>{res(r)}, e=>{rej(e)})
       }
     })
   }
@@ -787,11 +772,8 @@ class MyPromise {
         const index = curIndex;
         curIndex++;
         if(index < promises.length){
-          promises[index].then(r => {
-            result[index] = r;
-          }).catch(e => {
-            result[index] = e;
-          }).finally(r => {
+          promises[index].then(r =>{result[index] = r},e => {result[index] = e})
+          .finally(r => {
             resolvedCount++;
             if(resolvedCount === promises.length){
               res(result);
