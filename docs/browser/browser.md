@@ -56,7 +56,7 @@
   - 遍历DOM树中所有可见节点，并添加到布局中，计算节点的坐标位置
 - 分层
   - 基于布局树为[层叠上下文](https://developer.mozilla.org/zh-CN/docs/web/css/css_positioning/understanding_z_index/the_stacking_context)及需要裁剪的地方(overflow:auto需要滚动)创建图层树
-  - 图层树以内存管理为代价提升了DOM更新的性能，不宜过渡使用
+  - 图层树以内存管理为代价提升了DOM更新的性能，不宜过度使用
 - 图层绘制
   - 渲染引擎将图层拆分为小的绘制指令，生成待绘制指令列表
 - 合成(切分图块和栅格化)

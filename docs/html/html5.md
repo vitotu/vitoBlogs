@@ -169,7 +169,7 @@ CSP (Content Security Policy) 网页安全政策，浏览器端的白名单制�
 ## inline和img标签下方空白
 
 首先css中display:inline元素的[vertical-align](https://developer.mozilla.org/zh-CN/docs/Web/CSS/vertical-align)各值的含义与英语的四线格类似，默认值为baseline，其下有bottom其上有top，top和bottom之间的空间即为line-height，如下图：  
-[vertical-align](./resource/inline-vertical-align.png)  
+![vertical-align](./resource/inline-vertical-align.png)  
 而inline的img标签下方空白即为baseline和bottom之间的空白，因此可以通过line-height设置为0，或font-size设置为0消除空白  
 [参考文档](https://www.zhihu.com/question/21558138)  
 相关话题:字体度量、line-height 和 vertical-align[IFC](https://panelcf1.stgchannelxyzroute.xyz/auth/login)  

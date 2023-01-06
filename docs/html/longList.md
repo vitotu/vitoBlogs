@@ -101,13 +101,15 @@
     function createItem(page = 1, size = 10){  
       const fragment = document.createDocumentFragment();  
       const box = document.createElement("div");  
-      box.className = `page_${page}`;  for(let i = 0; i < size; i++){
-      const element = document.createElement("div");
-      element.style.width = "100%";
-      element.style.height = "50px";
-      element.className = `item_${page * (i + 1)}`;
-      element.innerText = `我是item——${((page - 1) * size) + i + 1}`;
-      box.appendChild(element);  }  
+      box.className = `page_${page}`;
+      for(let i = 0; i < size; i++){
+        const element = document.createElement("div");
+        element.style.width = "100%";
+        element.style.height = "50px";
+        element.className = `item_${page * (i + 1)}`;
+        element.innerText = `我是item——${((page - 1) * size) + i + 1}`;
+        box.appendChild(element);
+      }  
       fragment.appendChild(box);  
       return {fragment, box};
     }
