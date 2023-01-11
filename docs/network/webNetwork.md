@@ -330,8 +330,11 @@ cors将请求分为两类，同时满足以下两个条件即为简单请求，�
 
 * 请求方法为:HEAD,POST,GET
 * 请求头仅包含字段:Accept,Accept-Language,Content-Language,Last-Event-ID,Content-Type(取值限于application/x-www-form-urlencoded、 multipart/form-data、text/plain)  
-TODO：复杂请求和简单请求在跨域的不同表现
-常见的跨域错误:
+
+TODO：复杂请求和简单请求在跨域的不同表现  
+
+常见的跨域错误:  
+
 * `No 'Access-Control-Allow-Origin' header ..., code xxx`
   * code 为404时，复杂ajax请求，发送了options预检请求，但后端未允许options请求
   * code 405，后端支持options请求，但安全配置阻止了options
@@ -406,7 +409,7 @@ module.exports = function(ctx, body) {
 // node service.js开发服务端，浏览器打开html验证jsonp跨域
 ```
 
-ps1:根据同源策略，不同域不可共享cookie，但实际上浏览器实现是同一个ip下的多个端口下的cookie是共享的
+ps1:根据同源策略，不同域不可共享cookie，但实际上浏览器实现是同一个ip下的多个端口下的cookie是共享的  
 ps2:ajax请求基于XMLHttpRequest(XHR)，获取数据后无需立即展示，不会导致页面刷新；而普通http请求则会导致页面刷新
 
 ### CDN原理和优缺点
@@ -426,10 +429,10 @@ ps2:ajax请求基于XMLHttpRequest(XHR)，获取数据后无需立即展示，�
 
 ### DNS解析
 
-DNS属于应用层，基于UDP协议，用于将域名转换为ip地址
-hosts文件：本机hosts解析配置
-域名：mail(三级域名).ccav(二级域名).com(顶级域名)
-域名服务器：
+DNS属于应用层，基于UDP协议，用于将域名转换为ip地址  
+hosts文件：本机hosts解析配置  
+域名：mail(三级域名).ccav(二级域名).com(顶级域名)  
+域名服务器：  
 
 * 本地域名服务器
 * 根域名服务器
