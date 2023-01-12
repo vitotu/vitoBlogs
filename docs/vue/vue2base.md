@@ -21,7 +21,7 @@ template本身最终将不会被渲染为DOM结构，并且内部可以多层嵌
 </style>
 ```
 
-SFC有这内聚关注、作用域css，预编译模板避免运行编译开销、利于模块化等优点，但也必须使用构建工具  
+SFC有着内聚关注、作用域css，预编译模板避免运行编译开销、利于模块化等优点，但也必须使用构建工具  
 与之对应的`.jsx`风格即是在js中书写xml格式语法用于表示html结构，vue想要使用jsx风格需要自己书写render函数  
 vue在`<template>`中书写`{ {js表达式}}`,`v-指令:参数='表达式'`等语法样式，这些语法样式由Vue实例来解析。这种方式统称为模板语法  
 
@@ -62,7 +62,7 @@ console.log(vm._data === b) // false
 // 原有的对象引用a被覆盖了,因此不等于b对象  
 ```
 
-从data配置向中返回的对象将都具有响应式，即当该数据被修改后所有引用到的地方都会被同步修改
+从data配置项中返回的对象将都具有响应式，即当该数据被修改后所有引用到的地方都会被同步修改
 
 - 响应式基础特性
   1. Vue2在组件实例上设置属性,代理访问data配置项中的数据(vm.key与vm._data.key同源).  
@@ -77,7 +77,7 @@ console.log(vm._data === b) // false
 直接在模板语法中无法使用过于复杂的js表达式，computed属性可以用于解决此问题  
 类似于属性的getter/setter，仅配置一个函数时默认为getter  
 与methods中的方法相比，computed有基于响应式依赖进行缓存，只有依赖发生变化时才会重新求值，相对而言适用于计算量较大的场景  
-与watch属性相比，watch属性是更通用的监听数据变化的方法，适用于当数据变化时需要执行异步或开销较大的操作时  
+与computed属性相比，watch属性是更通用的监听数据变化的方法，适用于当数据变化时需要执行异步或开销较大的操作时  
 更多参见[computed和watch原理](./vue2plus/README.md#computed原理)  
 
 ## 根实例vm  
@@ -341,7 +341,6 @@ v-bind.sync本质是语法糖
 ```
 
 v-model：v-model实际是v-bind.sync的语法糖，且每个组件仅能绑定一个v-model指令，对应text, textarea 的value属性反向更新绑定为input事件，而checkbox, select等为change事件,且仅能绑定到这些标签对应的固定值上  
-在自定义组件中使用需要通过model选项定制其prop和event，否则默认事件为input  
 在自定义组件中使用需要通过model选项定制其prop和event，否则默认事件为input，默认绑定prop为value  
 
 ```js
