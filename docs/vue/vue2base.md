@@ -387,7 +387,7 @@ Vue中使用组件的三大步骤：
   3.在脚手架中推荐在options对象中使用name属性，其值命名多单词组成时可使用大驼峰(推荐方式,需在脚手架环境下)或`-`连字符的方式  
   4.组件文件名命名推荐与name属性保持一致  
   备注：使用template可以配置组件结构。  
-  全局定义组件时可简写:`const school = Vue.extend(options) => const school = options`  
+  全局定义组件时`const school = Vue.extend(options)`可简写为`const school = options`  
   
 - 二、注册组件  
   1.局部注册：靠new Vue的时候传入components选项  
@@ -685,7 +685,7 @@ v-enter, v-enter-active, v-enter-to;v-leave, v-leave-active, v-leave-to;
 
 - 列表过渡
 
-列表过渡适用于使用了v-for指令的元素组，需要使用`<transition-group>`组件包裹，组件会转换为真实DOM，默认为`<span>`标签，且过渡模式不可用，内部元素需要指定唯一的key，css过渡的类会应用于内部元素中而不是组或容易本身  
+列表过渡适用于使用了v-for指令的元素组，需要使用`<transition-group>`组件包裹，组件会转换为真实DOM，默认为`<span>`标签，且过渡模式不可用，内部元素需要指定唯一的key，css过渡的类会应用于内部元素中而不是组或元素本身  
 列表过渡的类名在普通过渡的基础上增加了move用于改变定位时使用  
 
 PS：将`<transition-group>`或`<transition>`作为根组件进行封装能够对过渡效果进行复用，更推荐使用函数式组件的方式进行复用  
@@ -734,10 +734,10 @@ attributeObject:{ // 可选，与模板中attribute对应的数据对象
 childNode: string | Array // 文本节点或子级虚拟节点需要由createElement函数生成
 ```
 
-PS:VNode必须唯一，因此多个相同的VNode需要用工行函数实现  
+PS:VNode必须唯一，因此多个相同的VNode需要用工厂函数实现  
 渲染函数中v-if/v-for可以用条件判断或map等方式实现，而v-model语法糖则需要自行实现相关逻辑  
 对于部分事件修饰符，提供了对应的修饰前缀，如`click.passive => &click; click.capture => !click; click.once => ~click`,而其他修饰符基本可以从event参数中读取到并操作，因此没有对应的修饰符  
-通过this.$slots可以访问静态插槽的内容, 通过this.$scopedSlots访问作用于插槽
+通过this.$slots可以访问静态插槽的内容, 通过this.$scopedSlots访问作用域插槽
 
 - jsx
 
