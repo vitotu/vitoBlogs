@@ -50,7 +50,10 @@ Observer对象利用Object.defineProperty()方法对数据进行监听，并借�
 每个data声明的属性，都拥有一个的专属依赖收集器Dep.subs，依赖收集器subs保存的依赖是watcher，watcher可进行视图更新
 
 至此当数据变动时，会触发set方法，而set中通过dep.notify方法遍历watcher数组，并调用其update方法更新视图完成响应式  
-而当视图发生更新时，仅需在compile增加input事件监听，完成数据修改即可
+
+- 双向绑定
+
+而当视图发生更新时，仅需在compile增加input事件监听，由回调函数修改数据，完成从视图到数据的更新。结合上述的数据劫持和发布订阅共同构成双向绑定。
 
 流程图如下：  
 ![reactive.png](./resource/reactive.png)  
@@ -67,7 +70,7 @@ Observer对象利用Object.defineProperty()方法对数据进行监听，并借�
 ## computed原理
 
 computed属性在响应式的基础上增加了缓存，当computed捕获到依赖变化时会将缓存控制位dirty置为true，重新读取computed时会执行get进行重新计算，并将计算值进行缓存，计算完成后翻转dirty状态，方便再次读取时使用缓存  
-computed会让依赖的data数据项收集到computed的watcher，从而对应data数据项变化时，会同时通知computed和依赖computed(页面等)的地方。  
+computed会让依赖的data数据项收集到computed对应的watcher，从而对应data数据项变化时，会同时通知computed和依赖computed(页面等)的地方。  
 
 1. 页面更新，读取computed的时候，Dep.target会设置为页面watcher，从而让computed的watcher中的get方法收集到页面watcher的dep对象。
 2. computed被读取，createComputedGetter包装的函数触发，第一次会进行计算。  
@@ -92,7 +95,7 @@ data改变首先调用computed - watcher的update方法，将dirty更改为true�
 
 watch在一开始初始化的时候，会读取一遍监听的数据的值，于是，此时那个数据就收集到watch的watcher了  
 然后给watch设置的handler，watch会放入watcher的更新函数中  
-当数据改变时，通知watch的watcher进行更新，于是你设置的handler就被调用了  
+当数据改变时，通知watch的watcher进行更新，于是上一步设置的handler就被调用了  
 
 - 设置 immediate 时，watch 如何工作
 
@@ -107,13 +110,13 @@ watch在一开始初始化的时候，会读取一遍监听的数据的值，于
 
 ## AST(abstract syntax tree)抽象语法树
 
-将字符串转换为可利用的树状数据结构，为后续的DOM API和js处理提供支持，过滤不安全的DOM结构，便于浏览器渲染
+AST主要将字符串转换为可利用的树状数据结构，为后续的DOM API和js处理提供支持，可以过滤不安全的DOM结构，便于浏览器渲染
 
 ### 预设算法题
 
 解码字符串压缩算法，如：`3[a]`复原为`aaa`,`2[1[a]2[b]]`复原为`abbabb`  
 
-- 思路：利用栈数据结构存入重复频次，缓存栈存入字符容器，遍历字符串，每次入栈数字则缓存栈一起入栈空字符串容器，遇到字符则将字符放入缓存栈顶容器内，若遇到`]`号，则出栈频次，出栈缓存，并将出栈的缓存字符串冲入频次数后添加到新的栈顶容器中
+- 思路：利用栈数据结构存入重复频次，缓存栈存入字符容器，遍历字符串，每次入栈数字则缓存栈一起入栈空字符串容器，遇到字符则将字符放入缓存栈顶容器内，若遇到`]`号，则出栈频次，出栈缓存，并将出栈的缓存字符串复制频次数后添加到新的栈顶容器中
   遍历结束后将缓存栈顶(也是最后一个容器)中的字符串重复最后一个频次数返回即可
 
 - js实现
