@@ -311,7 +311,10 @@ let data = {
 </div>
 ```
 
-除mustache之外，通过 a) 纯DOM的方法 b) 数组join方法 c) es6的模板字符串等方法也可进行转换  
+除mustache之外，通过  
+a) 纯DOM的方法  
+b) 数组join方法  
+c) es6的模板字符串等方法也可进行转换  
 
 mustache算法 首先将模板字符串解析分词为 tokens 形式，然后将 tokens 结合数据解析为新的 dom 字符串  
 mustache 先于 vue 出现，后来被 vue 所采用，mustache官方[项目地址](https://github.com/janl/mustache.js)  
