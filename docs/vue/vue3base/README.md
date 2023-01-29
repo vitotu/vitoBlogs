@@ -472,13 +472,13 @@ const props = defineProps({ // defineProps()宏无需引入即可使用
   title:String, // 基础类型检查，若指定null或undefined，则会跳过类型检查
   propA:[String, Number], // 多类型，Boolean类型存在特殊的类型转换
   propC:{
-    type:String, // 可以时常见的原生构造函数，也可以时自定义的类
+    type:String, // 可以是常见的原生构造函数，也可以是自定义的类型
     required:true, // 所有的prop默认都是可选的，定义required表明参数必传
     default:'默认值', // 未指定default的props默认值为undefined，Boolean类型则为false
     // default:(rowProps){return {message:''}} 
     // 若为Object或数组类型，则默认值必须从函数中返回
     validator(value){ return ['success', 'warning', 'danger'].includes(value)},
-    // 自定义校验规则，函数返回值必须上上述数组中，校验失败在开发模式下会抛出控制台警告
+    // 自定义校验规则，函数返回值必须在上述数组中，校验失败在开发模式下会抛出控制台警告
   }
 });
 // 以对象的形式声明key为prop属性名称,value为其类型的构造函数
@@ -504,7 +504,7 @@ export default { // 两种实现方式都是基于props选项
 - 透传attribute
 
 对于单根节点组件，未声明的props,emit会自动透传到子组件模板的根节点上, 与vue2中指定`$attrs`和`$listeners`类似，但vue3中只能在模板中访问`$attrs`，并且该变量包含了未声明的props和emits  
-通过`export default {inheritAttrs:false}`配置向可禁用attributes继承，并在模板中使用`v-bind="$attrs"`绑定到指定的元素上  
+通过`export default {inheritAttrs:false}`配置项可禁用attributes继承，并在模板中使用`v-bind="$attrs"`绑定到指定的元素上  
 
 TODO:此处`v-bind`是否会同时绑定监听事件，有待验证
 
@@ -539,7 +539,7 @@ export default { // 无setup时，attrs被暴露在上下文上
   <button @click="$emit('increaseBy', params)"></button>
 </template>
 <script setup>
-// setup 下无法想模板中一样使用$emit触发事件，需要使用defineEmits声明后使用
+// setup 下无法像模板中一样使用$emit触发事件，需要使用defineEmits声明后使用
 const emit = defineEmits({ // 也支持Array<string> 的方式定义
   submit(payload){return true}, // 对象形式定义支持对触发事件的参数与进行验证
   (e:'change', id:numebr):void, // 配合ts可直接写成函数type的形式
