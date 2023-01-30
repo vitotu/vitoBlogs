@@ -115,7 +115,7 @@ import { reactive } from 'vue'; // 导入reactive函数用于创建响应式对�
 export default {
   setup(){
     const state = reactive({count:0});
-    // reactive创建的响应式对象state != {count:0}原对象，state时es6中的proxy类型的对象
+    // reactive创建的响应式对象state != {count:0}原对象，state是es6中的proxy类型的对象
     function add(){state.count++;} // 相当于method中定义的方法
     return {state, add} // 返回的变量才能在模板中访问
   }
@@ -372,7 +372,7 @@ const unWatch = watch( // 第一个参数为要侦听的对象，可以取String
   // 若直接监听一个reactive对象，会默认创建一个深层侦听，且newCount和oldCount相等，应为他们是同一个对象,且deep配置不生效
   async (newCount, oldCount) => {}, // 在vue2中使用箭头函数无法保留上下文
   {
-    deep:true, // 绑定响应式对象时默认时深层侦听的，但也可以通过配置deep强制转换为深层侦听
+    deep:true, // 绑定响应式对象时默认是深层侦听的，但也可以通过配置deep强制转换为深层侦听
     flush:'post', // 状态变化时，回调调用默认在DOM更新之前，flush选项可指定在DOM更新之后调用
     // ... 更多选项查看api文档
   }, 
@@ -532,7 +532,7 @@ export default { // 无setup时，attrs被暴露在上下文上
 ### 监听事件
 
 自定义组件的事件使用与vue2中的[自定义事件](../vue2base.md#事件处理)基本一致  
-需要补充的是，vue3中自定义组件触发内触发的事件可以通过`defineEmits()`宏进行声明  
+需要补充的是，vue3中自定义组件内触发的事件可以通过`defineEmits()`宏进行声明  
 
 ```vue
 <template>
@@ -556,7 +556,7 @@ export default { // setup()函数情况下则通过emits配置定义，与props�
 ```
 
 v-model与v-bind.sync区别及原理见vue2[指令](../vue2base.md#指令)  
-在vue3自定义组件中没有响应的model配置项，可通过`defineProps(['modelValue'])`和`defineEmits(['update:modelValue'])`的方式实现，而父组件在使用时`<CustomComponent v-model:modelValue="reactiveValue"/>`，因此vue3也支持自定义组件同时绑定多个v-model  
+在vue3自定义组件中没有对应的model配置项，可通过`defineProps(['modelValue'])`和`defineEmits(['update:modelValue'])`的方式实现，在进行绑定时：`<CustomComponent v-model:modelValue="reactiveValue"/>`，因此vue3也支持自定义组件同时绑定多个v-model  
 更多v-model及修饰符相关参见[官方文档](https://cn.vuejs.org/guide/components/events.html)及[vue2指令章节](../vue2base.md#指令)  
 
 监听事件也可透传，详见上一小节，透传  
@@ -614,7 +614,7 @@ const SafeAsyncComp = defineAsyncComponent({ // 对象配置形式入参
 
 ## 组合式函数
 
-组合式函数时vue3中利用组合式api来封装和复用有状态逻辑的函数，如封装跟踪鼠标在当前页面中的位置功能  
+组合式函数是vue3中利用组合式api来封装和复用有状态逻辑的函数，如封装跟踪鼠标在当前页面中的位置功能  
 
 ```js
 // mouse.js
@@ -667,7 +667,7 @@ const { x, y } = useMouse()
 
 - 与vue2比较
 
-vue2中与组合式函数相类似的时mixins配置，vue3为了兼容项目迁移保留了mixins配置但不推荐主动使用  
+vue2中与组合式函数相类似的是mixins配置，vue3为了兼容项目迁移保留了mixins配置但不推荐主动使用  
 与mixins相比，mixins的缺点有：不清晰的数据来源；命名空间冲突；隐式的跨mixin通信；  
 与无渲染组件(类似于代理工作方式的组件)对比，组合式函数不会产生额外的组件实例开销  
 
@@ -694,10 +694,10 @@ PS：组合式函数的逻辑功能上与React hooks相近，组合式api与组�
 
 ### Suspense
 
-`<Suspense></Suspense>`用于在组件树中协调对异步依赖的处理，让组件数上层等待下层多个嵌套异步依赖解析完成，并在等待是渲染一个加载状态  
+`<Suspense></Suspense>`用于在组件树中协调对异步依赖的处理，让组件树上层等待下层多个嵌套异步依赖解析完成，并在等待是渲染一个加载状态  
 Suspense包裹异步组件，类似于async修饰的函数中使用await，用于顶层统一处理各异步组件的加载状态  
 `async setup()`和`<script setup> await /*顶层await*/</script>`均被视为异步依赖  
-异步组件suspensible选项幕刃为true，组件关系链上有`<Suspense></Suspense>`时组件内部的加载、报错、延时、超时等选型将被忽略，也可以显式的指定为false表明不受Suspense控制  
+异步组件suspensible选项默认为true，组件关系链上有`<Suspense></Suspense>`时组件内部的加载、报错、延时、超时等选型将被忽略，也可以显式的指定为false表明不受Suspense控制  
 `<Suspense></Suspense>`包裹的组件，也即Suspense的插槽有两种，`#default`和`#fallback`，两者都只允许一个直接子节点，即一个根节点  
 初始渲染时，将在内存中渲染默认插槽中的内容，若遇到异步以来则进入挂起状态，并展示fallback内容，当所有状态完成后进入完成状态，展示默认插槽的内容  
 进入完成状态后，只有当默认插槽的根节点被替换时，`<Suspense>` 才会回到挂起状态。组件树中新的更深层次的异步依赖不会造成 `<Suspense>` 回退到挂起状态。  
@@ -714,7 +714,7 @@ vue cli 官方提供的基于webpack的脚手架工具，当前处于维护模�
 ### 路由
 
 此处特指客户端路由  
-与vue2的vue-router v3.x对应的vue-router v4.x则时为vue3准备的路由库，[文档地址](https://router.vuejs.org/zh/introduction.html)
+与vue2的vue-router v3.x对应的vue-router v4.x则是为vue3准备的路由库，[文档地址](https://router.vuejs.org/zh/introduction.html)
 
 ### 状态管理
 
