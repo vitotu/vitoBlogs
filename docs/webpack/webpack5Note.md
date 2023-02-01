@@ -41,7 +41,7 @@ webpack 内部有 chunk 命名规则，不再是以 id(0, 1, 2)命名了
 
 ### Tree Shaking
 
-1. webpack 现在能够处理对嵌套模块的 tree shaking
+1. webpack5 现在能够处理对嵌套模块的 tree shaking
 
 ```js
 // inner.js
@@ -59,7 +59,7 @@ console.log(module.inner.a);
 
 在生产环境中, inner 模块暴露的 `b` 会被删除
 
-2. webpack 现在能够多个模块之前的关系
+2. webpack5 现在能够处理多个模块之前的关系
 
 ```js
 import { something } from './something';
@@ -75,7 +75,7 @@ export function test() {
 
 当设置了`"sideEffects": false`时，一旦发现`test`方法没有使用，不但删除`test`，还会删除`"./something"`
 
-3. webpack 现在能处理对 Commonjs 的 tree shaking
+3. webpack5 现在能处理对 Commonjs 的 tree shaking
 
 ### Output
 
@@ -118,9 +118,9 @@ cache: {
 
 ### 监视输出文件
 
-之前 webpack 总是在第一次构建时输出全部文件，但是监视重新构建时会只更新修改的文件。
+之前 webpack4 总是在第一次构建时输出全部文件，但是监视重新构建时会只更新修改的文件。
 
-此次更新在第一次构建时会找到输出文件看是否有变化，从而决定要不要输出全部文件。
+而webpack5在第一次构建时会找到输出文件看是否有变化，从而决定要不要输出全部文件。
 
 ### 默认值
 
@@ -136,7 +136,7 @@ cache: {
 
 对于脚手架，以vue-cli为例，vue2集成了webpack构建工具，使用`npx vue-cli-service inspect --mode=development > [文件名]`命令可将vue2使用的配置生成文件
 
-### loader
+### loader原理浅析
 
 loader主要用于处理webpack不能处理的资源，其本质是一个函数，详细参考[官方文档](https://www.webpackjs.com/api/loaders/)  
 以下为一个简单的babel-loader:
@@ -185,7 +185,7 @@ module.exports.pitch = function (remainingRequest, precedingRequest, data) {
 }
 ```
 
-### plugin
+### plugin原理浅析
 
 plugin是一个类，因此使用时需要new操作符实例化  
 plugin通过hook，捕获在每个编译(compilation)中触发的所有关键事件。在编译的每一步，plugin都具备完全访问webpack的compiler对象的能力，如果情况合适，还可以访问当前compilation对象。
