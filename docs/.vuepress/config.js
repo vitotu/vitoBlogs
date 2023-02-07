@@ -33,6 +33,7 @@ export default defineUserConfig({
         { text:'vue3基础', link:'/vue/vue3base/'},
         { text:'vuex', link:'/vue/vuex/'},
         { text:'vue router', link:'/vue/vueRouter/'},
+        { text:'pinia', link:'/vue/Pinia'},
       ]},
       {text: 'html', link: '/html/'},
       {text: 'css', children:[
