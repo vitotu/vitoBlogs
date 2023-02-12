@@ -66,7 +66,7 @@ console.log(vm._data === b) // false
 
 - 响应式基础特性
   1. Vue2在组件实例上设置属性,代理访问data配置项中的数据(vm.key与vm._data.key同源).  
-  2. data配置项中数组对象的响应式是通过数组包装Array类型的原生`push()`、`pop()`、`shift()`、`unshift()`、`splice()`、`sort()`、`reverse()`等函数来实现的，因此在修改数组类型的数据时，想要响应式的更新都各调用处，需要使用数组方法来修改数组而不是直接使用索引。  
+  2. data配置项中数组对象的响应式是通过数组包装Array类型的原生`push()`、`pop()`、`shift()`、`unshift()`、`splice()`、`sort()`、`reverse()`等函数来实现的，因此在修改数组类型的数据时，想要响应式的更新，各调用处需要使用数组方法来修改数组而不是直接使用索引。  
   3. data配置项中的对象都设置的了数据代理，新加的属性想要获得响应式，需要通过`Vue.set(target，propertyName/index，value)`方法或方法内`vm.$set(target，propertyName/index，value)`进行设置  
   4. 特别注意：`Vue.set()`和`vm.$set()`不能给vm 或 vm的根数据对象 添加属性！！！
 
@@ -87,7 +87,7 @@ vm取名字'mvvm'模型中的最后两个字符vm;model(数据),view(视图html)
 ## 事件处理  
 
 `v-on:事件名.修饰符="事件处理器"`，v-no也可以缩写为@符号；  
-事件名为html标签支持的事件click, input等或这自定义组件中触发的事件名  
+事件名为html标签支持的事件click, input等或自定义组件中触发的事件名  
 
 - 事件处理器
   - 内联事件处理器：内联js表达式，js表达式内通过$event手动访问event参数
