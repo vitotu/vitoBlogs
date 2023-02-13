@@ -209,7 +209,7 @@ qiankun的微应用应按业务拆分，子应用应能独立运行，因此应�
 
 Actions是qiankun官方提供了应用间通信方式，基于发布订阅模式，通过setGlobalState更改全局状态，通知观察者  
 通过onGlobalStateChange、offGlobalStateChange方法添加观察者或移除观察者  
-[!ActionsFLow](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2020/5/8/171f3c48e01117fa~tplv-t2oaga2asx-zoom-in-crop-mark:4536:0:0:0.awebp)  
+![ActionsFLow](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2020/5/8/171f3c48e01117fa~tplv-t2oaga2asx-zoom-in-crop-mark:4536:0:0:0.awebp)  
 
 actions适合于通信业务较少的场景  
 

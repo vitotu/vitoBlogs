@@ -52,6 +52,7 @@ export default defineUserConfig({
         { text:'npm', link:'/devToolsNote/npm-note'},
         { text:'webpack基础', link:'/webpack/webpackNote'},
         { text:'webpack5', link:'/webpack/webpack5Note'},
+        { text:'qiankun', link:'/micro-app/qiankun'},
       ]},
       {text: '算法', children:[
         { text:'排序算法', link:'/algorithm/tsClassicTop10SortAlgorithm'},
