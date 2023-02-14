@@ -668,6 +668,25 @@ class Solution {
 - 701. 二叉搜索树中的插入操作
 - 98. 验证二叉搜索树
 
+给定根节点，判断是否为一个有效的二叉搜索树  
+每个节点应该小于右边子树的所有节点，大于左边子树的左右节点  
+
+```ts
+function isValidBST(root: TreeNode | null): boolean {
+  return Solution.isValidBST(root, null, null);
+};
+
+class Solution {
+  static isValidBST(root: TreeNode, min:TreeNode, max:TreeNode){
+    if(root === null) return true;
+    if(min != null && root.val <= min.val) return false;
+    if(max != null && root.val >= max.val) return false;
+    // 左子树的最大值即为root.val， 右子树的最小值为root.val
+    return Solution.isValidBST(root.left, min, root) && Solution.isValidBST(root.right, root, max);
+  }
+}
+```
+
 ## 动态规划
 
 动态规划三要素：重叠子问题、最优子结构、状态转移方程  
