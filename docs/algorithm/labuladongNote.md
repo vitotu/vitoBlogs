@@ -663,9 +663,6 @@ class Solution {
 
 ### 二叉搜索树基操篇
 
-- leetcode 450. 删除二叉搜索树中的节点
-- 700. 二叉搜索树中的搜索
-- 701. 二叉搜索树中的插入操作
 - 98. 验证二叉搜索树
 
 给定根节点，判断是否为一个有效的二叉搜索树  
@@ -673,12 +670,13 @@ class Solution {
 
 ```ts
 function isValidBST(root: TreeNode | null): boolean {
-  return Solution.isValidBST(root, null, null);
+  return Solution.isValidBST(root, null, null); // 初始判断将任务交由边界重叠的左右递归
 };
 
 class Solution {
   static isValidBST(root: TreeNode, min:TreeNode, max:TreeNode){
     if(root === null) return true;
+    // 判断大小与递归条件判断有部分重叠，这样才能保证能进行连续递归
     if(min != null && root.val <= min.val) return false;
     if(max != null && root.val >= max.val) return false;
     // 左子树的最大值即为root.val， 右子树的最小值为root.val
@@ -686,6 +684,155 @@ class Solution {
   }
 }
 ```
+
+- 700. 二叉搜索树中的搜索
+
+给定二叉搜索树的根节点root和目标数值val，找到val在树中的位置并返回对应的子树根节点
+
+```ts
+function searchBST(root: TreeNode | null, val: number): TreeNode | null {
+  if(root === null) return null;
+  if(root.val > val) return searchBST(root.left, val);
+  if(root.val < val) return searchBST(root.right, val);
+  return root;
+};
+```
+
+- 701. 二叉搜索树中的插入操作
+
+```ts
+function insertIntoBST(root: TreeNode | null, val: number): TreeNode | null {
+  if(root === null) return new TreeNode(val);
+  if(root.val > val){ // 为了链接创建的node，需要接收递归函数的返回节点
+    root.left = insertIntoBST(root.left, val);
+  } else if(root.val < val){
+    root.right = insertIntoBST(root.right, val);
+  }
+  return root;
+};
+```
+
+- leetcode 450. 删除二叉搜索树中的节点
+
+删除给定二叉搜索树root中的值为key的节点(需要同时保证二叉搜索树的性质)
+
+思路：先找到对应节点，删除节点需要断开链接，因此需要接收递归函数的返回值  
+找到要删除的节点后，对应3种情况：
+
+1. 节点为叶子节点，返回null，若将root赋值为null，均可删除
+2. 节点只有左子树或右子树，则将左子树或右子树节点直接返回或赋值给root即可安全删除root
+3. 节点有左右子树，则需要将左子树中的最大值或右子树中的最小值与root对调，并在对应的子树中删除之前最小值或最大值对应的节点
+
+```ts
+function deleteNode(root: TreeNode | null, key: number): TreeNode | null {
+  if(root === null) return null;
+  // 先找到要刪除节点的位置
+  if(root.val === key){
+    // 若该节点为叶子结点，则直接删除，返回null即可
+    if(root.left === null && root.right === null) return null;
+    // 若该节点仅有一个子节点，则返回对应子节点即相当于删除当前节点
+    if(root.left === null) return root.right;
+    if(root.right === null) return root.left;
+    // 若该节点有左右子节点，则需要找到左子树中最大值或右子树中的最小值来替换当前节点
+    let min:TreeNode = getMin(root.right); // 以右子树中的最小值为例
+    root.right = deleteNode(root.right, min.val); // 从右子树中删除找到的最小值
+    // 将最小值替换为当前节点，即相当于删除了当前节点
+    min.left = root.left;
+    min.right = root.right;
+    root = min;
+  } else if(root.val > key){
+    root.left = deleteNode(root.left, key);
+  } else if(root.val < key){
+    root.right = deleteNode(root.right, key);
+  }
+  return root;
+};
+function getMin(node:TreeNode):TreeNode{ // 循环查找右子树中的最小值
+  while(node.left !== null) node = node.left;
+  return node;
+}
+```
+
+### 二叉搜索树构造篇
+
+[微信文档](https://mp.weixin.qq.com/s?__biz=MzAxODQxMDM0Mw==&mid=2247490696&idx=1&sn=798a350fcca16c89572caf65323dbec7&chksm=9bd7e280aca06b961613987e49b59cfc0faa67276b732c2ed664a8bb81daf8487a103ac0d0ce&mpshare=1&scene=1&srcid=0215YXvxGddJsWficBrwbPej&sharer_sharetime=1676472487897&sharer_shareid=7c8b9b306ef0d4ec2ab85fd7032f2a98&exportkey=n_ChQIAhIQNydoTKn3L3iXxpf7Y64kbhKJAgIE97dBBAEAAAAAACy6FDRrUVAAAAAOpnltbLcz9gKNyK89dVj0V%2FqG2kmLTI706Hp9c4mVtAEWw1%2FPpZ%2FTQX4e0oq56urQykvIY5huS7meXR2F8GRW1Q9Y7SUmq7f8V19Se9mK4x7ogFG09ahotOa%2FGDrojmDengoE0u6C%2FSoohA4Do4ITxU1%2BUeEqkj33V3e5I7Ai57VOyE5bekCc8%2BSntu6okoucv7gMceIukVIVyMFv9W4%2FIz2iz8jf7b0W51LBm8Xja2XW5jQKGWg1PzzqvIGYZlq2BDMgOXsobReQtWDRhGkmnPvAiq78zSy%2BkC0u4iYWzSwPRcX9Tbab5wo6UwjMcZhMos4%3D&acctmode=0&pass_ticket=XdTtQGuDnTawHkShWtgXBzSXfE3o%2FQ58rxJGUNhnI9KfJtyvvZmWdihREjXyue8%2Bs5l6My46FwmUguPjNziAVw%3D%3D&wx_header=0#rd)
+
+- leetcode 96 不同的二叉搜索树
+
+给定整数n，求值为1到n的节点能组成多少种互不相同的二叉搜索树
+
+思路：循环固定单一节点，则能组合的数量为左右子树组合数相乘，因此可以实现函数count，用于计算闭区间`[left, right]`能组成的互不相同的二叉搜索树的数量，函数中循环固定每个节点，并递归计算每个节点固定后左右区间(即左右子树)能构成的组合数，累加整个循环即可得当前区间能组成的组合数；  
+对于空区间，则对应这null节点，因此可记为组合数1，并作为base条件返回  
+计算区间的过程拆分成了子问题，因此可以通过“打表”的方式，添加cache避免重复计算  
+
+```ts
+function numTrees(n: number): number {
+  let demo = new Solution(n);
+  return demo.count(1, n);
+};
+
+class Solution {
+  cache:number[][]; // 缓存已经计算过的组合，加速计算过程
+  constructor(n:number){
+    this.cache = new Array(n+1).fill(0).map(i => new Array(n+1).fill(0));
+  }
+  count(left:number, right:number):number{
+    if(left > right) return 1; // 空区间节点为null ，组合数为1
+    let res = 0; // 初始化本区间组合数，查表有值则直接返回
+    if(this.cache[left][right] != 0) return this.cache[left][right];
+    for(let i = left; i <= right; i++){ // 循环固定区间中的i节点
+      let nLeft = this.count(left, i - 1); // 每轮循环中计算左右子树的组合数
+      let nRight = this.count(i+1, right);
+      res += nLeft * nRight; // 左右子树相乘即为本轮循环的组合数，累计记录
+    }
+    this.cache[left][right] = res; // 将对应区间的组合数存入表中，并返回对应的值
+    return res;
+  }
+}
+```
+
+- leetcode 95 不同的二叉搜索树 二
+
+给定整数n，返回值为1到n的节点能组成的所有互不相同的二叉搜索树根节点组成的列表
+
+思路：与上题类似，转换为区间子问题，在组装结果时则需要双重循环，将左右子树的不同组合组装到根节点上，并用结果数组记录即可
+
+```ts
+function generateTrees(n: number): Array<TreeNode | null> {
+  if(n === 0) return [];
+  return build(1, n);
+};
+
+function build(left:number, right:number):Array<TreeNode|null>{
+  let res:Array<TreeNode|null> = []
+  if(left > right){
+    res.push(null);
+    return res;
+  }
+
+  for(let i = left; i <= right; i++){
+    let NLeft = build(left, i - 1);
+    let NRight = build(i+1, right);
+
+    for( let NL of NLeft){
+      for(let NR of NRight){
+        let root = new TreeNode(i);
+        root.left = NL;
+        root.right = NR;
+        res.push(root);
+      }
+    }
+  }
+  return res;
+}
+```
+
+### 快速排序详解及应用
+
+[微信文档](https://mp.weixin.qq.com/s/8ZTMhvHJK_He48PpSt_AmQ)  
+
+- leetcode 215 数组中的第k个最大元素
+- leetcode 912 排序数组
 
 ## 动态规划
 
