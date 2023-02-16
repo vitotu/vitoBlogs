@@ -51,7 +51,7 @@ export default { // 到处vue options配置项对象用于创建组件或页面
 
 Vue获取配置项中的data对象后,对data对象进行代理(深度遍历对象给属性添加getter,setter等),然后将改造后的data对象赋给vm实例的`_data`属性,同时覆盖原有的对象引用,伪代码表示如下:  
 
-```JavaScript  
+```js
 let a = {} // data对象  
 let b = a  
 const vm = new Vue({  
