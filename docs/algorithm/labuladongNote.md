@@ -831,8 +831,84 @@ function build(left:number, right:number):Array<TreeNode|null>{
 
 [微信文档](https://mp.weixin.qq.com/s/8ZTMhvHJK_He48PpSt_AmQ)  
 
-- leetcode 215 数组中的第k个最大元素
 - leetcode 912 排序数组
+
+之前的通过归并排序解过此题，这次通过快速排序法解题  
+思路：快速排序法通过选定基准数，将小于基准的移动到左边，大于基准的移动到右边，再对左右子区间递归快速排序  
+这个过程为二叉树的前序遍历，并同时也在构造二叉搜索树的过程  
+数组长度为N，则partition需要执行N次，时间复杂度为O(N)，节点分布均匀的理想状态下树的层数为logN，最坏的情况为N, 所以算法时间复杂度为O(NlogN)，最坏为O(N^2)  
+
+```ts
+function sortArray(nums: number[]): number[] {
+  if(nums.length <= 1) return nums;
+  quickSort(nums, 0, nums.length - 1);
+  return nums;
+};
+
+function quickSort(nums:number[], left:number, right:number):void{
+  if(left >= right) return;
+  let p = partition(nums, left, right);
+  quickSort(nums, left, p-1);
+  quickSort(nums, p+1, right);
+}
+
+function partition(nums:number[], left:number, right:number):number{
+  let mid = nums[left];
+  let i = left + 1, j = right;
+  while(i <= j){
+    while(i < right && nums[i] <= mid) i++;
+    while(j > left && nums[j] > mid) j--;
+    if(i >= j) break;
+    let temp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = temp;
+  }
+  let temp = nums[left];
+  nums[left] = nums[j];
+  nums[j] = temp;
+  return j;
+}
+```
+
+- leetcode 215 数组中的第k个最大元素
+
+即寻找数组中第k大的元素  
+思路：两种解法：二叉堆(优先队列)的解法和快速排序的变体，快速选择算法  
+快速选择算法：
+在快速排序算法中，通过选定基准mid，获取了左右子区间，而子区间长度则表示了mid在数组中的正确位置，因此可以考虑降序排序数组，当左子区间长度为`k - 1`时，mid则为第k大元素  
+或升序排序数组求取第N - k小的元素，即为第k大元素  
+
+```ts
+function findKthLargest(nums: number[], k: number): number {
+  let i = 0, j = nums.length - 1;
+  k = nums.length - k;
+  while(i <= j){
+    let p = partition(nums, i, j);
+    if(p < k) i = p+1;
+    else if(p > k) j = p - 1;
+    else return nums[p]
+  }
+  return -1
+};
+
+function partition(nums:number[], left:number, right:number):number{
+  if(left >= right) return right;
+  let mid = nums[left];
+  let i = left + 1, j = right;
+  while(i <= j){
+    while(i < right && nums[i] <= mid) i++;
+    while(j > left && nums[j] > mid) j--;
+    if(i >= j) break;
+    let temp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = temp;
+  }
+  let temp = nums[j];
+  nums[j] = nums[left];
+  nums[left] = temp;
+  return j;
+}
+```
 
 ## 动态规划
 

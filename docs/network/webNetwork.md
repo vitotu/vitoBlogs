@@ -213,6 +213,7 @@ http/1.1中hop-by-hop逐跳首部字段有8个：Connection、Keep-Alive、Proxy
   * 401 unauthorized 请求需要有通过http认证的认证信息或认证失败
   * 403 forbidden 请求资源的访问被服务器拒绝
   * 404 not found 无法找到请求的资源
+  * 408 Request Timeout 请求超时，客户端没有在服务器预备等待的时间内完成一个请求的发送，随时可重发
 * 5** 服务器错误
   * 500 Internal server error 服务器执行请求时故障
   * 503 service unavailable 服务器暂时无法处理请求
