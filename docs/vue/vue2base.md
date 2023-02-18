@@ -1,7 +1,7 @@
 # vue2基础使用
 
-参考尚硅谷的vue2教程  
-视频教程[地址](https://www.bilibili.com/video/BV1Zy4y1K7SH?p=1)  
+本文参考了官方文档及参考尚硅谷的vue2教程, 适合于刚上手vue的新手学习  
+仅总结使用要点，对于基础语法部分参看[官网文档](https://v2.cn.vuejs.org/v2/guide/)学习  
 
 ## 模板语法
 
@@ -201,7 +201,7 @@ v-for与v-if不推荐在同一层级使用，若放在同一层级，则v-if优�
 
 列表渲染中推荐使用主键(每个item独一无二的值)绑定key，key辅助更新的原理：
 
-> react、vue中的key有什么作用？（key的内部原理）  
+::: tip react、vue中的key的作用（key的内部原理）  
 
 1. 虚拟DOM中key的作用：  
  key是虚拟DOM对象的标识，当数据发生变化时，Vue会根据【新数据】生成【新的虚拟DOM】,
@@ -212,6 +212,7 @@ v-for与v-if不推荐在同一层级使用，若放在同一层级，则v-if优�
       ②.若虚拟DOM中内容变了, 则生成新的真实DOM，随后替换掉页面中之前的真实DOM。  
   (2). 旧虚拟DOM中未找到与新虚拟DOM相同的key  
       创建新的真实DOM，随后渲染到到页面。
+详细的对比规则参见[虚拟dom和diff算法](./vue2plus/#虚拟dom和diff算法)  
 3. 用index作为key可能会引发的问题：  
   a. 若对数据进行：逆序添加、逆序删除等破坏顺序操作:  
     会产生没有必要的真实DOM更新 ==> 界面效果没问题, 但效率低。  
@@ -221,7 +222,8 @@ v-for与v-if不推荐在同一层级使用，若放在同一层级，则v-if优�
   a. 最好使用每条数据的唯一标识作为key, 比如id、手机号、身份证号、学号等唯一值。  
   b. 如果不存在对数据的逆序添加、逆序删除等破坏顺序操作，仅用于渲染列表用于展示，  
   使用index作为key是没有问题的。  
-  
+:::
+
 ## 表单  
 
 使用v-model绑定收集表单数据，对于不同的输入元素将绑定不同的property和事件：  
@@ -269,7 +271,7 @@ value是传给指令的值
 - v-html指令：  
   1.作用：向指定节点中渲染包含html结构的内容。  
   2.与插值语法的区别：  
-    (1).v-html会替换掉节点中所有的内容，{{xx}}则不会。  
+    (1).v-html会替换掉节点中所有的内容，`{{xx}}`则不会。  
     (2).v-html可以识别html结构。  
   3.严重注意：v-html有安全性问题！！！！  
     (1).在网站上动态渲染任意HTML是非常危险的，容易导致XSS攻击(如：通过插入html向特定网站发送用户的cookie等数据)。  
@@ -300,19 +302,19 @@ value是传给指令的值
 
   3. 回调函数的参数：
 
-     ```js
-      element // 指令所绑定的元素，可直接操作DOM
-      binding:{
-        name // 指令名，不含v-前缀
-        value // 绑定的值
-        oldValue // 绑定的旧值
-        expression // 字符串形式的指令表达式
-        arg // 传给指令的参数, 如v-bind:arg=""中的arg
-        modifiers // 修饰符对象, 如v-bind.sync => {sync:true}
-      }
-      vnode // 生成的虚拟节点
-      oldVnode // 上一个虚拟节点
-     ```
+```js
+element // 指令所绑定的元素，可直接操作DOM
+binding:{
+  name // 指令名，不含v-前缀
+  value // 绑定的值
+  oldValue // 绑定的旧值
+  expression // 字符串形式的指令表达式
+  arg // 传给指令的参数, 如v-bind:arg=""中的arg
+  modifiers // 修饰符对象, 如v-bind.sync => {sync:true}
+}
+vnode // 生成的虚拟节点
+oldVnode // 上一个虚拟节点
+```
 
   4. 备注：  
     1.指令定义时不加v-，但使用时要加v-；  
@@ -378,7 +380,7 @@ ps:在vue3中v-model的使用范围已和v-bind.sync相同，并且移除了v-bi
 
 ## 组件化编程  
 
-Vue中使用组件的三大步骤：  
+Vue中使用组件的几大步骤：  
 
 - 一、定义一个组件  
   使用Vue.extend(options)创建，其中options和new Vue(options)时传入的那个options几乎一样，但也有点区别；  
@@ -388,22 +390,35 @@ Vue中使用组件的三大步骤：
   4.组件文件名命名推荐与name属性保持一致  
   备注：使用template可以配置组件结构。  
   全局定义组件时`const school = Vue.extend(options)`可简写为`const school = options`  
+
+或者通过编写`.vue`文件，再通过import的方式引入，也可定义一个组件  
   
 - 二、注册组件  
-  1.局部注册：靠new Vue的时候传入components选项  
-  2.全局注册：靠Vue.component('组件名',组件)  
+  1.局部注册：传入components选项
+
+  ```js
+  import componentA from './componentA';
+  export default {
+    components:{
+      componentA,
+    }
+  }
+  ```
+
+  2.全局注册：`Vue.component('组件名',组件)`  
   
 - 三、使用组件标签：  
-  闭合标签和自闭合标签(需脚手架环境)均可,vue解析标签时实例化vue组件对象  
+  闭合标签和自闭合标签(需脚手架环境webpack，vite等)均可,vue解析标签时实例化vue组件对象  
   
 - 四、组件与vm之间的关系  
   内置关系：`VueComponent.prototype.__proto__ === Vue.prototype`  
   
-组件化编程中main.js文件中用于创建vm,唯一实例化的vue对象作为入口挂载组件,App.vue文件中定义根组件容器用于管理其它组件  
+工程化项目中main.js文件中用于创建vm,唯一实例化的vue对象作为入口挂载组件,App.vue文件中定义根组件容器用于管理其它组件  
   
 ps：构造函数的prototype显式原型属性与其实例化后的实例的__proto__隐式原型属性指向同一个原型对象  
   
-- 组件的函数式调用  
+### 组件的函数式调用
+
   通过在父组件的生命周期中调用函数，从而使用子组件的方式。适合于简单组件如非模态的弹窗消息、loading遮罩等
   定义方式示例：
 
@@ -420,20 +435,20 @@ ps：构造函数的prototype显式原型属性与其实例化后的实例的__p
   export {createMessage}  // 暴露函数，调用方引入该函数并调用即可使用MyMessage组件
   ```
 
-- 动态组件`<component>`
+### 动态组件`<component>`
 
 vue内置元素`<component v-bind:is="switchComponentName">`  
-通过`is`prop绑定已注册的组件名或组件的选项对象switchComponentName上，  
+通过`is`prop绑定已注册的组件名或组件的选项对象switchComponentName上，即可通过switchComponentName变量指定要使用的组件  
 组件名也可用于普通的html标签，但普通标签的value等property需要使用`.prop`修饰器修饰，否则功能异常  
 还可传入异步组件`defineAsyncComponent(()=>import('component path'))`实现按需加载  
-其上绑定的属性将被透传到动态指定的组件上  
+`<component>`上绑定的属性将被透传到动态指定的组件上  
 
-- 递归组件
+### 递归组件
 
 即组件在自己的模板中引用自身，此时要求组件有name选项或在全局注册  
 编写递归组件时需要保证递归终止条件，否则会导致栈溢出max stack size exceeded错误  
 
-- 组件间循环引用
+### 组件间循环引用
 
 组件间的循环引用在打包时就会形成引用悖论，引发编译错误，解决此问题有如下方式：
 
@@ -441,11 +456,11 @@ vue内置元素`<component v-bind:is="switchComponentName">`
 2. 在首先引用的那个组件A中通过beforeCreate生命周期钩子进行引入注册`beforeCreate(){ this.$options.components.yourComponent = require('url'); }`  
 3. 注册组件时使用异步`() => import('url')`的方式注册
 
-- 函数式组件(无状态无实例)
+### 函数式组件(无状态无实例)
 
 组件内部没有管理任何状态，没有生命周期，也没有实例(没有this上下文), 仅接收一些props，类似于函数，因此可以设置functional属性`<template functional>`或`Vue.component('myComponent', {functional:true})`，将该组件变为一个函数式组件  
 
-函数式组件若是写成渲染函数的形式，则其render 函数接收第二个参数context作为上下文，context对象包含props, children, slots, scopedSlots, data(传递给组件的整个数据对象区别与普通组件的data选项，此处还包含data.no, data.attrs等), parent, listeners(data.on的别名), injections  
+函数式组件若是写成渲染函数的形式，则其render 函数接收第二个参数context作为上下文，context对象包含props, children, slots, scopedSlots, data(传递给组件的整个数据对象区别与普通组件的data选项，此处还包含data.on, data.attrs等), parent, listeners(data.on的别名), injections  
 
 前面有介绍组件的函数式调用，其本质仍然是普通组件，这是其与函数式组件最大的区别  
 
@@ -491,7 +506,7 @@ export default {
 - `$parent` & `$children`或ref
 
 利用`$parent`和`$children`属性获取父组件或子组件的实例，通过读取或操作对应的值即可实现父子组件间通信  
-这种组件间通信方式仅应急状况下使用，不推荐大规模应用
+这种组件间通信方式仅应急状况下使用，不推荐大规模应用  
 PS: 与之相类似的还可通过`$root`访问到根实例  
 
 - `$attrs` & `$listeners`
@@ -501,16 +516,11 @@ PS: 与之相类似的还可通过`$root`访问到根实例
 当前组件可通过`v-bind="$attrs"`将其接收的绑定属性传递到其子组件上，从而让孙组件可以访问到祖组件上传入的绑定属性  
 `$listeners`与`$attrs`类似包含了v-on事件监听器(不含.native修饰的),同样使用`v-on="$listeners"`可将接收的事件监听器传递到子组件中，让孙组件能够访问到事件，并通过`$emit`可触发该事件，并且当当前组件中额外绑定了同名事件时，孙组件会同时触发这两个事件，触发顺序类似于冒泡，因此尽量避免事件名重复  
 
-- vuex
+- 全局状态管理
 
-vuex是一个全局状态管理库，详细特性及使用方法见[vuex](./vuex/README.md)
+vuex是一个全局状态管理库，详细特性及使用方法见[vuex](./vuex/README.md)  
+[pinia](./Pinia.md)与vuex定位相同，但同时支持vue2和vue3
 
-## 脚手架
-  
-main.js文件中使用`render: h => h(App)`的原因是  
-通过脚手架import的vue只包含核心功能没有模板解析器，因此不能使用template配置项，需要使用render函数接收到的createElement函数(简写为h)去指定具体内容  
-render函数将App组件放入容器中  
-  
 ## 组件属性及配置  
 
 - ref属性  
@@ -531,7 +541,7 @@ props类似于函数的参数，数据由父传子单向传递，若要进行子
 // 在父组件中，使用v-bind传入name属性值data
 <child-component v-bind:name="data"/>
 <child-component v-bind="data"/> // 传入整个data对象，data对象的key-value将对应props中定义的属性名，类似于函数的参数解构
-
+// 子组件中
 var childComponent = {
   //简单声明接收  
   props:['name','age','sex']  
@@ -553,10 +563,10 @@ var childComponent = {
 - mixin混入  
   
 将vue配置项的一部分提取出去,给各组件复用的方式称为混入;  
-局部混入:通过import导入对象,在配置项中使用`mixins:[mixinObj1,mixinObj2]`  
-全局混入:全局混入将混入每一个vue实例中,导入后,通过`Vue.mixin(mixinObj1)`逐个混入  
-混入的配置项若有重复,不会覆盖原配置,  
-混入的对象型选项会进行合并，若key值冲突，则组件的属性值将覆盖该选项，hook函数则将合并调用，混入的hook优先被调用
+局部混入:`import {mixinsObj, mixinObj2} from 'mixinsModules'`,在配置项中使用`mixins:[mixinObj1,mixinObj2]`  
+全局混入:可以将mixinObj混入每一个vue实例中。导入后,通过`Vue.mixin(mixinObj1)`混入  
+混入的配置项若有重复,不会覆盖组件中的原配置,  
+混入的对象型选项会进行合并，若key值冲突，则组件的属性值将覆盖该选项，hook函数(生命周期函数等)则将合并调用，混入的hook优先被调用
 
 Vue.extend()也采用了同样的策略进行合并  
 
@@ -564,24 +574,24 @@ Vue.extend()也采用了同样的策略进行合并
 
 - 插件  
   
-在实例化vm之前,调用`Vue.use(plugins,params)`的方式挂载插件,传入plugins对象中必须包含install方法,install可以接收到Vue构造函数和params参数,在此阶段全局过滤器,全局混入,第三方库等功能挂载到原型对象上,增加vue的功能  
+在实例化vm之前,调用`Vue.use(plugins,params)`的方式挂载插件  
+传入plugins对象中必须包含install方法,install可以接收到Vue构造函数和params参数,在此阶段全局过滤器,全局混入,第三方库等功能挂载到原型对象上,增加vue的功能  
+
+TODO：`Vue.use`的调用为什么要在`new Vue`之前，若在之后会怎样
+[vue.use](https://juejin.cn/post/6844903923321405453)
   
 - scoped  
   
-在vue文件中`<styl scoped></style>`中使用该属性,标签中的属性将只在本组件中生效.  
-vue是通过将模板中的标签加入`data-生成数字`属性来约束样式的  
+在vue文件中`<style scoped></style>`中使用该属性,标签中的样式将只在本组件中生效.  
+vue是通过将模板中的标签加入`data-随机数字`属性以及对css选择器添加`[data-随机数字]`来约束样式作用范围的  
   
 - `$nextTick`  
   
 `$nextTick`属性用于传入一个回调函数,该函数在下次DOM更新循环结束之后执行延迟回调。在修改数据之后立即使用这个方法，获取更新后的DOM.  
 `$nextTick`也算是生命周期图之外的一个生命周期函数  
-  
-- 过渡动画  
-  
-vue中还支持使用标签`<transition></transition>`或`<transition-group></transition-group>`设置过渡效果,详见[官方文档](https://cn.vuejs.org/v2/guide/transitions.html)  
-  
+
 - vue-resource  
-  
+
 vue-resource是vue1.×版本提供的ajax请求插件,vue2.0以后不再维护,推荐使用axios发起ajax请求  
   
 ## 插槽  
@@ -617,7 +627,8 @@ vue通过插槽向子组件中传递html结构
   
 - 作用域插槽
 
-父级模板中的所有内容都是在父级作用域中编译的；子组件的模板则时在子级作用域的中编译，因此要插入的html结构想要访问子组件中的变量，需要用到作用域插槽  
+父级模板中的所有内容都是在父级作用域中编译的；  
+子组件的模板则是在子级作用域的中编译，因此要插入的html结构想要访问子组件中的变量，需要用到作用域插槽  
 
 ```html  
 <!-- 父组件中 -->  
@@ -694,6 +705,8 @@ PS：将`<transition-group>`或`<transition>`作为根组件进行封装能够�
 
 组件中的状态，如节点位置，颜色显示，大小位置等其他属性发生变化可以利用响应式特性和组件结合一些css/js动效库，实现状态切换的过渡
 
+详见[官方文档](https://cn.vuejs.org/v2/guide/transitions.html)  
+
 ## 渲染函数与jsx
 
 `.vue`文件中的`<template>`经过模板编译阶段会生成render渲染函数，调用render会得到对应的虚拟DOM。  
@@ -736,7 +749,7 @@ childNode: string | Array // 文本节点或子级虚拟节点需要由createEle
 
 PS:VNode必须唯一，因此多个相同的VNode需要用工厂函数实现  
 渲染函数中v-if/v-for可以用条件判断或map等方式实现，而v-model语法糖则需要自行实现相关逻辑  
-对于部分事件修饰符，提供了对应的修饰前缀，如`click.passive => &click; click.capture => !click; click.once => ~click`,而其他修饰符基本可以从event参数中读取到并操作，因此没有对应的修饰符  
+对于部分事件修饰符，提供了对应的修饰前缀，如`click.passive => &click; click.capture => !click; click.once => ~click`,而其他修饰符基本可以从event参数中读取到并操作没有对应的修饰符  
 通过this.$slots可以访问静态插槽的内容, 通过this.$scopedSlots访问作用域插槽
 
 - jsx
@@ -755,7 +768,11 @@ jsx风格的语法允许在js文件中直接书写xml风格的template语法，�
 }
 ```
 
-***  
+::: tip 渲染函数在根实例上的体现
+main.js文件中使用`render: h => h(App)`的原因是  
+通过脚手架import的vue只包含核心功能没有模板解析器，因此不能使用template配置项，需要指定render选项  
+函数接收到的createElement函数(简写为h)，调用h函数去解析App组件，并生成根实例的渲染函数  
+:::
 
 ## Cookbook  
 
@@ -763,9 +780,8 @@ jsx风格的语法允许在js文件中直接书写xml风格的template语法，�
   
 ## 添加实例property  
 
-`vue.prototype.$appName = 'My App'`其中$符号是为了避免命名冲突而约定的符号。
+`vue.prototype.$appName = 'My App'`其中`$`符号是为了避免命名冲突而约定的符号。
 当在原型时绑定自定义函数时，该函数通过this，能够访问到实例的作用域。
-为了保证安全，应尽量避免使用该模式  
   
 ## 表单校验
 
@@ -778,7 +794,7 @@ vue-cli是基于webpack等打包工具的
 通过使用vue[打包命令](https://cli.vuejs.org/zh/guide/build-targets.html#%E5%BA%93)中的target参数 指定构建模式为lib，可打包生产umd文件。  
 lib模式下默认不会打包vue，若要打包vue可使用命令```vue-cli-service build --target lib --inline-vue```
 打包完成后可生成文件  
-×××.common.js: 一个给打包器用的 CommonJS 包 (不幸的是，webpack 目前还并没有支持 ES modules 输出格式的包)  
+×××.common.js: 一个给打包器用的 CommonJS 包 (webpack 目前还并没有支持 ES modules 输出格式的包)  
 ×××.umd.js: 一个直接给浏览器或 AMD loader 使用的 UMD 包  
 ×××.umd.min.js: 压缩后的 UMD 构建版本  
 ×××.css: 提取出来的 CSS 文件 (可以通过在 vue.config.js 中设置css: { extract: false } 强制内联)  
