@@ -39,7 +39,7 @@ vue3相对于vue2进行了一次大的升级, 仓库地址[github](https://githu
 1. 更好的逻辑复用(组合函数)  
 2. 更灵活的代码组织(逻辑关注点集中，相同处理逻辑放置于连续的相近位置)  
 3. 更好的类型推导，主要利用变量和函数，逻辑部分纯js的书写风格更利于与ts结合的类型推导  
-4. 更小的生产包体积，`<script setup></script>`书写形式的组件模板`<template/>`被编译为内敛函数，与setup处于同一作用于，因此省去了this上下文访问属性，更利于代码压缩(本地变量名可以被压缩，但对象属性名不能)  
+4. 更小的生产包体积，`<script setup></script>`书写形式的组件模板`<template/>`被编译为内敛函数，与setup处于同一作用域，因此省去了this上下文访问属性，更利于代码压缩(本地变量名可以被压缩，但对象属性名不能)  
 
 ## 创建Vue3.0工程
 
@@ -98,7 +98,7 @@ app.mount('#app') // 挂载应该在应用配置和资源注册完成后调用
 vue3中的模板语法风格与[vue2的](../vue2base.md#模板语法)基本一致;  
 模板中支持的表达式将被沙盒化, 只能访问[有限的全局对象](https://github.com/vuejs/core/blob/main/packages/shared/src/globalsWhitelist.ts#L3), 也可以通过`app.config.globalProperties`添加拓展的属性或方法  
 
-vue3中`<template></template>`多个根标签，内部通过将多个标签包裹在Fragment虚拟元素中实现，相比于vue2的单根节点，可以减少不必要的标签层级，减少内存占用  
+vue3中`<template></template>`支持多个根标签，内部通过将多个标签包裹在Fragment虚拟元素中实现，相比于vue2的单根节点，可以减少不必要的标签层级，减少内存占用  
 
 ## 响应式
 
@@ -144,7 +144,7 @@ reactive基于proxy，默认创建深层的响应式，使用shallowReactive函�
 - ref()
 
 另外reactive仅对对象类型有效，对string、number、boolean等原始类型无效  
-vue中引入了`ref`并通过`Object.defineProperty()`来解决原始类型响应式的问题, 使用方法同reactive, ref将入参包装为一个带有value属性的Ref对象, 如果入参为对象类型，则会调用reactive方法挂载到Ref对象的value属性上，利用reactive处理对象类型的深层次响应式  
+vue中引入了`ref`并通过`Object.defineProperty()`来解决原始类型响应式的问题, 使用方法同reactive, ref将入参包装为一个带有value属性的Ref对象, 如果入参为对象类型，则会调用reactive方法并将代理对象挂载到Ref对象的value属性上，利用reactive处理对象类型的深层次响应式  
 ref和reactive生成的对象在解构、传参、赋值时的响应式丢失情况相同，即传递对象本身，被赋值的变量响应式被保留，但传递普通属性，则响应式丢失  
 
 ```vue
@@ -198,7 +198,7 @@ proxy.name = 'tom'
 
 - 浅层响应式`shallowReactive()`和`shallowRef()`
 
-仅处理对象最外层的响应式，过于庞大的深层响应式有中性能和内存占用问题，在适当的地方使用浅层响应式可以环节这些问题，也常用于与外部系统集成  
+仅处理对象最外层的响应式，过于庞大的深层响应式有中性能和内存占用问题，在适当的地方使用浅层响应式可以缓解这些问题，也常用于与外部系统集成  
 
 - `readonly()`和`shallowReadonly()`
 
@@ -252,7 +252,7 @@ vue2中`<template></template>`中仅支持一个根节点，但vue3中可以有�
 
 ```vue
 <template>
-  <div></div>
+  <div v-bind="$attrs"></div>
   <div></div>
 </template>
 ```
