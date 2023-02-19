@@ -485,6 +485,7 @@ const props = defineProps({ // defineProps()宏无需引入即可使用
 // 此处大写String表示字符串包装类构造函数，注意与ts中的小写类型string表示的类型区分开
 console.log(props.title);
 </script>
+
 <!-- 没有使用setup的需要通过props选项来声明 -->
 <script>
 export default { // 两种实现方式都是基于props选项
@@ -498,7 +499,7 @@ export default { // 两种实现方式都是基于props选项
 </template>
 ```
 
-为了与Html的attribute对齐props属性名称推荐使用kebab-case的风格  
+为了与Html的attribute对齐,props属性名称推荐使用kebab-case的风格  
 与vue2中一样父组件模板通过`v-bind:propsKey`的方式向子组件中传入props参数，子组件中不应该直接修改传入的props，vue无法检测子组件到对传入对象、数组等引用类型的修改，且这些修改将反馈到父组件中  
 
 - 透传attribute
@@ -673,7 +674,7 @@ vue2中与组合式函数相类似的是mixins配置，vue3为了兼容项目迁
 
 不清晰的数据来源；  
 命名空间冲突；  
-隐式的跨mixin通信；  
+隐式的跨mixins通信；  
 
 与无渲染组件(类似于代理工作方式的组件)对比，组合式函数不会产生额外的组件实例开销  
 
@@ -714,7 +715,7 @@ Suspense包裹异步组件，类似于async修饰的函数中使用await，用�
 ### 构建工具
 
 vite由vue团队基于rollup开发的轻量级构建工具，在vue3中推荐使用vite构建而不是webpack  
-TODO：学习笔记 to be continue  
+[vite基础使用参见](../../vite/README.md)  
 vue cli 官方提供的基于webpack的脚手架工具，当前处于维护模式，vue3中非必要不使用  
 
 ### 路由
@@ -724,7 +725,8 @@ vue cli 官方提供的基于webpack的脚手架工具，当前处于维护模�
 
 ### 状态管理
 
-vue2中使用了vuex作为全局状态管理库，，在vue3中vue团队在vuex的基础上开发了 [pinia](https://pinia.vuejs.org/introduction.html) 状态管理库，同时兼容vue2和vue3
+vue2中使用了vuex作为全局状态管理库  
+在vue3中vue团队在vuex的基础上开发了 [pinia](https://pinia.vuejs.org/introduction.html) 状态管理库，同时兼容vue2和vue3
 
 ## 与TS一起使用
 
@@ -794,7 +796,7 @@ vue模板将被编译为渲染函数用于生成虚拟DOM树，在生产等环�
   1. 静态提升：模板中的静态内容会被自定提升到渲染函数之外，以便跳过这部分的比对。同时大量连续的静态节点会被缓存便于其他地方重用
   2. 更新类型标记：对于单个动态绑定的元素，标记其更新类型，便于vue更新元素时仅做最少的操作
   3. 树结构拍平：引入"区块"的概念，内部结构稳定的部分可以称之为区块，组件仅跟踪动态后代节点，减少需要遍历的节点数量  
-  4. 对于SSR激活：单个元素激活根据更新类型标记走快捷路径，激活时只有区块节点及动态自及诶单需要被遍历，因此大大提升了性能
+  4. 对于SSR激活：单个元素激活根据更新类型标记走快捷路径，激活时只有区块节点及动态自定义节点需要被遍历，因此大大提升了性能
 
 - 自定义渲染函数
 
