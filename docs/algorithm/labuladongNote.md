@@ -910,6 +910,140 @@ function partition(nums:number[], left:number, right:number):number{
 }
 ```
 
+### 最近公共祖先问题
+
+文章地址[GIT原理之最近公共祖先](https://mp.weixin.qq.com/s/njl6nuid0aalZdH5tuDpqQ)  
+
+- leetcode 236 二叉树的最近公共祖先
+
+给定一颗不含重复元素的二叉树以及其中两个节点p和q计算两节点最近的公共祖先节点
+
+思路：公共祖先节点必定在其左右子树中分别发现p和q，或该节点为p或q  
+
+```ts
+function lowestCommonAncestor(root: TreeNode | null, p: TreeNode | null, q: TreeNode | null): TreeNode | null {
+  if(!root) return null;
+  if(root.val === p.val || root.val === q.val) return root; // 为当前节点
+  let left = lowestCommonAncestor(root.left, p, q); // 遍历左子树查找
+  let right = lowestCommonAncestor(root.right, p, q);
+  if(left !== null && right !== null) return root; // 收集左右子树节点并判断
+  return left !== null ? left : right; // 返回不为空的节点，若都为空则返回空节点
+};
+```
+
+- leetcode 1644 二叉树的最近公共祖先 二
+
+与236题类似，但p和q不一定存在于二叉树中，若p或q不存在于二叉树中，则返回null
+此题被加锁，因此代码未被验证，但解题思路与236类似  
+因为p和q不一定存在于树中，因此需要对树进行完整遍历，需要将root节点的判断放到后序位置，同时记录是否发现p或q节点，在获取结果后，判断过p或q不再树中则返回null  
+
+```ts
+let foundP = false, foundQ = false;
+
+function lowestCommonAncestor(root: TreeNode | null, p:TreeNode|null, q:TreeNode|null): TreeNode | null {
+  let res = find(root, p.val, q.val);
+  if(!foundP || !foundQ) return null;
+  return res;
+};
+
+function find(root:TreeNode|null, val1:number, val2:number):TreeNode|null{
+  if(root === null) return null;
+  let left = find(root.left, val1, val2);
+  let right = find(root.right, val1, val2);
+  if(left !== null && right !== null) return root;
+  if(root.val === val1 || root.val === val2){
+    if(root.val === val1) foundP = true;
+    if(root.val === val2) foundQ = true;
+    return root;
+  }
+  return left !== null ? left : right;
+}
+```
+
+- leetcode 1650 二叉树的最近公共祖先 三
+
+这次二叉树节点中包含指向父节点的指针parent  
+由于存在父节点指针，因此可以不输入根节点，问题将装换为单链表的交点  
+此题解法思路与[双指针之链表](#双指针之链表)中leetcode 160题相同  
+
+- leetcode 1676 二叉树的最近公共祖先 四
+
+与236题类似，但给定nodes节点列表，查找列表中节点的最近公共祖先  
+此题被加锁，因此代码未被验证，但解题思路与236类似  
+
+```ts
+function lowestCommonAncestor(root: TreeNode | null, nodes:TreeNode[]): TreeNode | null {
+  let valueHash = new Set();
+  nodes.forEach(i => {
+    valueHash.add(i.val);
+  })
+  return find(root, valueHash);
+};
+
+function find(root:TreeNode|null, values:Set<typeof root.val>):TreeNode|null{
+  if(!root) return null;
+  if(values.has(root.val)) return root;
+  let left = find(root.left, values);
+  let right = find(root.right, values);
+  if(left !== null && right !== null) return root;
+  return left !== null ? left : right;
+}
+```
+
+- leetcode 235 二叉搜索树的最近公共祖先
+
+与236题类似，但二叉树换成二叉搜索树，假设p.val < q.val， 则只有满足 p.val <= root <= q.val的节点才是最近的公共祖先，因此可以根据此条件对二叉搜索树进行搜索  
+
+```ts
+function lowestCommonAncestor(root: TreeNode | null, p:TreeNode|null, q:TreeNode|null): TreeNode | null {
+  let val1 = Math.min(p.val, q.val);
+  let val2 = Math.max(p.val, q.val);
+  return find(root, val1, val2);
+};
+
+function find(root:TreeNode|null, val1:number, val2:number):TreeNode|null{
+  if(root === null) return null;
+  if(root.val > val2) return find(root.left, val1, val2); // 节点过大，在左子树中找
+  if(root.val < val1) return find(root.right, val1, val2);
+  return root;
+}
+```
+
+### 其他二叉树相关问题
+
+- leetcode 341 扁平化嵌套列表迭代器
+
+给你一个嵌套的整数列表 nestedList， 每个元素要么是一个整数，要么是一个列表， 列表中可能是整数也可能是其他列表，实现迭代器类NestedIterator,会先被调用hasNext()方法，然后时next方法输出整数  
+
+思路：分析nestedList结构可知，其对应着多叉树，当存储元素为整数时，表示叶子节点，对应列表时表示其他节点集合，因此可以通过遍历多叉树，缓存叶子节点的方式对列表进行迭代实现迭代器。  
+
+这种方法在面对大数据量时可能会有性能问题，可以考虑在hasNext时迭代多叉树，使缓存数组的首个元素为叶子节点，调用next时直接返回整数即可  
+
+文章地址[题目不让我做什么，我就偏要去做什么](https://mp.weixin.qq.com/s/uEmD5YVGG5LHQEmJQ2GSfw)  
+
+```ts
+class NestedIterator {
+  list: Array<NestedInteger>
+  constructor(nestedList: NestedInteger[]) {
+    this.list = nestedList;
+  }
+
+  hasNext(): boolean { // 在hasNext中迭代保证this.list第一个元素为整数
+    while (this.list.length > 0 && !this.list[0].isInteger()) {
+      let temp = this.list.shift().getList();
+      for (let i = temp.length - 1; i >= 0; i--) { // 倒序遍历，保持节点拍平顺序
+        this.list.unshift(temp[i]);
+      }
+    }
+    return this.list.length > 0;
+  }
+
+  next(): number {
+    return this.list.shift().getInteger();
+  }
+}
+```
+
 ## 动态规划
 
 动态规划三要素：重叠子问题、最优子结构、状态转移方程  
