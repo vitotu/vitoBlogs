@@ -1044,6 +1044,30 @@ class NestedIterator {
 }
 ```
 
+- leetcode 222 完全二叉树的节点个数
+
+完全二叉树的定义为每层都紧凑的靠左排列，对比于满二叉树(每层都是满的)，则是完全二叉树的一种特殊情况  
+对于一颗普通的二叉树节点数可通过遍历每个节点统计获得  
+若为满二叉树则节点数与高度呈指数关系：2^h - 1  
+完全二叉树中一定有一大部分子树是满二叉树，因此可以考虑结合两种树节点的计算方法来计算完全二叉树的节点个数  
+
+```ts
+function countNodes(root: TreeNode | null): number {
+  let left = root, right = root;
+  let hLeft = 0, hRight = 0; // 沿着左侧和右侧分别计算高度
+  while(left != null){
+    left = left.left;
+    hLeft++;
+  }
+  while(right != null){
+    right = right.right;
+    hRight++;
+  } // 若高度相同则使用满二叉树的计算方法，否则使用普通二叉树的递归统计方法
+  if(hLeft === hRight) return Math.pow(2, hLeft) - 1;
+  return 1 + countNodes(root.left) + countNodes(root.right);
+};
+```
+
 ## 动态规划
 
 动态规划三要素：重叠子问题、最优子结构、状态转移方程  
