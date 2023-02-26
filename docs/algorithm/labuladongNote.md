@@ -3115,4 +3115,40 @@ function removeDuplicateLetters(s: string): string {
 
 ### 图论基础及遍历算法
 
+推荐先观看[原文](https://labuladong.gitee.io/algo/di-yi-zhan-da78c/shou-ba-sh-03a72/tu-lun-ji--d55b2/)对图的分析，然后再开始解题  
+
 - leetcode 797 所有可能的路径
+
+给定n个节点的有向无环图，找到从节点0到节点n-1的所有路径，并输出  
+
+输入：`graph = [[1,2],[3],[3],[]]`  
+输出：`[[0,1,3],[0,2,3]]`  
+解释：有两条路径 `0 -> 1 -> 3` 和 `0 -> 2 -> 3`  
+
+```ts
+function allPathsSourceTarget(graph: number[][]): number[][] {
+  let demo  = new Solution();
+  demo.traverse(graph, 0, []);
+  return demo.res;
+};
+
+class Solution {
+  res:number[][] = [] // 收集结果
+  traverse(graph:number[][], s:number, path:number[]){ // DFS
+    path.push(s); // 收集路径
+    let n = graph.length;
+    if(s == n -1){ // 到达终点，收集结果
+      this.res.push([...path]);
+    }
+    for(let i = 0; i < graph[s].length; i++) {
+      this.traverse(graph, graph[s][i], path) // 对每个相邻的节点迭代DFS
+    }
+    path.pop(); // 退出路径
+  }
+}
+```
+
+### 环检测及拓扑排序算法
+
+- leetcode 207 课程表
+- leetcode 210 课程表 二
