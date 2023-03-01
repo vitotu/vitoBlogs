@@ -599,8 +599,11 @@ es6中多使用寄生组合式继承模式
 >>可交互时间FCI  
 >>可流畅交互时间
 
-在chrome中f12开发者工具中的Lighthouse可获取上述部分指标及网页性能报告，而performanc选项则用于收集webapp运行时的性能(与加载性能区别开)
-[参考文档](https://serverless-action.com/fontend/fe-optimization/%E4%BB%8E%E8%BE%93%E5%85%A5%20URL%20%E5%88%B0%E9%A1%B5%E9%9D%A2%E5%8A%A0%E8%BD%BD%E5%AE%8C%E6%88%90%EF%BC%8C%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%9F.html#%E5%8F%82%E8%80%83)
+在chrome中f12开发者工具中的Lighthouse可获取上述部分指标及网页性能报告，而performance选项则用于收集webapp运行时的性能(与加载性能区别开)  
+[参考文档](https://serverless-action.com/fontend/fe-optimization/%E4%BB%8E%E8%BE%93%E5%85%A5%20URL%20%E5%88%B0%E9%A1%B5%E9%9D%A2%E5%8A%A0%E8%BD%BD%E5%AE%8C%E6%88%90%EF%BC%8C%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%9F.html#%E5%8F%82%E8%80%83)  
+如：  
+白屏时间: window.performance.timing.domLoading - window.performance.timing.navigationStart  
+首屏时间: window.performance.timing.domInteractive - window.performance.timing.navigationStart  
 
 ### 首屏时间优化
 
