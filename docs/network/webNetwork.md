@@ -26,9 +26,10 @@ www.abc.com/123/img2.png
 www.abc.com/123/xyz/img3.png  
 www.abc.com/xyz/img4.png  
 
-通常情况下使用nginx或者其他服务器都能在根目录找不到temp文件，但能找到temp文件夹的情况下  
-自动通过301重定向自动将www.abc.com/123转换为www.abc.com/123/  
-但如果nginx进行了转发，则会出现上述1、2情况  
+当访问的uri最后不带斜杠时，例如 www.abc.com/123 ，会先查找 123 文件，存在就返回；若存在 123 文件夹，会在末尾加上一个斜杠并产生 301 跳转www.abc.com/123/  
+当访问的uri最后带斜杠时，例如 www.abc.com/123/，查找 123 下的 index 页面，存在就返回；不存在且未开启自动索引目录选项（autoindex on）则报 403 错误  
+
+但如果nginx块未配置目录进行了转发，则不会出现301跳转，因此可能导致页面资源相对url解析错误，从而导致资源加载失败  
 此时nginx配置多类似与：  
 
 ```nginx.conf
