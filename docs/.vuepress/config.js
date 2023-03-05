@@ -47,7 +47,11 @@ export default defineUserConfig({
       // ]},
       {text: '浏览器', link: '/browser/browser'},
       {text: '网络通信', link: '/network/webNetwork'},
-      {text: 'Linux', link: '/linuxNote/'},
+      {text: 'Linux', children:[
+        {text:'git使用笔记', link:'/linuxNote/gitUseNote'},
+        {text:'linux使用记录', link:'/linuxNote/UbuntuUsingNode'},
+        // {text:'dev', link:'/linuxNote/index'},
+      ]},
       {text: '开发构建工具', children:[
         { text:'npm', link:'/devToolsNote/npm-note'},
         { text:'webpack基础', link:'/webpack/webpackNote'},
