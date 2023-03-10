@@ -3152,3 +3152,10 @@ class Solution {
 
 - leetcode 207 课程表
 - leetcode 210 课程表 二
+
+## 动态规划汇总
+
+### 最长递增子序列
+
+- leetcode 300 最长递增子序列
+- leetcode 354 俄罗斯套娃信封问题
