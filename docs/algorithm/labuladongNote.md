@@ -3158,4 +3158,74 @@ class Solution {
 ### 最长递增子序列
 
 - leetcode 300 最长递增子序列
+
+题目：输入一个无序的整数数组，请你找到其中最长的严格递增子序列的长度
+
+子序列不同于子串，子序列元素不一定连续，我们定义一个dp数组，`dp[i]`表示以`nums[i]`这个数结尾的最长递增子序列的长度  
+即对问题进行分解，由之前的状态推导当前的状态，由`dp[0...i-1]`推出`dp[i]`  
+因此base case `dp[0]`为1  
+求`dp[i]`即找到结尾比`nums[i]`小的子序列，将`nums[i]`拼接到这些子序列末尾，就可以形成一个新的递增子序列，并且新的子序列长度+1
+
+```ts
+function lengthOfLIS(nums: number[]): number {
+  let dp:Array<number> = new Array(nums.length).fill(1); // 初始化dp
+  for(let i = 0; i < nums.length; i++){
+    for(let j = 0;j < i;j++){ // 从之前的序列末尾中发现比当前元素小的情况，添加到末尾
+      if(nums[i] > nums[j]) dp[i] = Math.max(dp[i], dp[j] + 1); // 更新当前序列长度
+    }
+  }
+  let res = 0; // 取出dp数组中最大的长度即为最长递增子序列的长度
+  for(let i = 0; i < dp.length; i++){
+    res = Math.max(res, dp[i]);
+  }
+  return res;
+};
+```
+
+使用二分查找法求解：处理数组，分成若干堆，较小的数只能放到较大数后方，或当前较大数没有可以放的位置，则新建一个堆将当前数放进去，若当前数字有多个堆可选则，选择最左侧的一个堆放置  
+而由于选择最左侧放置，堆顶必定有序，因此可以使用二分查找  
+执行完上述操作后，堆的数量就是最长递增子序列的长度
+
+```ts
+function lengthOfLIS(nums: number[]): number {
+  let top = new Array(nums.length).fill(0); // 仅存储堆顶元素
+  let piles = 0; // 堆数初始化为0
+  for(let i = 0;i < nums.length; i++){
+    let num = nums[i];
+    let left = 0, right = piles; // 二分查找当前数要放入的堆
+    while(left < right){
+      let mid = Math.floor((left + right) / 2);
+      if(top[mid] > num) right = mid;
+      else if(top[mid] < num) left = mid + 1;
+      else right = mid; // left需指向刚好可填充的第一个位置
+    }
+    if(left === piles) piles++; // 没有找到合适的堆则新建一个
+    top[left] = num; // 将当前数放入堆顶
+  }
+  return piles;
+};
+```
+
+PS:与之关联的，vue3中的快速diff算法使用了最长递增子序列，但需要求出最长递增子序列而不是仅返回一个长度
+
 - leetcode 354 俄罗斯套娃信封问题
+
+给定二维整数数组envelopes，`envelopes[i] = [wi,hi]`表示第i个信封的宽度和高度  
+当另一个信封的宽高都大于这个信封时，这个信封就可以放进另一个信封中，如同俄罗斯套娃一样，计算最多能有多少个信封组成一组“俄罗斯套娃”信封
+PS：信封不可旋转
+
+该题本质是最长递增子序列的二维版本，长度为最多能嵌套的信封个数，
+基本思路为先对W升序排序(保证W能嵌套)，遇到W相同的情况对H降序排序(W相同时不能相互包含，因此对H降序排序)，操作完成后问题转换为对H组成的数组求最长递增子序列问题
+
+```ts
+function maxEnvelopes(envelopes: number[][]): number {
+  let n = envelopes.length;
+  envelopes.sort((left:number[], right:number[]) => {
+    if(left[0] === right[0]) return right[1] - left[1]; // 高度降序
+    else return left[0] - right[0]; // 宽度升序
+  });
+  let height = new Array(n); // 构造h高度序列
+  for(let i = 0; i < n; i++) height[i] = envelopes[i][1];
+  return lengthOfLIS(height); // 必须调用二分法的最长递增子序列函数，否则不能通过时间复杂度检查
+};
+```
