@@ -323,6 +323,8 @@ mustache 先于 vue 出现，后来被 vue 所采用，mustache官方[项目地�
 [源码](./mustache.md)
 :::
 
+除mustache之外，还有比较流行的模板引擎有：Jade,EJS,JSHTML, Handlebars等
+
 ## 虚拟DOM和Diff算法
 
 snabbdom是著名的虚拟DOM库，diff算法的鼻祖，vue源码借鉴了snabbdom，[snabbdom地址](https://github.com/snabbdom/snabbdom)  
