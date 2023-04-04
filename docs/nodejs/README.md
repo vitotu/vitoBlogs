@@ -21,3 +21,5 @@ Koa 1 通过 generator、koa 2 通过 async/await 语法，让 web 中高频出�
 egg是一个生成web框架的框架，目标用户是团队架构师，约定了一套优先配置实现，其底层基于koa2，中间件机制与koa一直，egg也可以被当做web框架直接使用  
 
 由于ts的推出，nest框架基于Express上封装，并增加了TS特性支持，Midway则是基于egg封装增加了TS的特性支持  
+
+## 与ssr服务端渲染的联系
