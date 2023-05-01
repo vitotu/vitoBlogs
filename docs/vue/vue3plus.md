@@ -58,15 +58,93 @@ vue3通过`Object.defineProperty`或`Proxy`API在数据的读取环节收集副�
 vue3定义了effect函数用于注册作用用函数，通过传入副作用函数，在effect内部执行，并通过全局变量临时存储副作用函数，方便响应式数据的getter收集副作用函数  
 对于收集副作用函数的数据结构，需要能建立读取字段与副作用函数数组（使用set实现，方便去重）之间的联系  
 
+```js
+const bucket = new WeakMap()
+
+const obj = new Proxy(data, {
+  get(target, key){
+    track(target, key)
+    return target[kay]
+  },
+  set(target, key, newVal){
+    target[key] = newVal
+    trigger(target, key)
+  }
+})
+
+function track(target, key){
+  if(!activeEffect) return
+  let depsMap = bucket.get(target) // bucket中存储所有收集的副作用函数
+  if(!depsMap) bucket.set(target, (depsMap = new Map()))
+  let deps = depsMap.get(key) // 再根据key取出对应的副作用函集
+  if(!deps) depsMap.set(key, (deps = new Set()))
+  deps.add(activeEffect) // 收集副作用函数
+}
+
+function trigger(target, key){
+  const depsMap = bucket.get(target)
+  if(!depsMap) return
+  const effects = depsMap.get(key)
+  effects && effects.forEach(fn => fn())
+}
+
+let activeEffect
+function effect(fn){ // effect注册函数中设置全局变量activateEffect，方便getter收集
+  activeEffect = fn // 简单实现，手续将完善注册函数的功能
+  fn()
+}
+```
+
+- 分支切换与cleanup
+
 当副作用函数中存在条件分支，且条件分支依赖于响应式数据，当进入a分支时，不希望b分支的响应式数据变化时触发副作用函数，反之亦然  
 因此需要在副作用函数执行时将其从与之关联的所有依赖集合中删除，执行完毕后会重新建立联系，但在新的联系中不会包含遗留的副作用函数  
 为了实现这一点，在 track 函数中我们将当前执行的副作用函数activeEffect 添加到依赖集合 deps 中, 也把deps添加到activeEffect.deps 数组中,这样就完成了对依赖集合的收集
+
+```js
+
+```
+
+- 嵌套的effect与effect栈
 
 由于嵌套的用于临时存储effect的全局变量activeEffect只有一个，当出现effect嵌套调用时，会出现内层函数覆盖外层的情况，导致副作用函数收集及调用出现异常，因此需要引入一个副作用函数栈effectStack，在副作用函数执行时，将当前副作用函数压入栈中，执行完毕后弹出，这样就避免了副作用函数嵌套带来的问题
 
 - 调度执行
 
 另外为了更灵活的调用副作用函数，effect函数支持传入options对象，通过其中的scheduler选项，传递用户的调度函数，在trigger阶段，若发现有scheduler选项则，将副作用函数传递给scheduler函数，将执行权交由调度器处理  
+
+- 计算属性 computed 与 lazy
+
+计算属性具有懒计算， 缓存结果等特性，其通过在effect入参的options选项中提供lazy属性，在effect函数内部，将副作用函数的执行逻辑定义effectFn函数中，档options.lazy为false时执行effectFn，否则返回effectFn将执行全交给用户  
+在computed中添加value缓存上次计算结果，调用effect函数，并传入lazy参数获得返回的effectFn，当用户访问computed属性时，根据是否为脏数据标志重新计算或返回缓存  
+当计算属性发生嵌套时，会导致外层effect不会被内层响应式数据收集，因此当读取计算属性时需要手动调用track，数据发生变化时手动trigger触发响应
+
+```js
+function computed() {
+  let value
+  let dirty = true
+  const effectFn = effect(getter, { // effect函数返回对getter函数包装后的函数
+    lazy: true,
+    scheduler(){
+      if(!dirty){
+        dirty = true // 每次执行重置dirty为true，避免数据不变时的重复计算
+        trigger(obj, 'value')
+      }
+    }
+  })
+  const obj = {
+    get value(){
+      if(dirty){
+        value = effectFn() // 执行包装后的函数获取getter函数执行的返回值
+        dirty = false // 重置dirty
+      }
+      track(obj, 'value')
+      return value
+    }
+  }
+  return obj
+}
+```
 
 ## 渲染器
 
