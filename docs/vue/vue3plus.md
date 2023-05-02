@@ -223,6 +223,42 @@ function effect(fn, options = {}){
 
 - watch的实现原理
 
+利用scheduler选项触发用户传入的回调函数，  
+定义traverse函数，兼容对象类型的响应式数据，让对象的每个属性变化时都能触发回调函数  
+定义getter变量，兼容用户传入getter函数的情况  
+定义oldValue和newValue，在scheduler中收集新旧值，并传递给回调函数  
+
+```js
+function watch(source, cb){
+  let getter // 兼容传入getter函数的情况
+  if(typeof source === 'function') getter = source
+  else getter = () => traverse(source)
+  let oldValue, newValue
+  const effectFn = effect(
+    () => getter(),
+    {
+      lazy: true,
+      scheduler(){
+        newValue = effectFn()
+        cb(newValue, oldValue)
+        oldValue = newValue
+      }
+    }
+  )
+  oldValue = effectFn()
+}
+
+function traverse(value, seen = new Set()){
+  // 原始值或已被读取过则不进行操作
+  if(typeof value !== 'object' || value === null || seen.has(value)) return
+  seen.add(value) // 避免死循环
+  for(const k in value){ // 若为对象，则递归的读取对象的每个值
+    traverse(value[k], seen)
+  }
+  return value
+}
+```
+
 ## 渲染器
 
 ## 组件化
