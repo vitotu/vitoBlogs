@@ -85,7 +85,7 @@ function trigger(target, key){
   const depsMap = bucket.get(target)
   if(!depsMap) return
   const effects = depsMap.get(key)
-  effects && effects.forEach(fn => fn())
+  
 }
 
 let activeEffect
@@ -102,16 +102,80 @@ function effect(fn){ // effect注册函数中设置全局变量activateEffect，
 为了实现这一点，在 track 函数中我们将当前执行的副作用函数activeEffect 添加到依赖集合 deps 中, 也把deps添加到activeEffect.deps 数组中,这样就完成了对依赖集合的收集
 
 ```js
-
+let activateEffect
+function effect(fn){
+  const effectFn = () => {
+    cleanup(effectFn)
+    activateEffect = effectFn
+    fn()
+  }
+  effectFn.deps = []
+  effectFn()
+}
+function cleanup(effectFn){
+  for(let i = 0; i < effectFn.deps.length; i++){
+    const deps = effectFn.deps[i]
+    if(deps) deps.delete(effectFn)
+  }
+  effectFn.deps.length = 0
+}
+function track(target, key){
+  activateEffect.deps.push(deps) // ... 省略其他代码，末尾新增以下代码
+}
+function trigger(target, key){
+  // 删除此行 effects && effects.forEach(fn => fn())
+  const effectsToRun = new Set(effects) // 末尾新增以下两行
+  effectsToRun.forEach(effectFn => effectFn())
+}
 ```
 
 - 嵌套的effect与effect栈
 
 由于嵌套的用于临时存储effect的全局变量activeEffect只有一个，当出现effect嵌套调用时，会出现内层函数覆盖外层的情况，导致副作用函数收集及调用出现异常，因此需要引入一个副作用函数栈effectStack，在副作用函数执行时，将当前副作用函数压入栈中，执行完毕后弹出，这样就避免了副作用函数嵌套带来的问题
 
+```js
+const effectStack = [] // 新增代码
+function effectFn(fn){
+  const effectFn() => { // 新增如下代码
+    // 省略其他代码
+    effectStack.push(effectFn)
+    fn()
+    effectStack.pop()
+    activateEffect = effectStack[effectStack.length - 1]
+  }
+  // 省略其他代码
+}
+```
+
 - 调度执行
 
 另外为了更灵活的调用副作用函数，effect函数支持传入options对象，通过其中的scheduler选项，传递用户的调度函数，在trigger阶段，若发现有scheduler选项则，将副作用函数传递给scheduler函数，将执行权交由调度器处理  
+
+```js
+function effect(fn, options = {}){
+  // 省略其他代码
+  effectFn.options = options // 将options挂载到effectFn上
+  effectFn.deps = []
+}
+function trigger(target, key){
+  const depsMap = bucket.get(target)
+  if(!depsMap) return
+  const effects = depsMap.get(key)
+  // 防止无限递归
+  const effectsToRun = new Set()
+  effects && effects.forEach(effectFn =>{
+    if(effectFn !== activateEffect) effectsToRun.add(effectFn)
+  })
+  // 若options中传入了scheduler调度函数，则交出执行权给用户
+  effectsToRun.forEach(effectFn => {
+    if(effectFn.options.scheduler){
+      effectFn.options.scheduler(effectFn)
+    }else{
+      effectFn()
+    }
+  })
+}
+```
 
 - 计算属性 computed 与 lazy
 
@@ -121,14 +185,14 @@ function effect(fn){ // effect注册函数中设置全局变量activateEffect，
 
 ```js
 function computed() {
-  let value
-  let dirty = true
+  let value // 缓存上次计算的值
+  let dirty = true // 是否需要重新计算flag
   const effectFn = effect(getter, { // effect函数返回对getter函数包装后的函数
     lazy: true,
     scheduler(){
       if(!dirty){
         dirty = true // 每次执行重置dirty为true，避免数据不变时的重复计算
-        trigger(obj, 'value')
+        trigger(obj, 'value') // 手动触发，解决computed嵌套问题
       }
     }
   })
@@ -138,13 +202,26 @@ function computed() {
         value = effectFn() // 执行包装后的函数获取getter函数执行的返回值
         dirty = false // 重置dirty
       }
-      track(obj, 'value')
+      track(obj, 'value') // 手动追踪，解决computed嵌套问题
       return value
     }
   }
   return obj
 }
+
+function effect(fn, options = {}){
+  const effectFn = () => {
+    // ...
+    const res = fn() // 存储执行结果
+    // ...
+    return res // 返回执行结果
+  }
+  // ...
+  return effectFn
+}
 ```
+
+- watch的实现原理
 
 ## 渲染器
 
