@@ -229,23 +229,36 @@ function effect(fn, options = {}){
 定义oldValue和newValue，在scheduler中收集新旧值，并传递给回调函数  
 
 ```js
-function watch(source, cb){
+function watch(source, cb, options = {}){
   let getter // 兼容传入getter函数的情况
   if(typeof source === 'function') getter = source
   else getter = () => traverse(source)
   let oldValue, newValue
+  let cleanup // 存储过期的回调函数, 解决竞态问题
+  function onInvalidate(fn){
+    cleanup = fn // 存入过期的回调函数到cleanup中
+  }
+
+  const job = () => {  // 将scheduler封装为job方便调用
+    newValue = effectFn()
+    if(cleanup) cleanup() // 在调用cb之前先调用过期的回调
+    cb(newValue, oldValue, onInvalidate) // 传入第三个参数方便用户使用
+    oldValue = newValue
+  }
   const effectFn = effect(
     () => getter(),
     {
       lazy: true,
-      scheduler(){
-        newValue = effectFn()
-        cb(newValue, oldValue)
-        oldValue = newValue
+      scheduler: () => { // 支持flush选项
+        if(options.flush === 'post'){
+          const p = Promise.resolve()
+          p.then(job)
+        } else job()
       }
     }
   )
-  oldValue = effectFn()
+  if(options.immediate) job() // 若传入立即调用则执行job
+  else oldValue = effectFn()
 }
 
 function traverse(value, seen = new Set()){
@@ -258,6 +271,8 @@ function traverse(value, seen = new Set()){
   return value
 }
 ```
+
+### 非原始值的响应式方案
 
 ## 渲染器
 
