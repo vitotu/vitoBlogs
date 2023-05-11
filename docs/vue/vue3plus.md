@@ -274,6 +274,11 @@ function traverse(value, seen = new Set()){
 
 ### 非原始值的响应式方案
 
+当对象中存在存在getter，setter时，Proxy代理读取时其中this指向为原始数据，因此无法触发响应式收集，Vue3使用Reflect方法的第三个参数receiver，重新绑定Proxy对象，通过Proxy对象访问原始对象属性，并触发响应式收集  
+
+
+
+
 ## 渲染器
 
 ## 组件化
