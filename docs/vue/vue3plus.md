@@ -276,13 +276,63 @@ function traverse(value, seen = new Set()){
 
 当对象中存在存在getter，setter时，Proxy代理读取时其中this指向为原始数据，因此无法触发响应式收集，Vue3使用Reflect方法的第三个参数receiver，重新绑定Proxy对象，通过Proxy对象访问原始对象属性，并触发响应式收集  
 
-读取操作 
+读取操作  
 obj.foo, --> Reflect.get
 key in obj, --> HasProperty方法 --> Reflect.has
 for...in --> 依赖iteration迭代对象 --> Reflect.ownKeys
 添加新属性set --> Reflect.set
 删除属性delete --> Reflect.deleteProperty
 
+```js
+const ITERATE_KEY = Symbol('iterate')
+const p = new Proxy(obj, {
+  get(target, key, receiver){
+    track(target, key)
+    return Reflect.get(target, key, receiver)
+  },
+  has(target, key){
+    track(target, key)
+    return Reflect.has(target, key)
+  },
+  ownKeys(target){ // 此操作不予任何key绑定，因此使用标识ITERATE_KEY
+    track(target, ITERATE_KEY) // 将副作用函数与ITERATE_KEY绑定
+    return Reflect.ownKeys(target)
+  },
+  set(target, key, newVal, receiver){
+    const type = Object.prototype.hasOwnProperty.call(target,
+    key) ? 'SET' : 'ADD' // 判断是修改还是添加
+    const res = Reflect.set(target, key, newVal, receiver)
+    trigger(target, key, type) // 触发时传入操作类型
+    return res
+  },
+
+  deleteProperty(target, key) {
+    // 检查被操作的属性是否是对象自己的属性
+    const hadKey = Object.prototype.hasOwnProperty.call(target,
+  key)
+    // 使用 Reflect.deleteProperty 完成属性的删除
+    const res = Reflect.deleteProperty(target, key)
+    if (res && hadKey) {
+      // 只有当被删除的属性是对象自己的属性并且成功删除时,才触发更新
+      trigger(target, key, 'DELETE')
+    }
+    return res
+  }
+})
+
+function trigger(target, key, type) { // 增加入参type，用于区分add和modify
+  // ... 省略其他代码
+  if(type === 'ADD' || type === 'DELETE'){ // 若为添加操作，则触发ITERATE_KEY
+    const iterateEffects = depsMap.get(ITERATE_KEY)
+    iterateEffects && iterateEffects.forEach(effectFn => {
+      if (effectFn !== activeEffect) {
+        effectsToRun.add(effectFn)
+      }
+    })
+  }
+  // ... 省略其他代码
+}
+```
 
 ## 渲染器
 
