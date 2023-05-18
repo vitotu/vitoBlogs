@@ -297,7 +297,7 @@ const p = new Proxy(obj, {
   ownKeys(target){ // 此操作不予任何key绑定，因此使用标识ITERATE_KEY
     track(target, ITERATE_KEY) // 将副作用函数与ITERATE_KEY绑定
     return Reflect.ownKeys(target)
-  },
+  }, // 为配合ITERATE_KEY key, 同时调整set
   set(target, key, newVal, receiver){
     const type = Object.prototype.hasOwnProperty.call(target,
     key) ? 'SET' : 'ADD' // 判断是修改还是添加
