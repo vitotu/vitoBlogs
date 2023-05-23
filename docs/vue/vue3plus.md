@@ -334,6 +334,25 @@ function trigger(target, key, type) { // 增加入参type，用于区分add和mo
 }
 ```
 
+想要合理的触发响应，需要解决如下场景：新旧值相同时，不触发响应；访问原型上属性时重复触发响应等问题，可通过封装reactive函数创建响应式数据
+
+```js
+function reactive(obj) {
+  return new Proxy(obj, {
+    get(target, key, receiver){
+      if(key === 'raw') return target // 代理对象可通过raw访问原始属性
+      track(target, key)
+      return Reflect.get(target, key, receiver)
+    }
+    set(target, key, newVal, receiver){
+      const oldVal = target[key]
+      const type = Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
+      const res = Reflect.set(target, key, newVal, receiver)
+    }
+  })
+}
+```
+
 ## 渲染器
 
 ## 组件化
