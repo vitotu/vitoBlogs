@@ -337,21 +337,54 @@ function trigger(target, key, type) { // 增加入参type，用于区分add和mo
 想要合理的触发响应，需要解决如下场景：新旧值相同时，不触发响应；访问原型上属性时重复触发响应等问题，可通过封装reactive函数创建响应式数据
 
 ```js
-function reactive(obj) {
+function createReactive(obj, isShallow = false, isReadonly = false) {
   return new Proxy(obj, {
     get(target, key, receiver){
       if(key === 'raw') return target // 代理对象可通过raw访问原始属性
-      track(target, key)
-      return Reflect.get(target, key, receiver)
+      if(!isReadonly) track(target, key) // 只读属性不收集副作用函数
+      const res = Reflect.get(target, key, receiver)
+      if(isShallow) return res
+      if(typeof res === 'object' && res !== null){
+        return isReadonly ? readonly(res) : reactive(res) // 递归处理嵌套对象
+      }
+      return res
     }
     set(target, key, newVal, receiver){
+      if(isReadonly) return true // 只读属性直接返回
       const oldVal = target[key]
       const type = Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
       const res = Reflect.set(target, key, newVal, receiver)
+      if(target === receiver.raw) {
+        if(oldVal !== newVal && (oldVal === oldVal || newVal === newVal)) trigger(target, key, type)
+      }
+      return res
     }
+    deleteProperty(target, key){
+      if(isReadonly) return true
+      const hadKey = Object.prototype.hasOwnProperty.call(target, key)
+      const res = Reflect.deleteProperty(target, key)
+      if(res && hadKey) trigger(target, key, 'DELETE')
+      return res
+    }
+    // ... 省略其他拦截函数
   })
 }
+
+function reactive(obj){
+  return createReactive(obj)
+}
+function shallowReactive(obj){
+  return createReactive(obj, true)
+}
+function readonly(obj){
+  return createReactive(obj, false, true)
+}
+function shallowReadonly(obj){
+  return createReactive(obj, true /* shallow */, true)
+}
 ```
+
+代理数组
 
 ## 渲染器
 
