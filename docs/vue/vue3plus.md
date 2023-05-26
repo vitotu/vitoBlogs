@@ -385,6 +385,7 @@ function shallowReadonly(obj){
 ```
 
 代理数组
+js中的对象分为普通对象和异质对象，异质对象是在普通对象的基础上修改了内部方法的对象，如数组修改了 `[[DefineOwnProperty]]`方法
 
 ## 渲染器
 
