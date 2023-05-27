@@ -384,8 +384,26 @@ function shallowReadonly(obj){
 }
 ```
 
-代理数组
-js中的对象分为普通对象和异质对象，异质对象是在普通对象的基础上修改了内部方法的对象，如数组修改了 `[[DefineOwnProperty]]`方法
+代理数组  
+
+js中的对象分为普通对象和异质对象，异质对象是在普通对象的基础上修改了内部方法的对象，如数组修改了 `[[DefineOwnProperty]]`方法  
+
+```js
+function createReactive(obj, isShallow=false, isReadonly=false){
+  return new Proxy(obj, {
+    set(target, key, newVal, receiver){
+      if(isReadonly) return true
+      const oldVal = target[key]
+      const type = Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
+      const res = Reflect.set(target, key, newVal, receiver)
+      if(target === receiver.raw){
+        if(oldVal !== newVal && (oldVal === oldVal || newVal === newVal)) trigger(target, key, type)
+      }
+      return res
+    }
+  })
+}
+```
 
 ## 渲染器
 
