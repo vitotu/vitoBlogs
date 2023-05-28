@@ -341,7 +341,7 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
   return new Proxy(obj, {
     get(target, key, receiver){
       if(key === 'raw') return target // 代理对象可通过raw访问原始属性
-      if(!isReadonly) track(target, key) // 只读属性不收集副作用函数
+      if(!isReadonly && typeof key !== 'symbol') track(target, key) // 只读属性不收集副作用函数
       const res = Reflect.get(target, key, receiver)
       if(isShallow) return res
       if(typeof res === 'object' && res !== null){
@@ -387,6 +387,7 @@ function shallowReadonly(obj){
 代理数组  
 
 js中的对象分为普通对象和异质对象，异质对象是在普通对象的基础上修改了内部方法的对象，如数组修改了 `[[DefineOwnProperty]]`方法  
+当数组长度发生改变时，需要通过length为key，记录相关副作用函数，如遍历
 
 ```js
 function createReactive(obj, isShallow=false, isReadonly=false){
@@ -394,14 +395,65 @@ function createReactive(obj, isShallow=false, isReadonly=false){
     set(target, key, newVal, receiver){
       if(isReadonly) return true
       const oldVal = target[key]
-      const type = Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
+      const type = Array.isArray(target) ? 
+        Number(key) < target.length ? 'SET':'ADD' : 
+        Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
       const res = Reflect.set(target, key, newVal, receiver)
       if(target === receiver.raw){
-        if(oldVal !== newVal && (oldVal === oldVal || newVal === newVal)) trigger(target, key, type)
+        if(oldVal !== newVal && (oldVal === oldVal || newVal === newVal)) trigger(target, key, type, newVal)
       }
       return res
+    },
+    ownKeys(target){
+      track(target, Array.isArray(target) ? 'length' : ITERATE_KEY)
+      return Reflect.ownKeys(target)
     }
   })
+}
+function trigger(target, key, type, newVal) {
+  const depsMap = bucket.get(target)
+  if (!depsMap) return
+  // 省略部分内容
+
+  // 当操作类型为 ADD 并且目标对象是数组时,应该取出并执行那些与 length属性相关联的副作用函数
+  if (type === 'ADD' && Array.isArray(target)) {
+    // 取出与 length 相关联的副作用函数
+    const lengthEffects = depsMap.get('length')
+    // 将这些副作用函数添加到 effectsToRun 中,待执行
+    lengthEffects && lengthEffects.forEach(effectFn => {
+      if (effectFn !== activeEffect) {
+          effectsToRun.add(effectFn)
+      }
+    })
+  }
+  if(Array.isArray(target) && key === 'length'){
+    // 当目标对象是数组并且修改了 length 属性时,应该取出并执行那些与索引相关联的副作用函数
+    depsMap.forEach((effects, key) => {
+      if(key > newVal){
+        effects.forEach(effectFn => {
+          if (effectFn !== activeEffect) {
+            effectsToRun.add(effectFn)
+          }
+        })
+      }
+    })
+  }
+  effectsToRun.forEach(effectFn => {
+    if (effectFn.options.scheduler) {
+      effectFn.options.scheduler(effectFn)
+    } else {
+      effectFn()
+    }
+  })
+}
+
+const reactiveMap = new Map()
+function reactive(obj){
+  const existionProxy = reactiveMap.get(obj)
+  if(existionProxy) return existionProxy
+  const proxy = createReactive(obj)
+  reactiveMap.set(obj, proxy)
+  return proxy
 }
 ```
 
