@@ -390,6 +390,16 @@ js中的对象分为普通对象和异质对象，异质对象是在普通对象
 当数组长度发生改变时，需要通过length为key，记录相关副作用函数，如遍历
 
 ```js
+const originMethod = Array.prototype.includes
+const arrayInstrumentations = {
+  includes: function(...args){
+    let res = originMethod.apply(this, args) // 先尝试从代理对象总查找
+    if(res === false){
+      res = originMethod.apply(this.raw, args)
+    }
+    return res
+  }
+} // 对于includes， indexOf， lastIndexOf的处理方法相同
 function createReactive(obj, isShallow=false, isReadonly=false){
   return new Proxy(obj, {
     set(target, key, newVal, receiver){
@@ -407,6 +417,13 @@ function createReactive(obj, isShallow=false, isReadonly=false){
     ownKeys(target){
       track(target, Array.isArray(target) ? 'length' : ITERATE_KEY)
       return Reflect.ownKeys(target)
+    },
+    get(target, key, receiver){
+      if(key === 'raw') return target
+      if(Array.isArray(target) && arrayInstrumentations.hasOwnProperty(key))) { // 若为数组对象则返回定义在 arrayInstrumentations的值，用于解决includes 方法问题
+        return Reflect.get(arrayInstrumentations, key, receiver)
+      }
+      //... 省略其他代码
     }
   })
 }
@@ -449,7 +466,7 @@ function trigger(target, key, type, newVal) {
 
 const reactiveMap = new Map()
 function reactive(obj){
-  const existionProxy = reactiveMap.get(obj)
+  const existionProxy = reactiveMap.get(obj) // 避免创建重复的代理对象
   if(existionProxy) return existionProxy
   const proxy = createReactive(obj)
   reactiveMap.set(obj, proxy)
