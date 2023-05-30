@@ -393,7 +393,7 @@ js中的对象分为普通对象和异质对象，异质对象是在普通对象
 const originMethod = Array.prototype.includes
 const arrayInstrumentations = {
   includes: function(...args){
-    let res = originMethod.apply(this, args) // 先尝试从代理对象总查找
+    let res = originMethod.apply(this, args) // 先尝试从代理对象中查找
     if(res === false){
       res = originMethod.apply(this.raw, args)
     }
@@ -471,6 +471,22 @@ function reactive(obj){
   const proxy = createReactive(obj)
   reactiveMap.set(obj, proxy)
   return proxy
+}
+
+// 解决隐式修改数组长度，导致循环触发栈溢出问题
+let shouldTrack = true
+// 重写数组的 push、pop、shift、unshift 以及 splice 方法
+;['push', 'pop', 'shift', 'unshift', 'splice'].forEach(method =>{
+  const originMethod = Array.prototype[method]
+  arrayInstrumentations[method] = function(...args) {
+    shouldTrack = false
+    let res = originMethod.apply(this, args)
+    shouldTrack = true
+    return res
+  }
+})
+function track(target, key){
+  if(!activeEffect || !shouldTrack) return
 }
 ```
 
