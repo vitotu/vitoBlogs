@@ -530,6 +530,15 @@ const mutableInstrumentations = {
     }
     return res
   }
+  get(key) {
+    const target = this.raw
+    const had = target.has(key)
+    track(target, key)
+    if(had){
+      const res = target.get(key)
+      return typeof res === 'object' ? reactive(res) : res
+    }
+  }
 }
 ```
 
