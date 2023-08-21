@@ -551,6 +551,35 @@ const mutableInstrumentations = {
       trigger(target, key, 'SET')
     }
   }
+  forEach(callback, thisArg) {
+    const wrap = (val) => typeof val === 'object' ? reactive(val) : val
+    const target = this.raw
+    track(target, ITERATE_KEY)
+    target.forEach((v, k) => {
+      callback(thisArg, wrap(v), wrap(k), this)
+    })
+  }
+}
+function trigger(target, key, type, newVal) {
+  const depsMap = bucket.get(target)
+  if(!depsMap) return
+  const effects = depsMap.get(key)
+  const effectsToRun = new Set()
+  effects && effects.forEach(effectFn => {
+    if(effectFn !== activeEffect){
+      effectsToRun.add(effectFn)
+    }
+  })
+  // 添加set操作类型， 触发与Iterate_key相关的副作用函数
+  if(type === 'ADD' || type === 'DELETE' || (type === 'SET' && Object.prototype.toString.call(target) === '[object Map]')){
+    const iterateEffects = depsMap.get(ITERATE_KEY)
+    iterateEffects && iterateEffects.forEach(effectFn => {
+      if(effectFn !== activeEffect){
+        effectsToRun.add(effectFn)
+      }
+    })
+  }
+  // 省略部分代码
 }
 ```
 
