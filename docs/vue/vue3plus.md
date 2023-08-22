@@ -559,6 +559,25 @@ const mutableInstrumentations = {
       callback(thisArg, wrap(v), wrap(k), this)
     })
   }
+  [Symbol.iterator]() {
+    const target = this.raw
+    const itr = target[Symbol.iterator]()
+    const wrap = (val) => typeof val === 'object' ? reactive(val) : val
+    track(target, ITERATE_KEY)
+    return {
+      next() {
+        const { value, done } = itr.next()
+        return {
+          value: value ? [wrap(value[0]), wrap(value[1])] : value,
+          done
+        }
+      }
+      [Symbol.iterator]() {
+        return this
+      }
+    }
+  }
+  // entries 等方法的实现方式与上面可迭代协议类似
 }
 function trigger(target, key, type, newVal) {
   const depsMap = bucket.get(target)
