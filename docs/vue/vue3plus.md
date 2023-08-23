@@ -577,7 +577,7 @@ const mutableInstrumentations = {
       }
     }
   }
-  // entries 等方法的实现方式与上面可迭代协议类似
+  // entries, values, keys 等方法的实现方式与上面可迭代协议类似, 但keys需要再trigger中额外处理
 }
 function trigger(target, key, type, newVal) {
   const depsMap = bucket.get(target)
