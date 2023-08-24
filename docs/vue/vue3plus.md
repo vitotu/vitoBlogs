@@ -602,6 +602,50 @@ function trigger(target, key, type, newVal) {
 }
 ```
 
+### 原始值的响应式方案
+
+proxy的代理目标是非原始值， 对原始值的拦截只能通过一个非原始值的包装对象来实现
+
+```js
+function ref(val) {
+  const wrapper = {
+    value: val
+  }
+  // 定义一个不可枚举对象， 用于区分ref对象和普通对象
+  Object.defineProperty(wrapper, '__v_isRef', {
+    value: true
+  })
+  return reactive(wrapper)
+}
+```
+
+toRef和toRefs解决，当响应式对象进行结构赋值的，响应式丢失的问题
+
+```js
+function toRef(obj, key) {
+  const wrapper = {
+    get value() {
+      return obj[key]
+    }
+    set value(val) {
+      obj[key] = val
+    }
+  }
+  Object.defineProperty(wrapper, '__v_isRef', {
+    value: true
+  })
+  return wrapper
+}
+
+function toRefs(obj) {
+  const ret = {}
+  for(const key in obj) {
+    ret[key] = toRef(obj, key)
+  }
+  return ret
+}
+```
+
 ## 渲染器
 
 ## 组件化
