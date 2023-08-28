@@ -646,7 +646,30 @@ function toRefs(obj) {
 }
 ```
 
+ref对象的值必须通过value进行访问， 为了方便使用， 需要提供自动脱ref功能
+
+```js
+function proxyRefs(target) { // setup函数返回时会调用类似的函数, 对ref对象调用reactive也会有类似过程
+  return new Proxy(target, {
+    get(target, key, receiver) {
+      const res = Reflect.get(target, key, receiver)
+      return res.__v_isRefs ? res.value : res
+    },
+    set(target, key, val, receiver) {
+      const value = target[key]
+      if(value.__v_isRef){
+        value.value = val
+        return true
+      }
+      return Reflect.set(target, key, val, receiver)
+    }
+  })
+}
+```
+
 ## 渲染器
+
+### 渲染器的设计
 
 ## 组件化
 
