@@ -671,7 +671,31 @@ function proxyRefs(target) { // setup函数返回时会调用类似的函数, �
 
 ### 渲染器的设计
 
+渲染器将虚拟DOM渲染为特定平台上的真实元素， 渲染器与渲染函数不同， 渲染器是更宽泛的概概念， 可以用来渲染和激活已有的DOM元素(与服务端渲染相关)
 
+```js
+function createRenderer() {
+  function render(vnode, container) {
+    if(vnode){
+      // patch(container._vnode, vnode, container)
+    } else {
+      if(container._vnode) {
+        // 旧的vnode 存在， 且新的vnode不存在， 则卸载
+      }
+    }
+    container._vnode = vnode // 渲染完成后， 将vnode挂载到container上
+  }
+  function hydrate(vnode, container) {
+
+  }
+  // ...
+  return {
+    render,
+    hydrate,
+    // ...
+  }
+}
+```
 
 ## 组件化
 
