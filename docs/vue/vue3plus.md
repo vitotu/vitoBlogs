@@ -688,6 +688,9 @@ function createRenderer() {
   function hydrate(vnode, container) {
 
   }
+  function patch(n1, n2, container) {
+
+  }
   // ...
   return {
     render,
