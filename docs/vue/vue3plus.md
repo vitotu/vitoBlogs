@@ -674,7 +674,12 @@ function proxyRefs(target) { // setup函数返回时会调用类似的函数, �
 渲染器将虚拟DOM渲染为特定平台上的真实元素， 渲染器与渲染函数不同， 渲染器是更宽泛的概概念， 可以用来渲染和激活已有的DOM元素(与服务端渲染相关)
 
 ```js
-function createRenderer() {
+function createRenderer(options) {
+  const { // 通过options传入操作DOM的API实现渲染器的平台无关能力
+    createElement,
+    insert,
+    setElementText,
+  } = options
   function render(vnode, container) {
     if(vnode){
       // patch(container._vnode, vnode, container)
@@ -689,7 +694,18 @@ function createRenderer() {
 
   }
   function patch(n1, n2, container) {
-
+    if(!n1) { // n1不存在， 则直接挂载
+      mountElement(n2, container)
+    } else {
+      // n1 存在需要打补丁
+    }
+  }
+  function mountElement(vnode, container) { // 挂载vnode
+    const el = createElement(vnode.type)
+    if(typeof vnode.children === 'string') {
+      setElementText(el, vnode.children)
+    }
+    insert(el, container)
   }
   // ...
   return {
@@ -698,6 +714,19 @@ function createRenderer() {
     // ...
   }
 }
+// 浏览器中options实现示例
+const options = {
+  createElement(tag) {
+    return document.createElement(tag)
+  },
+  setElementText(el, text){
+    el.textContent = text
+  },
+  insert(el, parent, anchor = null) {
+    parent.insertBefore(el, anchor)
+  }
+}
+
 ```
 
 ## 组件化
