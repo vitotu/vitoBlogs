@@ -704,6 +704,16 @@ function createRenderer(options) {
     const el = createElement(vnode.type)
     if(typeof vnode.children === 'string') {
       setElementText(el, vnode.children)
+    } else if (Array.isArray(vnode.children)) { // 处理数组型子节点
+      vnode.children.forEach(child => {
+        patch(null, child, el)
+      })
+    }
+
+    if(vnode.props) {
+      for(const key in vnode.props) {
+        el.setAttribute(key, vnode.props[key])
+      }
     }
     insert(el, container)
   }
