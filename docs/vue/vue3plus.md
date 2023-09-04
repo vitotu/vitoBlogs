@@ -679,6 +679,7 @@ function createRenderer(options) {
     createElement,
     insert,
     setElementText,
+    patchProps,
   } = options
   function render(vnode, container) {
     if(vnode){
@@ -712,10 +713,14 @@ function createRenderer(options) {
 
     if(vnode.props) {
       for(const key in vnode.props) {
-        el.setAttribute(key, vnode.props[key])
+        patchProps(el, key, null, vnode.props[key])
       }
     }
     insert(el, container)
+  }
+  function shouldSetAsProps(el, key, value) {
+    if(key === 'form' && el.tagName === 'INPUT') return false
+    return key in el
   }
   // ...
   return {
@@ -734,6 +739,18 @@ const options = {
   },
   insert(el, parent, anchor = null) {
     parent.insertBefore(el, anchor)
+  },
+  patchProps(el, key, preValue, nextValue) {
+    if(shouldSetAsProps(el, key, nextValue)) {
+      const type = typeof el[key]
+      if(type == 'boolean' && nextValue == '') {
+        el[key] = true
+      } else {
+        el[key] = nextValue
+      }
+    } else {
+      el.setAttribute(key, nextValue)
+    }
   }
 }
 
