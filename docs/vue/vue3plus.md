@@ -683,10 +683,11 @@ function createRenderer(options) {
   } = options
   function render(vnode, container) {
     if(vnode){
-      // patch(container._vnode, vnode, container)
+      patch(container._vnode, vnode, container)
     } else {
       if(container._vnode) {
         // 旧的vnode 存在， 且新的vnode不存在， 则卸载
+        unmount(container._vnode)
       }
     }
     container._vnode = vnode // 渲染完成后， 将vnode挂载到container上
@@ -695,14 +696,27 @@ function createRenderer(options) {
 
   }
   function patch(n1, n2, container) {
-    if(!n1) { // n1不存在， 则直接挂载
-      mountElement(n2, container)
-    } else {
-      // n1 存在需要打补丁
+    if(n1 && n1.type !== n2.type) {
+      unmount(n1)
+      n1 = null
     }
+    const { type } = n2
+    if(typeof type === 'string') {
+      if(!n1) { // n1不存在， 则直接挂载
+        mountElement(n2, container)
+      } else {
+        patchElement(n1, n2)
+        // n1 存在需要打补丁
+      }
+    } else if (typeof type === 'object') {
+      // 如何n2.type的值时对象类型，则它是组件
+    } else if (type === '***') {
+      // 处理其他类型的vnode
+    }
+
   }
   function mountElement(vnode, container) { // 挂载vnode
-    const el = createElement(vnode.type)
+    const el = vnode.el = createElement(vnode.type)
     if(typeof vnode.children === 'string') {
       setElementText(el, vnode.children)
     } else if (Array.isArray(vnode.children)) { // 处理数组型子节点
@@ -721,6 +735,12 @@ function createRenderer(options) {
   function shouldSetAsProps(el, key, value) {
     if(key === 'form' && el.tagName === 'INPUT') return false
     return key in el
+  }
+  function unmount(vnode) {
+    const parent = vnode.el.parentNode
+    if(parent) {
+      parent.removeChild(vnode.el)
+    }
   }
   // ...
   return {
@@ -741,7 +761,9 @@ const options = {
     parent.insertBefore(el, anchor)
   },
   patchProps(el, key, preValue, nextValue) {
-    if(shouldSetAsProps(el, key, nextValue)) {
+    if(key === 'class') { // 对class特殊处理
+      el.className = nextValue || ''
+    } else if(shouldSetAsProps(el, key, nextValue)) {
       const type = typeof el[key]
       if(type == 'boolean' && nextValue == '') {
         el[key] = true
