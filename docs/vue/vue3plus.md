@@ -761,7 +761,30 @@ const options = {
     parent.insertBefore(el, anchor)
   },
   patchProps(el, key, preValue, nextValue) {
-    if(key === 'class') { // 对class特殊处理
+    if(/^on/.test(key)) { // 处理绑定事件
+      const invokers = el._vei || (el._vei = {}) // 存储事件名称到函数的映射
+      let invoker = invokers[key] // 尝试获取事件对应的函数缓存
+      const name = key.slice(2).toLowerCase()
+      if(nextValue) { // 更新或新增事件
+        if(!invoker) { // 新增事件
+          invoker = el._vei[key] = e => { // 包装事件函数
+            if(e.timeStamp < invoker.attached) return // 事件发生事件早于事件绑定时间， 则不处理
+            if(Array.isArray(invoker.value)) {
+              invoker.value.forEach(fn => fn(e))
+            } else {
+              invoker.value(e)
+            }
+          }
+          invoker.value = nextValue // 存储回调函数， 通过value调用
+          invoker.attached = performance.now() // 存储事件绑定时间
+          el.addEventListener(name, invoker) // 绑定包装函数
+        } else { // 更新事件，仅需直接替换，而不需要remove原来的回调函数，提升性能
+          invoker.value = nextValue
+        }
+      } else if(invoker) { // 未传入回调函数，则表明移除事件
+        el.removeEventListener(name, invoker)
+      }
+    } else if(key === 'class') { // 对class特殊处理
       el.className = nextValue || ''
     } else if(shouldSetAsProps(el, key, nextValue)) {
       const type = typeof el[key]
