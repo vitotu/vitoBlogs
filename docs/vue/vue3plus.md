@@ -742,6 +742,42 @@ function createRenderer(options) {
       parent.removeChild(vnode.el)
     }
   }
+  function patchElement(n1, n2) {
+    const el = n2.el = n1.el
+    const oldProps = n1.props
+    const newProps = n2.props
+    for(const key in newProps) {
+      if(newProps[key] !== oldProps[key]) {
+        patchProps(el, key, oldProps[key], newProps[key])
+      }
+    }
+    for(const key in oldProps) {
+      if(!(key in newProps)) {
+        patchProps(el, key, oldProps[key], null)
+      }
+    }
+    function patchChildren(n1, n2, container) {
+      if(typeof n2.children === 'string') { // 新子节点是文本节点
+        if(Array.isArray(n1.children)) { // 若旧子节点是一组子节点，则逐个卸载
+          n1.children.forEach(c => unmount(c))
+        }
+        setElementText(container, n2.children) // 将新的文本节点内容设置到容器上
+      } else if(Array.isArray(n2.children)) {
+        if(Array.isArray(n1.children)) {
+          // 新旧子节点均为一组子节点，需要进行diff算法
+        } else { // 此时旧子节点为文本节点或不存在， 因此只需将容器清空， 然后将子节点逐个挂载
+          setElementText(container, '')
+          n2.children.forEach(c => patch(null, c, container))
+        }
+      } else { // 新子节点是空节点
+        if(Array.isArray(n1.children)) { // 逐个卸载旧的子节点
+          n1.children.forEach(c => unmount(c))
+        } else if(typeof n1.children === 'string') { // 直接置空容器
+          setElementText(container, '')
+        }
+      }
+    }
+  }
   // ...
   return {
     render,
