@@ -680,6 +680,8 @@ function createRenderer(options) {
     insert,
     setElementText,
     patchProps,
+    createText,
+    setText,
   } = options
   function render(vnode, container) {
     if(vnode){
@@ -710,8 +712,23 @@ function createRenderer(options) {
       }
     } else if (typeof type === 'object') {
       // 如何n2.type的值时对象类型，则它是组件
-    } else if (type === '***') {
+    } else if (type === Text) {
       // 处理其他类型的vnode
+      if(!n1){
+        const el = n2.el = createText(n2.children)
+        insert(el, container)
+      } else {
+        cosnt el = n2.el = n1.el
+        if(n2.children !== n1.children) {
+          setText(el, n2.children)
+        }
+      }
+    } else if (type === Fragment) { // Fragment类型，支持多根节点
+      if(!n1){
+        n2.children.forEach(c => patch(null, c, container))
+      } else {
+        patchChildren(n1, n2, container)
+      }
     }
 
   }
@@ -737,6 +754,10 @@ function createRenderer(options) {
     return key in el
   }
   function unmount(vnode) {
+    if(vnode.type === Fragment) { // unmount兼容Fragment类型节点
+      vnode.children.forEach(c => unmount(c))
+      return
+    }
     const parent = vnode.el.parentNode
     if(parent) {
       parent.removeChild(vnode.el)
@@ -796,6 +817,12 @@ const options = {
   insert(el, parent, anchor = null) {
     parent.insertBefore(el, anchor)
   },
+  createText(text) {
+    return document.createTextNode(text)
+  },
+  setText(el, text) {
+    el.nodeValue = text
+  },
   patchProps(el, key, preValue, nextValue) {
     if(/^on/.test(key)) { // 处理绑定事件
       const invokers = el._vei || (el._vei = {}) // 存储事件名称到函数的映射
@@ -836,6 +863,10 @@ const options = {
 }
 
 ```
+
+### 简单diff算法
+
+diff算法是当新旧vnode的子节点都是一组节点是，为了最小的性能开销完成更新的算法
 
 ## 组件化
 
