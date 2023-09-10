@@ -697,7 +697,7 @@ function createRenderer(options) {
   function hydrate(vnode, container) {
 
   }
-  function patch(n1, n2, container) {
+  function patch(n1, n2, container, anchor = null) {
     if(n1 && n1.type !== n2.type) {
       unmount(n1)
       n1 = null
@@ -705,7 +705,7 @@ function createRenderer(options) {
     const { type } = n2
     if(typeof type === 'string') {
       if(!n1) { // n1不存在， 则直接挂载
-        mountElement(n2, container)
+        mountElement(n2, container, anchor) // 支持指定位置挂载
       } else {
         patchElement(n1, n2)
         // n1 存在需要打补丁
@@ -732,7 +732,7 @@ function createRenderer(options) {
     }
 
   }
-  function mountElement(vnode, container) { // 挂载vnode
+  function mountElement(vnode, container, anchor) { // 挂载vnode
     const el = vnode.el = createElement(vnode.type)
     if(typeof vnode.children === 'string') {
       setElementText(el, vnode.children)
@@ -747,7 +747,7 @@ function createRenderer(options) {
         patchProps(el, key, null, vnode.props[key])
       }
     }
-    insert(el, container)
+    insert(el, container, anchor) // 支持在指定位置插入
   }
   function shouldSetAsProps(el, key, value) {
     if(key === 'form' && el.tagName === 'INPUT') return false
@@ -868,7 +868,293 @@ const options = {
 
 diff算法是当新旧vnode的子节点都是一组节点是，为了最小的性能开销完成更新的算法
 
+先遍历新子节点序列，查找对应的旧子节点调整顺序并进行复用，对于不存在的节点删除，新增节点则进行挂载
+
+```js
+function patchChildren(n1, n2, container, anchor) {
+  if(typeof n2.children === 'string') { // 省略部分代码
+  } else if(Array.isArray(n2.children)) {
+    const oldChildren = n1.children
+    const newChildren = n2.children
+
+    let lastIndex = 0 // 旧子节点的索引
+    for(let i = 0; i < newChildren.length; i++) {
+      const newVNode = newChildren[i]
+      let find = false // 是否找到对应的旧子节点，初始值为false
+      for(let j = 0; j < oldChildren.length; j++) {
+        const oldVNode = oldChildren[j]
+        if(newVNode.key === oldVNode.key) { // 新旧子节点的key相同
+          find = true
+          patch(oldVNode, newVNode, container)
+          if(j < lastIndex) { // 旧子节点的位置在当前位置之前，需要移动
+            const preVNode = newChildren[i - 1]
+            if(preVNode) { // 若非第一个节点， 则需要移动真实DOM
+              const anchor = preVNode.el.nextSibling // 获取下一个兄弟节点作为锚点
+              insert(newVNode.el, container, anchor)
+            }
+          } else {
+            lastIndex = j
+          }
+          break
+        }
+        if(!find) { // 若仍未找到旧子节点，则新增节点
+          const preVNode = newChildren[i - 1]
+          let anchor = null
+          if(preVNode) {
+            anchor = preVNode.el.nextSibling
+          } else {
+            anchor = container.firstChild // 新增节点为第一个节点
+          }
+          patch(null, newVNode, container, anchor)
+        }
+      }
+    }
+
+    for(let i = 0; i < oldChildren.length; i++) {
+      const oldVNode = oldChildren[i]
+      const has = newChildren.find(newVNode => newVNode.key === oldVNode.key)
+      if(!has) {
+        unmount(oldVNode)
+      }
+    }
+  } else { // 省略部分代码
+  }
+}
+```
+
+### 双端Diff算法
+
+利用首尾指针，比较与交叉比较尽可能的减少DOM的移动次数，以提升DOM更新性能
+
+```js
+function patchChildren(n1, n2, container) {
+  if(typeof n2.children === 'string') {
+    // 省略部分代码
+  } else if(Array.isArray(n2.children)) {
+    patchKeyedChildren(n1, n2, container)
+  } else {
+    // 省略部分代码
+  }
+}
+
+function patchKeyedChildren(n1, n2, container){
+  const oldChildren = n1.children
+  const newChildren = n2.children
+  // 四个索引值
+  let oldStartIdx = 0
+  let oldEndIdx = oldChildren.length - 1
+  let newStartIdx = 0
+  let newEndIdx = newChildren.length - 1
+  // 四个节点
+  let oldStartVNode = oldChildren[oldStartIdx]
+  let oldEndVNode = oldChildren[oldEndIdx]
+  let newStartVNode = newChildren[newStartIdx]
+  let newEndVNode = newChildren[newEndIdx]
+
+  while(oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx){
+    if(!oldStartVNode){ // 若节点已被处理则跳过
+      oldStartVNode = oldChildren[++oldStartIdx]
+    } else if (!oldEndVNode) {
+      oldEndVNode = oldChildren[--oldEndIdx]
+    } else if(oldStartVNode.key === newStartVNode.key) {
+      patch(oldStartVNode, newStartVNode, container) // 头部相等仅打补丁
+      oldStartVNode = oldChildren[++oldStartIdx]
+      newStartVNode = newChildren[++newStartIdx]
+    } else if(oldEndVNode.key === newEndVNode.key) { // 尾部相等，仅需打补丁
+      patch(oldEndVNode, newEndVNode, container)
+      oldEndVNode = oldChildren[--oldEndIdx]
+      newEndVNode = newChildren[--newEndIdx]
+    } else if(oldStartVNode.key === newEndVNode.key) { // 交叉相等，则打补丁并移动节点
+      patch(oldStartVNode, newEndVNode, container)
+      insert(oldStartVNode.el, container, newEndVNode.el)
+      oldStartVNode = oldChildren[++oldStartIdx]
+      newEndVNode = newChildren[--newEndIdx]
+    } else if(oldEndVNode.key === newStartVNode.key) {
+      patch(oldEndVNode, newStartVNode, container) // 调用patch打补丁
+      insert(oldEndVNode.el, container, oldStartVNode.el) // 移动尾部节点到头部
+      oldEndVNode = oldChildren[--oldEndIdx] // 更新对应索引
+      newStartVNode = newChildren[++newStartIdx]
+    } else {
+      const idxInOld = oldChildren.findIndex(node => node.key === newStartVNode.key)
+      if(idxInOld > 0){ // 找到可复用的旧子节点
+        const vnodeToMove = oldChildren[idxInOld]
+        patch(vnodeToMove, newStartVNode, container)
+        insert(vnodeToMove.el, container, oldStartVNode) // 移动旧子节点到头部
+        oldChildren[idxInOld] = undefined // 标记已处理的节点
+        newStartVNode = newChildren[++newStartIdx]
+      } else { // 新增节点
+        patch(null, newStartVNode, container, oldStartVNode.el)
+        newStartVNode = newChildren[++newStartIdx]
+      }
+    }
+  }
+  if(oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx){
+    // 挂载遗漏的新增节点
+    for(let i = newStartIdx; i <= newEndIdx; i++){
+      patch(null, newChildren[i], container, oldStartVNode.el)
+    }
+  } else if(newEndIdx < newStartIdx && oldStartIdx <= oldEndIdx){
+    // 移除多余的旧节点
+    for(let i = oldStartIdx; i <= oldEndIdx; i++){
+      unmount(oldChildren[i])
+    }
+  }
+}
+```
+
+### 快速Diff算法
+
+该算法最早应用于ivi和inferno两个框架中，vue3中借鉴并扩展之。  
+扩展后该算法先对新旧子节点序列的相同前置元素和后置元素进行预处理，分离出，仅需要插入节点或仅需要删除节点的情况  
+随后对处理后新子节点序列的剩余部分构造source数组用于存储对应旧子节点的位置索引，并计算出最长递增子序列，辅助完成DOM移动的操作  
+
+```js
+function patchKeyedChildren(n1, n2, container){
+  const newChildren = n2.children
+  const oldChildren = n1.children
+  let j = 0
+  let oldVNode = oldChildren[j], newVNode = newChildren[j]
+  while(oldVNode.key === newVNode.key){ // 预处理前置节点
+    patch(oldVNode, newVNode, container)
+    j++
+    oldVNode = oldChildren[j]
+    newVNode = newChildren[j]
+  }
+  let oldEnd = oldChildren.length - 1, newEnd = newChildren.length - 1
+  oldVNode = oldChildren[oldEnd]
+  newVNode = newChildren[newEnd]
+  while(oldVNode.key === newVNode.key){ // 预处理后置节点
+    patch(oldVNode, newVNode, container)
+    oldEnd--
+    newEnd--
+    oldVNode = oldChildren[oldEnd]
+    newVNode = newChildren[newEnd]
+  }
+
+  if(j > oldEnd && j <= newEnd){ // 仅存在新增节点的情况，插入节点
+    const anchorIndex = newEnd + 1
+    const anchor = anchorIndex < newChildren.length ? newChildren[anchorIndex].el : null
+    while(j <= newEnd){
+      patch(null, newChildren[j++], container, anchor)
+    }
+  } else if(j > newEnd && j <= oldEnd){ // 仅存在删除节点的情况，删除剩余节点
+    while(i <= oldEnd) unmount(oldChildren[j++])
+  } else { // 处理需要移动节点等复杂情况
+    // 处理新子节点序列的剩余部分，构造source数组存储其对应旧子节点中的位置索引(未处理部分，从0开始)
+    const count = newEnd - j + 1
+    const source = new Array(count).fill(-1) // -1标志为未在旧子节点序列中匹配到
+    // 构造keyIndex索引表，存储剩余新子节点的key到节点位置索引的映射，辅助填充source
+    const oldStart = j, newStart = j, keyIndex = {}
+    let moved = false, pos = 0
+    for(let i = newStart; i <= newEnd; i++){
+      keyIndex[newChildren[i].key] = i
+    }
+    let patched = 0 // 记录已更新过的节点数量
+    for(let i = oldStart; i <= oldEnd; i++){
+      oldVNode = oldChildren[i]
+      if(patched <= count){
+        const k = keyIndex[oldVNode.key] // 利用索引表在旧的序列中寻找相同key的新节点
+        if(typeof k !== 'undefined') { // 找到则，做patch，并标记索引方便后续移动
+          newVNode = newChildren[k]
+          patch(oldVNode, newVNode, container) // 发现相同的节点做patch
+          patched++
+          source[k - newStart] = i // 以newStart为起点记录其在就子节点中的索引i
+          if(k < pos){ // 若非递增顺序，则标记需要移动节点
+            moved = true
+          } else pos = k
+        } else {
+          unmount(oldVNode) // 未找到节点则卸载旧节点
+        }
+      } else { // 已更新节点数超过需要更新的节点数(剩余新子节点)，则说明需要卸载多余的节点
+        unmount(oldVNode)
+      }
+    }
+    if(moved){ // 处理DOM移动操作
+      const seq = list(source) // 计算最长增长子序列，返回其对应的索引数组
+      // 最长增长子序列尽可能的减少移动操作，因此seq对应的节点不需要进行移动
+      let s = seq.length -1 // 指向增长子序列的末尾
+      let i = count - 1 // 指向剩余新子节点的末尾
+      for(i; i >= 0; i--){ // 向头部遍历
+        if(source[i] === -1) { // i节点为新增节点，进行挂载
+          const pos = i + newStart
+          const newVNode = newChildren[pos]
+          const nextPos = pos + 1
+          const anchor = nextPos < newChildren.length ? newChildren[nextPos].el : null
+          patch(null, newVNode, container, anchor)
+        } else if(i !== seq[s]){ // i节点需要移动
+          const pos = i + newStart
+          const newVNode = newChildren[pos]
+          const nextPos = pos + 1
+          const anchor = nextPos < newChildren.length ? newChildren[nextPos].e : null
+          insert(newVNode.el, container, anchor)
+        } else { // i节点无需移动
+          s--
+        }
+      }
+    }
+  }
+}
+```
+
+求解最长递增子序列，元素可不连续，返回对应元素的索引
+
+```js
+function list(arr) {
+  const p = arr.slice()
+  const result = [0]
+  let i, j, u, v, c
+  const len = arr.length
+  for(i = 0; i < len; i++){
+    const arrI = arr[i]
+    if(arrI !== 0) {
+      j = result[result.length - 1]
+      if(arr[j] < arrI){
+        p[i] = j
+        result.push[i]
+        continue
+      }
+      u = 0
+      v = result.length - 1
+      while(u < v){
+        c = ((u + v) / 2) | 0
+        if(arr[result[c]] < arrI) {
+          u = c + 1
+        } else v = c
+      }
+      if(arrI < arr[result[u]]){
+        if(u > 0) p[i] = result[u - 1]
+      }
+      result[u] = i
+    }
+  }
+  u = result.length
+  v = result[u - 1]
+  while(u-- > 0){
+    result[u] = v
+    v = p[v]
+  }
+  return result
+}
+```
+
 ## 组件化
+
+### 组件实现原理
+
+从框架使用者角度看，组件是一个选项对象，从渲染器内部实现看，组件是一种特殊类型的虚拟DOM节点，其type为Object类型，需要调用组件的挂载mountComponent或更新patchComponent方法
+
+```js
+function patch(n1, n2, container, anchor) {
+  // 省略其他代码
+  const { type } = n2
+  if(typeof type === 'string'){
+    // 
+  } else if(typeof type === 'object'){
+    if(!n1) mountComponent(n2, container, anchor)
+    else patchComponent(n1, n2, anchor)
+  }
+}
+```
 
 ## 编译器
 
