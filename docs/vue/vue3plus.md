@@ -1156,6 +1156,173 @@ function patch(n1, n2, container, anchor) {
 }
 ```
 
+以自定义render函数的组件为例
+
+```js
+const MyComponent = { // 样例组件
+  name: 'MyComponent',
+  data() {
+    return {
+      foo: 'hello component'
+    }
+  },
+  render() {
+    return {
+      type: 'div',
+      children: `foo's value is: ${this.foo}`
+    }
+  }
+}
+
+function mountComponent(vnode, container, anchor){
+  const componentOptions = vnode.type
+  // 从options中获取选项式api的生命周期hook
+  const { render, data, beforeCreate, created, beforeMount, beforeUpdate, updated, props: propsOption, setup } = componentOptions
+  beforeCreate && beforeCreate() // 调用选项式生命周期钩子（如有下同）
+  const state = reactive(data())
+  const [props, attrs] = resolveProps(propsOption, vnode.props)
+  const slots = vnode.children || [] // 从children中获取插槽引用
+  const instance = { // 组件实例
+    state,
+    props: shallowReactive(props),
+    isMounted: false, // 是否已挂载
+    subTree: null,
+    slots,
+    mounted: [], // 存储setup中通过onMounted函数注册的生命周期函数
+  }
+  function emit(event, ...payload) {
+    // 从props中读取绑定的事件处理函数并执行
+    const eventName = `on${event[0].toUpperCase() + event.slice(1)}`
+    const handler = instance.props[eventName]
+    if(handler) handler(payload)
+    else console.error('event not found')
+  }
+  const setupContext = { attrs, emit, slots }
+  setCurrentInstance(instance) // 执行setup函数之前设置当前组件实例，
+  const setupResult = setup(shallowReadonly(instance.props), setupContext)
+  setCurrentInstance(null) // 执行后释放全局变量
+  let setupState = null
+  if(typeof setupResult === 'function'){ // setup返回了render函数的情况
+    if(render) console.error('setup() should not return a Function when used with render().')
+    render = setupResult
+  } else { // setup返回了状态的情况
+    setupState = setupResult
+  }
+  vnode.component = instance
+  // 创建渲染上下文, 作为组件实例的代理
+  const renderContext = new Proxy(instance, {
+    get(t, k, r){
+      const { props, state, slots } = t
+      if(k === '$slots') return slots // 返回插槽对象，以便在render函数中可以使用this.$slots
+      if(state && k in state) {
+        return state[k]
+      } else if(k in props){
+        return props[k]
+      } else if(setupState && k in setupState){ // 使用上下文读取setup返回的状态暴露出的state
+        return setupState[k]
+      } else console.log('not found')
+    },
+    set(t, k, v, r) {
+      const { props, state } = t
+      if(state && k in state) {
+        state[k] = v
+      } else if(k in props){
+        console.warn('props is readonly')
+      } else if(setupState && k in setupState) {
+        setupState[k] = v
+      } else console.error('not found')
+    }
+  })
+
+  created && created.call(state) // 调用选项式created钩子
+  effect(() => {
+    const subTree = render.call(renderContext, renderContext) // 修改this指向
+    if(!instance.isMounted){
+      beforeMount && beforeMount.call(state) // 调用beforeMount钩子
+      patch(null, subTree, container, anchor)
+      instance.isMounted = true
+      instance.mounted && instance.mounted.forEach(hook => hook.call(renderContext)) // 调用mounted钩子
+    } else {
+      beforeUpdate && beforeUpdate.call(state) // 调用beforeUpdate钩子
+      patch(instance.subTree, subTree, container, anchor)
+      updated && updated.call(state) // 调用updated钩子
+    }
+    instance.subTree = subTree // 组件所渲染的内容，子vnode(子组件)
+  }, {
+    scheduler: queueJob
+  })
+}
+// 实现一个微任务队列与调度器，可通过调度器对重复的任务去重
+const queue = new Set() // 任务队列
+let isFlushing = false // 是否正在刷新锁
+const p = Promise.resolve()
+
+function queueJob(job){ // 添加任务到缓冲队列中，并开始刷新队列
+  queue.add(job)
+  if(!isFlushing){ // 若未开始刷新队列，则开始
+    isFlushing = true // 加锁，避免重复刷新
+    p.then(() => {
+      try {
+        queue.forEach(job => job()) // 执行任务队列
+      } finally { // 重置状态
+        isFlushing = false
+        queue.clear = 0
+      }
+    })
+  }
+}
+
+function resolveProps(options, propsData){
+  const props = {}
+  const attrs = {}
+  for(const key in propsData){
+    // 以字符串on开头的props， 将其添加到props中
+    if(key in options || key.startsWith('on')) props[key] = propsData[key]
+    else attrs[key] = propsData[key]
+  }
+  return [props, attrs]
+}
+
+function patchComponent(n1, n2, anchor) {
+  const instance = (n2.component = n1.component) // 复用组件实例 
+  const { props } = instance // 获取当前props
+  if(hasPropsChange(n1.props, n2.props)) {
+    const [ nextProps ] = resolveProps(n2.type.props, n2.props)
+    for(const k in nextProps){
+      props[k] = nextProps[k]
+    }
+    for(const k in props){
+      if(!(k in nextProps)){
+        delete props[k]
+      }
+    }
+  }
+}
+
+function hasPropsChange(prevProps, nextProps) { // 判定props是否发生变化
+  const nextKeys = Object.keys(nextProps)
+  if(nextKeys.length !== Object.keys(prevProps).length) return true
+  for(let i = 0; i < nextKeys.length; i++){
+    const key = nextKeys[i]
+    if(nextProps[key] !== prevProps[key]) return true
+  }
+}
+
+// 存储当前正在初始化的组件实例
+let currentInstance = null
+function setCurrentInstance(instance) {
+  currentInstance = instance
+}
+
+function onMounted(fn) { // 其他生命周期函数的注册类似
+  if(currentInstance) {
+    currentInstance.mounted.push(fn)
+  } else console.error('onMounted function only allow being called in setup')
+}
+```
+
+### 异步组件与函数式组件
+
 ## 编译器
 
 ## 服务端渲染
