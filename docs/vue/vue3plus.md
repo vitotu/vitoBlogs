@@ -1323,8 +1323,130 @@ function onMounted(fn) { // 其他生命周期函数的注册类似
 
 ### 异步组件与函数式组件
 
-```js
+异步组件以异步的方式加载并渲染一个组件，根据加载器的状态来决定渲染的内容，除需要异步加载的组件外，还支持指定loading、error状态展示的组件
 
+```js
+function defineAsyncComponent(options) {
+  if(typeof options === 'function') { // 将加载器转换为配置项
+    options = {
+      loader: options
+    }
+  }
+
+  const { loader } = options
+
+  let InnerComp = null
+  let retries = 0 // 记录重试次数
+  function load() {
+    return loader().catch(err => {
+      if(options.onError){ // 若指定了错误处理函数，则调用
+        return new Promise((resolve, reject) => {
+          const retry = () => { // 包装重试函数
+            resolve(load())
+            retries++
+          }
+          const fail = () => reject(err) // 包装失败函数
+          options.onError(retry, fail, retries) // 作为参数传递给错误处理函数，让用户在onError回调中决定调用
+        })
+      } else throw err
+    })
+  }
+  return {
+    name: 'AsyncComponentWrapper',
+    setup() {
+      const loaded = ref(false)
+      const error = shallowRef(null)
+      const loading = ref(false) // 是否正在加载
+      let loadingTimer = null
+      if(options.delay) {
+        loadingTimer = setTimeout(() => {
+          loading.value = true
+        }, options.delay)
+      } else loading.value = true
+
+      loader().then(c => {
+        InnerComp = c
+        loaded.value = true
+      }).catch((err) => error.value = err)
+      .finally(() => {
+        loading.value = false
+        clearTimeout(loadingTimer) // 加载完毕后清除延迟定时器
+      })
+      let timer = null
+      if(options.timeout) { // 指定了超时时长则开启个定时器
+        timer = setTimeout(() => {
+          const err = new Error(`Async component timeout after ${options.timeout}ms.`)
+          error.value = err
+        }, options.timeout)
+      }
+      onUnmounted(() => { // 包装组件被卸载时清除定时器
+        clearTimeout(timer)
+      })
+      const placeholder = { type: Text, children: '' } // 占位内容
+
+      return () => { // 如果异步组件加载成功则渲染组件，否则一个占位内容
+        if(loaded.value) { // 异步组件加载成功，则渲染被加载的组件
+          return { type: InnerComp }
+        } else if (error.value && options.errorComponent) { // 超时或其他错误，渲染错误组件，并传递错误详情
+          return { type: options.errorComponent, props: { error: error.value } }
+        } else if (loading.value && options.loadingComponent) {
+          return { type: options.loadingComponent } // 延迟后异步组件正在加载时， 渲染loading组件
+        } else return placeholder
+      }
+    }
+  }
+}
+
+options = { // 示例异步组件配置项
+  loader: () => import('./MyComponent.js'),
+  timeout: 2000,
+  delay: 200, // 指定延迟展示loading组件的时长
+  loadingComponent: MyLoadingComp, // 用于配置loading组件
+  errorComponent: MyErrorComp,
+}
+
+function unmount(vnode) { // unmount函数兼容异步组件的内容卸载
+  if(vnode.type === Fragment) {
+    vnode.children.forEach(c => unmount(c))
+    return
+  } else if(typeof vnode.type === 'object') {
+    // 对于组件的卸载，本质是要卸载组件所渲染的内容，即subTree, 支持loading组件的卸载
+    unmount(vnode.component.subTree)
+    return
+  }
+  const parent = vnode.el.parentNode
+  if(parent) {
+    parent.removeChild(vnode.el)
+  }
+}
+```
+
+函数式组件的本事是普通函数，返回值是虚拟DOM， 在vue3中函数式组件和有状态组件之间的性能差距不大， 使用函数式组件通常是因为其简单性而不是性能  
+挂载函数式组件可以复用mountComponent函数  
+
+```js
+function patch(n1, n2, container, anchor) {
+  if(n1 && n1.type !== n2.type) {
+    unmount(n1)
+    n1 = null
+  }
+  const { type } = n2 // patch函数做出响应的调整
+  if(typeof type === 'object' || typeof type === 'function'){
+    if(!n1) mountComponent(n2, container, anchor)
+    else patchComponent(n1, n2, anchor)
+  }
+}
+
+function mountComponent(vnode, container, anchor) {
+  const isFunctional = typeof vnode.type === 'function'
+  let componentOptions = vnode.type
+  if(isFunctional) { // 若为函数式组件，则将vnode.type作为渲染函数
+    componentOptions = {
+      render: vnode.type,
+      props: vnode.type.props
+    }
+  }
+}
 ```
 
 ## 编译器
