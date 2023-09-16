@@ -1449,6 +1449,12 @@ function mountComponent(vnode, container, anchor) {
 }
 ```
 
+### 内建组件和模块
+
+```js
+
+```
+
 ## 编译器
 
 ## 服务端渲染
