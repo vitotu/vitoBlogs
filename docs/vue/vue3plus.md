@@ -1451,10 +1451,207 @@ function mountComponent(vnode, container, anchor) {
 
 ### 内建组件和模块
 
-```js
+- keepAlive组件的实现原理，keepAlive缓存了插槽内的组件，避免了组件的频繁销毁创建， 取而代之的是出发激活与失活(activate/deactivate)
 
+```js
+const KeepAlive = {
+  __isKeepAlive: true,
+  props: {
+    include: RegExp, // 暂且仅支持正则匹配的形式指定
+    exclude: RegExp,
+  },
+  setup(props, { slots }) {
+    const cache = new Map() // key: vnode.type, value: vnode 缓存组件实例
+    const instance = currentInstance // 通过全局变量获取当前KeepAlive组件的实例
+    // keepAliveCtx属性由渲染器注入， 暴露渲染器内部的部分方法
+    const { move, createElement } = instance.keepAliveCtx
+    const storageContainer = createElement('div')
+    instance._deActivate = (vnode) => {
+      move(vnode, storageContainer) // move将一段DOM移动到另一个容器中
+    }
+    instance._activate = (vnode, container, anchor) => {
+      move(vnode, container, anchor)
+    }
+    return () => {
+      let rawVNode = slots.default() // 默认插槽就是需要KeepAlive的组件
+      if(typeof rawVNode.type !== 'object') return rawVNode // 不是组件，直接渲染
+      const name = rawVNode.type.name // 组件名
+      if(name && (props.include && !props.include.test(name)) || (props.exclude && props.exclude.test(name))) return rawVNode // 不在include中或者在exclude中，直接渲染
+      const cachedVNode = cache.get(rawVNode.type) // 尝试从缓存中获取组件实例
+      if(cachedVNode) { // 缓存存在，则执行激活操作
+        rawVNode.component = cachedVNode.component
+        rawVNode.keptAlive = true
+      } else { // 缓存不存在，则执行缓存操作
+        cache.set(rawVNode.type, rawVNode)
+      }
+      rawVNode.shouldKeepAlive = true // 标记keepAlive, 避免被渲染器卸载
+      rawVNode.keepAliveInstance = instance // 将keepAlive的实例添加到vnode上
+      return rawVNode
+    }
+  }
+}
+// 相关函数修改适配
+function unmount(vnode) {
+  if(vnode.type === Fragment) {
+    vnode.children.forEach(c => unmount(c))
+    return
+  } else if(typeof vnode.type === 'object') {
+    if(vnode.shouldKeepAlive) { // keepAlive组件，不卸载，而执行deActivate
+      vnode.keepAliveInstance._deActivate(vnode)
+    } else {
+      unmount(vnode.component.subTree)
+    }
+    return
+  }
+  const parent = vnode.el.parentNode
+  if(parent) parent.removeChild(vnode.el)
+}
+
+function patch(n1, n2, container, anchor) {
+  // 省略其他代码
+  if(typeof type === 'object' || typeof type === 'function') {
+    if(!n1) {
+      if(n2.keptAlive) n2.keepAliveInstance._activate(n2, container, anchor)
+      else mountComponent(n1, n2, anchor)
+    } else patchComponent(n1, n2, anchor)
+  }
+  // 省略其他代码
+}
+
+function mountComponent(vnode, container, anchor) {
+  // 省略其他代码
+  const instance = {
+    // 省略其他代码
+    keepAliveCtx: null // 只有KeepAlive实例才有keepAlive的上下文
+  }
+  const isKeepAlive = vnode.type.__isKeepAlive // 判断是否是KeepAlive组件
+  if(isKeepAlive) {
+    instance.keepAliveCtx = { // 注入上下文，暴露渲染器的move等方法
+      move(vnode, container, anchor) {
+        insert(vnode.component.subTree.el, container, anchor)
+      },
+      createElement
+    }
+  }
+}
+```
+
+- Teleport组件的实现原理
+
+Teleport组件可以将组件渲染到指定节点上，其实现同样依赖于框架的底层实现与支持
+
+```js
+const Teleport = {
+  __isTeleport: true,
+  process(n1, n2, container, anchor, internals){
+    const { patch, patchChildren, move } = internals
+    if(!n1) { // 挂载
+      const target = typeof n2.props.to === 'string' ? document.querySelector(n2.props.to) : n2.props.to
+      n2.children.forEach(c => patch(null, c, target, anchor))
+    } else { // 更新
+      patchChildren(n1, n2, container)
+      if(n2.props.to !== n1.props.to) { // 位置变更则执行移动操作
+        const newTarget = typeof n2.props.to === 'string' ? document.querySelector(n2.props.to) : n2.props.to
+        n2.children.forEach(c => move(c, newTarget))
+      }
+    }
+  }
+}
+
+function patch(n1, n2, container, anchor) {
+  // 省略其他代码
+  if(typeof type === 'object' || typeof type .__isTeleport) {
+    type.process(n1, n2, container, anchor, {
+      patch,
+      patchChildren,
+      unmount,
+      move(vnode, container, anchor) {
+        insert(vnode.component ? vnode.component.subTree.el : vnode.el, container, anchor)
+      }
+    })
+  }
+  // 省略其他代码
+}
+```
+
+- Transition组件的实现原理
+
+Transition实现过渡效果，通过在适当的时机调用对应的hook，添加或删除对应的类名来实现
+
+```js
+const Transition = { // 简单的transition实现
+  name: 'Transition',
+  setup(props, { slots }) {
+    return () => {
+      const innerVNode = slots.default()
+      innerVNode.transition = { // VNode对象上添加transtion相应的钩子函数
+        beforeEnter(el) {
+          el.classList.add('enter-from') // 设置初始状态
+          el.classList.add('enter-active')
+        },
+        enter(el){
+          nextFrame(() => { // 下一帧切换到结束状态
+            el.classList.remove('enter-from')
+            el.classList.add('enter-to')
+            el.addEventListener('transitionend', () => {
+              el.classList.remove('enter-to')
+              el.classList.remove('enter-leave')
+            })
+          })
+        },
+        leave(el, performRemove){
+          el.classList.add('leave-from') // 设置离场过度的初始状态
+          el.classList.add('leave-active')
+          document.body.offsetHeight // 强制reflow，使初始状态生效
+          nextFrame(() => {
+            el.classList.remove('leave-from')
+            el.classList.add('leave-to')
+            el.addEventListener('transitionend', () => {
+              el.classList.remove('leave-to')
+              el.classList.remove('leave-active')
+              performRemove()
+            })
+          })
+        }
+      }
+      return innerVNode
+    }
+  }
+}
+
+function mountElement(vnode, container, anchor) {
+  // 省略部分代码, after patchProps called
+  const needTransition = vnode.transition
+  if(needTransition) {
+    vnode.transition.beforeEnter(el)
+  }
+  insert(el, container, anchor)
+  if(needTransition) vnode.transition.enter(el)
+}
+
+function unmout(vnode) {
+  // 省略部分代码, VNode卸载时调用过度相关hook
+  const needTransition = vnode.transition
+  // 省略部分代码
+  const parent = vnode.el.parentNode
+  if(parent){
+    const performRemove = () => parent.removeChild(vnode.el) // 封装卸载动作
+    if(needTransition){
+      vnode.transition.leave(vnode.el, performRemove) // 将卸载执行交给leave
+    } else {
+      performRemove()
+    }
+  }
+}
 ```
 
 ## 编译器
+
+### 编译器核心技术概览
+
+- 模板DSL的编译器
+
+编译器是一段程序，将一种语言A(源代码)翻译为另一种语言B(目标代码)， 这个过程称为编译  
+vue模板编译器的目标代码是渲染函数
 
 ## 服务端渲染
