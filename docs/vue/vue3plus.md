@@ -1652,6 +1652,16 @@ function unmout(vnode) {
 - 模板DSL的编译器
 
 编译器是一段程序，将一种语言A(源代码)翻译为另一种语言B(目标代码)， 这个过程称为编译  
-vue模板编译器的目标代码是渲染函数
+vue模板编译器的目标代码是渲染函数, 其对模板进行词法分析和语法分析得到AST， 将模板AST转换为jsAST， 最后根据jsAST生成js代码即渲染函数  
+
+```js
+const templateAST = parse(template) // 解析模板，生成模板AST
+const jsAST = transform(templateAST) // 转换模板AST为js AST
+const code = generate(jsAST) // 根据js AST生成render函数， 字符串形式，存储于code常量中
+```
+
+- parser的实现原理与状态机
+
+利用有限状态自动机的状态迁移过程，分析模板，生成一系列token  
 
 ## 服务端渲染
