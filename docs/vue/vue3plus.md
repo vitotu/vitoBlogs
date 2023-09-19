@@ -1660,8 +1660,9 @@ const jsAST = transform(templateAST) // 转换模板AST为js AST
 const code = generate(jsAST) // 根据js AST生成render函数， 字符串形式，存储于code常量中
 ```
 
-- parser的实现原理与状态机
+利用有限状态自动机的状态迁移过程，分析模板字符串，生成一系列tokens  
+扫描tokens列表，维护一个标签栈，每当扫描到一个开始标签节点，就将其压入栈顶。栈顶的节点始终作为下一个扫描的节点的父节点。这样，当所有 Token 扫描完毕后，即可构建出一棵树型 AST。即为描述模板的AST  
 
-利用有限状态自动机的状态迁移过程，分析模板，生成一系列token  
+
 
 ## 服务端渲染
