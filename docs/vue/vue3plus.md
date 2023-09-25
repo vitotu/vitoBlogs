@@ -1669,4 +1669,6 @@ const code = generate(jsAST) // 根据js AST生成render函数， 字符串形�
 
 ### 解析器
 
+解析器，对模板进行解析，是对上面三步中的第一步的优化
+
 ## 服务端渲染
