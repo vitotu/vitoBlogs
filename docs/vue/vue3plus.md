@@ -1096,7 +1096,7 @@ function patchKeyedChildren(n1, n2, container){
 }
 ```
 
-求解最长递增子序列，元素可不连续，返回对应元素的索引
+求解最长递增子序列，元素可不连续，返回对应元素的索引，也可参看[labuladong算法中的最长递增子序列](https://vitotu.github.io/algorithm/labuladongNote.html#%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97)
 
 ```js
 function list(arr) {
