@@ -1,13 +1,14 @@
 import { defineUserConfig, defaultTheme } from 'vuepress';
 import { searchPlugin } from '@vuepress/plugin-search';
+import envConfig from '../../envConfig.js';
 export default defineUserConfig({
   title: 'Vito\'s blog',
   description: 'vito的个人网站',
   open:true,
   head: [ // 注入到当前页面的 HTML <head> 中的标签
-    ['link', { rel: 'icon', href: '/img/cat.jpg' }], // 增加一个自定义的 favicon(网页标签的图标)
+    ['link', { rel: 'icon', href: envConfig.base + 'img/cat.jpg' }], // 增加一个自定义的 favicon(网页标签的图标)
   ],
-  base: './', // 这是部署到github相关的配置
+  base: envConfig.base, // 这是部署到github相关的配置
   markdown: {
     lineNumbers: false, // 代码块显示行号
     toc: {
