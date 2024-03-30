@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "target='dev' vuepress dev docs",
-    "build-github": "target='github' vuepress build docs",
-    "build-i996": "target='i996' vuepress build docs",
+    "dev": "cross-env target='dev' vuepress dev docs",
+    "build-github": "cross-env target='github' vuepress build docs",
+    "build-i996": "cross-env target='i996' vuepress build docs",
     "deploy-github": "bash deploy.sh"
   },
   "keywords": [],
@@ -15,6 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "@vuepress/plugin-search": "^2.0.0-beta.51",
+    "cross-env": "^7.0.3",
     "vuepress": "^2.0.0-beta.51"
   }
 }
