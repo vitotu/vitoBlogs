@@ -1,6 +1,6 @@
 # guide
 
-恭喜你发现了收藏的学习网站
+## 收藏的学习网站
 
 图解计算机基础系列[小林coding](https://xiaolincoding.com/)  
 leetcode算法刷题[LABULADONG 的算法网站](https://labuladong.github.io/algo/)  
