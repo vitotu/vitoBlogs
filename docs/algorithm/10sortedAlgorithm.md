@@ -7,7 +7,11 @@
 ## 冒泡排序法(bubbleSort)
 
 相邻元素比较大小进行互换
-![bubbleSort.gif](./resource/bubbleSort.gif)
+
+<picture>
+  <source srcset="https://cdnjson.com/images/2024/05/13/bubbleSortb5be109d39f7ca53.gif"/>
+  <img src="./resource/bubbleSort.gif" alt="bubbleSort.gif">
+</picture>
 
 ```python
 def bubbleSort(arr):

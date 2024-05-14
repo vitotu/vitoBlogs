@@ -9,7 +9,12 @@
 若想要从大到小排序，则将较小的放置在右边即可  
 
 + 图解：
-![bubbleSort.gif](./resource/bubbleSort.gif)
+
+<picture>
+  <source srcset="https://cdnjson.com/images/2024/05/13/bubbleSortb5be109d39f7ca53.gif"/>
+  <img src="./resource/bubbleSort.gif" alt="bubbleSort.gif">
+</picture>
+
 + ts实现:
 
 ```ts

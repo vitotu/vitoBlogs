@@ -39,7 +39,10 @@
 
 万宜水库东坝 --> 破边洲 --> 返回东坝 --> 浪茄湾 --> 西湾山 --> 吹筒坳(近西湾亭) --> 西湾沙滩 --> 咸田湾 --> 赤径码头 --> 北潭凹  
 
-![map](./map.jpg)  
+<picture>
+  <source srcset="https://cdnjson.com/images/2024/05/13/map7cc08dc07b9b871e.jpg"/>
+  <img src="./map.jpg" alt="map"/>
+</picture>
 
 - 路径详解
 
@@ -103,16 +106,27 @@ PS: 西贡码头也可坐1A到彩虹地铁站
 的士平台电话（座机）： 27296600 | 27291199，或高德打车  
 
 NR29时刻表:  
-![NR29时刻表](./NR29timeSheet.jpg)
+
+<picture>
+  <source srcset="https://cdnjson.com/images/2024/05/13/NR29timeSheetce54f1f3b82baf0c.jpg"/>
+  <img src="./NR29timeSheet.jpg" alt="NR29时刻表"/>
+</picture>
 
 - 咸田湾快艇：私人快艇（180hkd，末班17:30） --> 西贡码头 --> 299x大巴到沙田地铁站 --> 落马洲地铁站 --> 过关返深
 
 快艇名片：  
-![快艇名片](./privateShipCart.jpg)
+
+<picture>
+  <source srcset="https://cdnjson.com/images/2024/05/13/privateShipCartb16762659db78a90.jpg"/>
+  <img src="./privateShipCart.jpg" alt="快艇名片"/>
+</picture>
 
 - 赤径轮渡：赤径轮渡（30hkd） --> 马料水码头 --> 步行15分钟到大学地铁站 --> 落马洲地铁站 --> 过关返深
 
-![赤径轮渡时刻表](./cuihuaShipTimeSheet.jpg)
+<picture>
+  <source srcset="https://cdnjson.com/images/2024/05/13/cuihuaShipTimeSheete594cb0783baf3ff.jpg"/>
+  <img src="./cuihuaShipTimeSheet.jpg" alt="赤径轮渡时刻表"/>
+</picture>
 
 - 北潭凹
 
