@@ -1,4 +1,4 @@
-# 7.14 深圳天文台一日游攻略
+# 深圳天文台一日游攻略
 
 深圳天文台，中国最美海岸线之一。 海天栈道是其中的精华，栈道后半段不用预约，前半段需要在“深圳天文”微信公众号上预约， 周末和节假日栈道后半段游客巨多，强烈推荐尝试预约天文台。  
 预约后的区别在于可以登顶天文台，参观展厅，向下走完整的栈道，且因为预约门槛，天文台人少，更容易出片。  
@@ -41,8 +41,8 @@ TODO:
 西冲沙滩4号停车场 --> 天文台2号岗亭 --> 天文台(需预约) --> 海天栈道 --> 海边礁石 --> 西冲沙滩
 
 <picture>
-  <source srcset=""/>
-  <img src="./map.jpg" alt="路线图"/>
+  <source srcset="https://cdnjson.com/images/2024/07/10/mainMap.webp"/>
+  <img src="./mainMap.webp" alt="路线图"/>
 </picture>
 
 - 路径详解
@@ -50,16 +50,30 @@ TODO:
 1. 西冲沙滩4号停车场
 
 徒步起点，附近有厕所，可选择盘山公路徒步上山去往2号点(耗时约0.5~1小时)。也可选择摆渡车10块(车程8分钟，但遇人多时需要排队)  
-<string style="color:red;">全程除3号点外无厕所</strong>  
+<strong style="color:red;">全程除3号点外无厕所</strong>  
+
+<picture>
+  <source srcset="https://cdnjson.com/images/2024/07/10/node01.png"/>
+  <img src="./node01.png" alt="节点1"/>
+</picture>
 
 2. 天文台2号岗亭
 
 摆渡车下车点，已预约由此去3号点天文台，未预约从旁边栈道绕行去4号点栈道后半段  
 注意预约截止时间提前半小时停止入场， 需11:30或17:00前抵达
 
+<picture>
+  <source srcset="https://cdnjson.com/images/2024/07/10/node02.jpg"/>
+  <img src="./node02.jpg" alt="路线图"/>
+</picture>
+
 3. 天文台(需预约)
 
 天文台内有厕所， 可参观展厅，天文望远镜，以及栈道前半段，最佳打卡点
+
+<picture>
+  <img src="./astronomicalObservatoryGuide.webp" alt="天文台游览图"/>
+</picture>
 
 4. 海天栈道
 
@@ -83,4 +97,4 @@ TODO:
 
 - 公共交通
 
-TOOD:
+TODO:
