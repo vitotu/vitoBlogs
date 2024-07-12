@@ -64,7 +64,7 @@ TODO:
 
 <picture>
   <source srcset="https://cdnjson.com/images/2024/07/10/node02.jpg"/>
-  <img src="./node02.jpg" alt="路线图"/>
+  <img src="./node02.jpg" alt="节点2"/>
 </picture>
 
 3. 天文台(需预约)
