@@ -79,5 +79,6 @@ export default defineUserConfig({
     searchPlugin({
 
     }),
-  ]
+  ],
+  watch: true,
 });
