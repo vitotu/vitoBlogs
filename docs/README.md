@@ -5,7 +5,7 @@ heroText: Vito 的博客
 tagline: 学而知不足，记录学习，分享交流
 actions:
   - text: 导航
-    link: /guide/
+    link: /guide.md
 # actionText: 快速上手 →
 # actionLink: /zh/guide/
 features:

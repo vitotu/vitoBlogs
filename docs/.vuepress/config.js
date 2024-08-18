@@ -1,6 +1,9 @@
-import { defineUserConfig, defaultTheme } from 'vuepress';
+import { defineUserConfig } from 'vuepress';
 import { searchPlugin } from '@vuepress/plugin-search';
+import { defaultTheme } from '@vuepress/theme-default';
+import { viteBundler } from '@vuepress/bundler-vite'
 import envConfig from '../../envConfig.js';
+
 export default defineUserConfig({
   title: 'Vito\'s blog',
   description: 'vito的个人网站',
@@ -80,5 +83,5 @@ export default defineUserConfig({
 
     }),
   ],
-  watch: true,
+  bundler: viteBundler(),
 });
