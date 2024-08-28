@@ -78,6 +78,12 @@ export default defineUserConfig({
     // nextLinks: true,
     // prevLinks: true
   }),
+  themeConfig: {
+    sidebar: 'auto', // 侧边栏配置
+    sidebarDepth: 2,
+    lastUpdated: 'Last Updated',
+
+  },
   plugins:[
     searchPlugin({
 
