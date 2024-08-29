@@ -72,18 +72,12 @@ export default defineUserConfig({
       ]},
       {text: 'github主页', link: 'https://github.com/vitotu'}      
     ],
-    sidebar: 'auto', // 侧边栏配置
+    sidebar: 'heading', // 侧边栏配置
     sidebarDepth: 2, // 侧边栏显示2级
     lastUpdated: 'Last Updated',
     // nextLinks: true,
     // prevLinks: true
   }),
-  themeConfig: {
-    sidebar: 'auto', // 侧边栏配置
-    sidebarDepth: 2,
-    lastUpdated: 'Last Updated',
-
-  },
   plugins:[
     searchPlugin({
 
