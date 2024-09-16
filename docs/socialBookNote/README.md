@@ -282,7 +282,9 @@
 #### 书籍简介
 
 [只需倾听：与所有人都能沟通的秘密](https://book.douban.com/subject/5350203/)  
-作者: 〔美〕马克•郭士顿（Mark Goulston）
+作者: 〔美〕马克•郭士顿（Mark Goulston）  
+
+本书主要讲述了，倾听
 
 ## 商业畅销书
 
