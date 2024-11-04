@@ -7,3 +7,4 @@
 [香港城门水塘](./HKShingMunReservoir/HKShingMunReservoir.md)  
 [香港鸭脷洲玉桂山](./HKAberdeenIsland/guide.md)  
 [香港南丫岛索罟灣](./HKLammaIsland/guide.md)  
+[香港东龙洲岛](./HKTungLungChau/guide.md)  
