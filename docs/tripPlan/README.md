@@ -8,3 +8,8 @@
 [香港鸭脷洲玉桂山](./HKAberdeenIsland/guide.md)  
 [香港南丫岛索罟灣](./HKLammaIsland/guide.md)  
 [香港东龙洲岛](./HKTungLungChau/guide.md)  
+[香港钓鱼翁](./HKHighJunkPeak/guide.md)  
+[香港昂坪营地](./HKNgongPingCampsite/guide.md)  
+
+------------- coming soon ---------------------
+香港飞鹅山
