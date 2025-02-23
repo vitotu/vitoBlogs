@@ -10,6 +10,7 @@
 [香港东龙洲岛](./HKTungLungChau/guide.md)  
 [香港钓鱼翁](./HKHighJunkPeak/guide.md)  
 [香港昂坪营地](./HKNgongPingCampsite/guide.md)  
+[香港荔枝窝](./HKLaiChiWo/guide.md)  
 
 ------------- coming soon ---------------------
 香港飞鹅山
