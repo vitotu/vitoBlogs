@@ -11,6 +11,7 @@
 [香港钓鱼翁](./HKHighJunkPeak/guide.md)  
 [香港昂坪营地](./HKNgongPingCampsite/guide.md)  
 [香港荔枝窝](./HKLaiChiWo/guide.md)  
+[香港麦理浩径一段](./HKMaclehoseTrail1/guide.md)  
 
 ------------- coming soon ---------------------
 香港飞鹅山
