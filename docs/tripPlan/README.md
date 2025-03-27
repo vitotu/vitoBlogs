@@ -13,3 +13,4 @@
 [香港荔枝窝](./HKLaiChiWo/guide.md)  
 [香港麦理浩径一段](./HKMaclehoseTrail1/guide.md)  
 [香港北果洲](./HKNorthNinepinIsland/guide.md)  
+[香港龙虾湾](./HKLungHaWan/guide.md)  
