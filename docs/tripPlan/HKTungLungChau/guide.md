@@ -80,7 +80,7 @@
 | **东龙岛开出时间** | 上午 8:50、10:00、11:10<br>下午 12:25、2:00、3:10、4:20、5:40                                                       |
 | **船只编号**    | A3273、A3473                                                                                               |
 
-## 徒步路线
+## [徒步路线](https://www.2bulu.com/track/track_detail.htm?trackId=RTdbL8E7lfzp/R2KBg5Tzw==)
 
 ![游览图](./mainMap.jpg)  
 ![路线图](./trailMap.jpg)
