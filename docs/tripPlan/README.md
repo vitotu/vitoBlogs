@@ -15,3 +15,4 @@
 [香港北果洲](./HKNorthNinepinIsland/guide.md)  
 [香港龙虾湾](./HKLungHaWan/guide.md)  
 [香港赤柱](./HKStanley/guide.md)  
+[香港蒲台岛](./HKPoToi/guide.md)  
