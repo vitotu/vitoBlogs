@@ -6,7 +6,7 @@
 [香港龙脊+鹤咀](./HKDragonBack/guide.md)  
 [香港城门水塘](./HKShingMunReservoir/HKShingMunReservoir.md)  
 [香港鸭脷洲玉桂山](./HKAberdeenIsland/guide.md)  
-[香港南丫岛索罟灣](./HKLammaIsland/guide.md)  
+[香港南丫岛寻石路](./HKLammaIsland/guide.md)  
 [香港东龙洲岛](./HKTungLungChau/guide.md)  
 [香港钓鱼翁](./HKHighJunkPeak/guide.md)  
 [香港昂坪营地](./HKNgongPingCampsite/guide.md)  
@@ -16,3 +16,4 @@
 [香港龙虾湾](./HKLungHaWan/guide.md)  
 [香港赤柱](./HKStanley/guide.md)  
 [香港蒲台岛](./HKPoToi/guide.md)  
+[香港长洲岛](./HKCheungChau/guide.md)  
