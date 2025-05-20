@@ -17,3 +17,4 @@
 [香港赤柱](./HKStanley/guide.md)  
 [香港蒲台岛](./HKPoToi/guide.md)  
 [香港长洲岛](./HKCheungChau/guide.md)  
+[香港塔门岛](./HKTapMun/guide.md)  
